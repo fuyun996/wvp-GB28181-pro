@@ -108,9 +108,9 @@ public class Swagger3Config {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("WVP-PRO 接口文档")
-                .description("更多请咨询服务开发者(https://github.com/648540858/wvp-GB28181-pro)。")
-                .contact(new Contact("648540858", "648540858", "648540858@qq.com"))
+                .title("曙光视频云接口文档")
+                .description("曙光云视频云平台，基于wvp开源系统迭代开发。")
+                .contact(new Contact("xuych", "", "xuych@sugon.com"))
                 .version("2.0")
                 .build();
     }
