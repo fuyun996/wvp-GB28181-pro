@@ -21,7 +21,9 @@ public interface DeviceMobilePositionMapper {
     "<if test=\"endTime != null\"> AND time&lt;=#{endTime}</if>" +
     " ORDER BY time ASC" +
     " </script>"})
-    List<MobilePosition> queryPositionByDeviceIdAndTime(String deviceId, String startTime, String endTime);
+    List<MobilePosition> queryPositionByDeviceIdAndTime(@Param("deviceId")String deviceId,
+                                                        @Param("startTime")String startTime,
+                                                        @Param("endTime")String endTime);
 
     @Select("SELECT * FROM device_mobile_position WHERE deviceId = #{deviceId}" +
             " ORDER BY time DESC LIMIT 1")

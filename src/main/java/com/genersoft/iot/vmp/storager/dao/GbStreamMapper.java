@@ -49,7 +49,8 @@ public interface GbStreamMapper {
     int update(GbStream gbStream);
 
     @Delete("DELETE FROM gb_stream WHERE app=#{app} AND stream=#{stream}")
-    int del(String app, String stream);
+    int del(@Param("app")String app,
+            @Param("stream")String stream);
 
     @Select("<script> "+
             "SELECT gs.* FROM gb_stream gs " +
@@ -65,10 +66,15 @@ public interface GbStreamMapper {
             " <if test='mediaServerId != null' > AND gs.mediaServerId=#{mediaServerId} </if>" +
             " order by gs.gbStreamId asc " +
             "</script>")
-    List<GbStream> selectAll(String platformId, String catalogId, String query, Boolean pushing, String mediaServerId);
+    List<GbStream> selectAll(@Param("platformId")String platformId,
+                             @Param("catalogId") String catalogId,
+                             @Param("query") String query,
+                             @Param("pushing")Boolean pushing,
+                             @Param("mediaServerId")String mediaServerId);
 
     @Select("SELECT * FROM gb_stream WHERE app=#{app} AND stream=#{stream}")
-    StreamProxyItem selectOne(String app, String stream);
+    StreamProxyItem selectOne(@Param("app")String app,
+                              @Param("stream")String stream);
 
     @Select("SELECT * FROM gb_stream WHERE gbId=#{gbId}")
     List<GbStream> selectByGBId(String gbId);
@@ -76,7 +82,8 @@ public interface GbStreamMapper {
     @Select("SELECT gs.*, pgs.platformId as platformId, pgs.catalogId as catalogId FROM gb_stream gs " +
             "LEFT JOIN platform_gb_stream pgs ON gs.gbStreamId = pgs.gbStreamId " +
             "WHERE gs.gbId = '${gbId}' AND pgs.platformId = '${platformId}'")
-    GbStream queryStreamInPlatform(String platformId, String gbId);
+    GbStream queryStreamInPlatform(@Param("platformId")String platformId,
+                                   @Param("gbId")String gbId);
 
     @Select("SELECT gs.*, pgs.platformId as platformId, pgs.catalogId as catalogId FROM gb_stream gs " +
             "LEFT JOIN platform_gb_stream pgs ON gs.gbStreamId = pgs.gbStreamId " +
@@ -91,15 +98,19 @@ public interface GbStreamMapper {
     @Update("UPDATE gb_stream " +
             "SET status=${status} " +
             "WHERE app=#{app} AND stream=#{stream}")
-    int setStatus(String app, String stream, boolean status);
+    int setStatus(@Param("app")String app,
+                  @Param("stream")String stream,
+                  @Param("status")boolean status);
 
     @Update("UPDATE gb_stream " +
             "SET status=${status} " +
             "WHERE mediaServerId=#{mediaServerId} ")
-    void updateStatusByMediaServerId(String mediaServerId, boolean status);
+    void updateStatusByMediaServerId(@Param("mediaServerId")String mediaServerId,
+                                     @Param("status")boolean status);
 
     @Delete("DELETE FROM gb_stream WHERE streamType=#{type} AND gbId=NULL AND mediaServerId=#{mediaServerId}")
-    void deleteWithoutGBId(String type, String mediaServerId);
+    void deleteWithoutGBId(@Param("type")String type,
+                           @Param("mediaServerId")String mediaServerId);
 
     @Delete("<script> "+
             "DELETE FROM gb_stream where " +

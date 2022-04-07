@@ -70,22 +70,31 @@ public interface DeviceChannelMapper {
             " <if test='hasSubChannel == false' >  AND dc.subCount = 0 </if>" +
             "GROUP BY dc.channelId " +
             " </script>"})
-    List<DeviceChannel> queryChannels(String deviceId, String parentChannelId, String query, Boolean hasSubChannel, Boolean online);
+    List<DeviceChannel> queryChannels(@Param("deviceId")String deviceId,
+                                      @Param("parentChannelId")String parentChannelId,
+                                      @Param("query")String query,
+                                      @Param("hasSubChannel") Boolean hasSubChannel,
+                                      @Param("online") Boolean online);
 
     @Select("SELECT * FROM device_channel WHERE deviceId=#{deviceId} AND channelId=#{channelId}")
-    DeviceChannel queryChannel(String deviceId, String channelId);
+    DeviceChannel queryChannel(@Param("deviceId")String deviceId,
+                               @Param("channelId")String channelId);
 
     @Delete("DELETE FROM device_channel WHERE deviceId=#{deviceId}")
     int cleanChannelsByDeviceId(String deviceId);
 
     @Delete("DELETE FROM device_channel WHERE deviceId=#{deviceId} AND channelId=#{channelId}")
-    int del(String deviceId, String channelId);
+    int del(@Param("deviceId")String deviceId,
+            @Param("channelId")String channelId);
 
     @Update(value = {"UPDATE device_channel SET streamId=null WHERE deviceId=#{deviceId} AND channelId=#{channelId}"})
-    void stopPlay(String deviceId, String channelId);
+    void stopPlay(@Param("deviceId")String deviceId,
+                  @Param("channelId")String channelId);
 
     @Update(value = {"UPDATE device_channel SET streamId=#{streamId} WHERE deviceId=#{deviceId} AND channelId=#{channelId}"})
-    void startPlay(String deviceId, String channelId, String streamId);
+    void startPlay(@Param("deviceId")String deviceId,
+                   @Param("channelId")String channelId,
+                   @Param("streamId")String streamId);
 
     @Select(value = {" <script>" +
             "SELECT " +
@@ -111,7 +120,11 @@ public interface DeviceChannelMapper {
             " <if test='catalogId != null ' >  AND pgc.platformId = #{platformId} and pgc.catalogId=#{catalogId} </if> " +
             " ORDER BY dc.deviceId, dc.channelId ASC" +
             " </script>"})
-    List<ChannelReduce> queryChannelListInAll(String query, Boolean online, Boolean hasSubChannel, String platformId, String catalogId);
+    List<ChannelReduce> queryChannelListInAll(@Param("query")String query,
+                                              @Param("online")Boolean online,
+                                              @Param("hasSubChannel")Boolean hasSubChannel,
+                                              @Param("platformId")String platformId,
+                                              @Param("catalogId")String catalogId);
 
     @Select(value = {" <script>" +
             "SELECT " +
@@ -130,10 +143,12 @@ public interface DeviceChannelMapper {
     List<DeviceChannel> queryChannelByChannelId( String channelId);
 
     @Update(value = {"UPDATE device_channel SET status=0 WHERE deviceId=#{deviceId} AND channelId=#{channelId}"})
-    void offline(String deviceId,  String channelId);
+    void offline(@Param("deviceId")String deviceId,
+                 @Param("channelId")String channelId);
 
     @Update(value = {"UPDATE device_channel SET status=1 WHERE deviceId=#{deviceId} AND channelId=#{channelId}"})
-    void online(String deviceId,  String channelId);
+    void online(@Param("deviceId")String deviceId,
+                @Param("channelId")String channelId);
 
     @Insert("<script> " +
             "insert into device_channel " +
@@ -230,8 +245,13 @@ public interface DeviceChannelMapper {
             "ORDER BY dc1.channelId ASC " +
             "Limit #{limit} OFFSET #{start}" +
             " </script>"})
-    List<DeviceChannel> queryChannelsByDeviceIdWithStartAndLimit(String deviceId, String parentChannelId, String query,
-                                                                 Boolean hasSubChannel, Boolean online, int start, int limit);
+    List<DeviceChannel> queryChannelsByDeviceIdWithStartAndLimit(@Param("deviceId")String deviceId,
+                                                                 @Param("parentChannelId")String parentChannelId,
+                                                                 @Param("query")String query,
+                                                                 @Param("hasSubChannel")Boolean hasSubChannel,
+                                                                 @Param("online")Boolean online,
+                                                                 @Param("start")int start,
+                                                                 @Param("limit")int limit);
 
     @Select("SELECT * FROM device_channel WHERE deviceId=#{deviceId} AND status=1")
     List<DeviceChannel> queryOnlineChannelsByDeviceId(String deviceId);
@@ -260,7 +280,8 @@ public interface DeviceChannelMapper {
             " AND channelId NOT IN " +
             "<foreach collection='channels'  item='item'  open='(' separator=',' close=')' > #{item.channelId}</foreach>" +
             " </script>"})
-    int cleanChannelsNotInList(String deviceId, List<DeviceChannel> channels);
+    int cleanChannelsNotInList(@Param("deviceId")String deviceId,
+                               @Param("channels")List<DeviceChannel> channels);
 
     @Update(" update device_channel" +
             " set subCount = (select *" +
@@ -269,8 +290,12 @@ public interface DeviceChannelMapper {
             "                      where deviceId = #{deviceId} and parentId = #{channelId}) as temp)" +
             " where deviceId = #{deviceId} " +
             " and channelId = #{channelId}")
-    int updateChannelSubCount(String deviceId, String channelId);
+    int updateChannelSubCount(@Param("deviceId")String deviceId,
+                              @Param("channelId")String channelId);
 
     @Update(value = {"UPDATE device_channel SET latitude=${latitude}, longitude=${longitude} WHERE deviceId=#{deviceId} AND channelId=#{channelId}"})
-    void updatePotion(String deviceId, String channelId, double longitude, double latitude);
+    void updatePotion(@Param("deviceId")String deviceId,
+                      @Param("channelId")String channelId,
+                      @Param("longitude")double longitude,
+                      @Param("latitude")double latitude);
 }

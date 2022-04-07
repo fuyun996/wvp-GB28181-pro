@@ -2,10 +2,7 @@ package com.genersoft.iot.vmp.storager.dao;
 
 import com.genersoft.iot.vmp.gb28181.bean.DeviceAlarm;
 import com.genersoft.iot.vmp.storager.dao.dto.LogDto;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -30,7 +27,10 @@ public interface LogMapper {
             " <if test=\"endTime != null\" >  AND createTime &lt;= '${endTime}' </if>" +
             " ORDER BY createTime DESC " +
             " </script>"})
-    List<LogDto> query(String query, String type, String startTime, String endTime);
+    List<LogDto> query(@Param("query")String query,
+                       @Param("type")String type,
+                       @Param("startTime")String startTime,
+                       @Param("endTime")String endTime);
 
     @Delete("DELETE FROM log")
     int clear();

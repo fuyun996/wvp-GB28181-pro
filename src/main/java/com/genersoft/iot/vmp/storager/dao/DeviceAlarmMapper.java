@@ -31,8 +31,12 @@ public interface DeviceAlarmMapper {
             " <if test=\"endTime != null\" >  AND alarmTime &lt;= '${endTime}' </if>" +
             " ORDER BY alarmTime ASC " +
             " </script>"})
-    List<DeviceAlarm> query(String deviceId, String alarmPriority, String alarmMethod,
-                            String alarmType, String startTime, String endTime);
+    List<DeviceAlarm> query(@Param("deviceId") String deviceId,
+                            @Param("alarmPriority") String alarmPriority,
+                            @Param("alarmMethod") String alarmMethod,
+                            @Param("alarmType")String alarmType,
+                            @Param("alarmType")String startTime,
+                            @Param("endTime")String endTime);
 
 
     @Delete(" <script>" +
@@ -44,5 +48,7 @@ public interface DeviceAlarmMapper {
             " <if test=\"id != null\" > AND id = ${id}</if>" +
             " </script>"
             )
-    int clearAlarmBeforeTime(Integer id, List<String> deviceIdList, String time);
+    int clearAlarmBeforeTime(@Param("id")Integer id,
+                             @Param("deviceIdList")List<String> deviceIdList,
+                             @Param("time")String time);
 }

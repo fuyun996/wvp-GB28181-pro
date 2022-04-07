@@ -76,7 +76,8 @@ public interface ParentPlatformMapper {
     int outlineForAllParentPlatform();
 
     @Update("UPDATE parent_platform SET status=#{online} WHERE serverGBId=#{platformGbID}" )
-    int updateParentPlatformStatus(String platformGbID, boolean online);
+    int updateParentPlatformStatus(@Param("platformGbID")String platformGbID,
+                                   @Param("online")boolean online);
 
     @Select("SELECT * FROM parent_platform WHERE shareAllLiveStream=true")
     List<ParentPlatform> selectAllAhareAllLiveStream();
@@ -86,10 +87,12 @@ public interface ParentPlatformMapper {
             "SET catalogId=#{catalogId}" +
             "WHERE serverGBId=#{platformId}"+
             "</script>"})
-    int setDefaultCatalog(String platformId, String catalogId);
+    int setDefaultCatalog(@Param("platformId")String platformId,
+                          @Param("catalogId")String catalogId);
 
     @Select("select 'channel' as name, count(pgc.platformId) count from platform_gb_channel pgc left join device_channel dc on dc.id = pgc.deviceChannelId where  pgc.platformId=#{platformId} and dc.channelId =#{gbId} " +
             "union " +
             "select 'stream' as name, count(pgs.platformId) count from platform_gb_stream pgs left join gb_stream gs on pgs.gbStreamId = gs.gbStreamId where  pgs.platformId=#{platformId} and gs.gbId = #{gbId}")
-    List<ChannelSourceInfo> getChannelSource(String platformId, String gbId);
+    List<ChannelSourceInfo> getChannelSource(@Param("platformId")String platformId,
+                                             @Param("gbId")String gbId);
 }

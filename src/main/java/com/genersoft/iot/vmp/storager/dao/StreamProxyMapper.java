@@ -38,7 +38,8 @@ public interface StreamProxyMapper {
     int update(StreamProxyItem streamProxyDto);
 
     @Delete("DELETE FROM stream_proxy WHERE app=#{app} AND stream=#{stream}")
-    int del(String app, String stream);
+    int del(@Param("app")String app,
+            @Param("stream") String stream);
 
     @Select("SELECT st.*, pgs.gbId, pgs.name, pgs.longitude, pgs.latitude FROM stream_proxy st LEFT JOIN gb_stream pgs on st.app = pgs.app AND st.stream = pgs.stream order by st.createTime desc")
     List<StreamProxyItem> selectAll();
@@ -47,12 +48,14 @@ public interface StreamProxyMapper {
     List<StreamProxyItem> selectForEnable(boolean enable);
 
     @Select("SELECT st.*, pgs.gbId, pgs.name, pgs.longitude, pgs.latitude FROM stream_proxy st LEFT JOIN gb_stream pgs on st.app = pgs.app AND st.stream = pgs.stream WHERE st.app=#{app} AND st.stream=#{stream} order by st.createTime desc")
-    StreamProxyItem selectOne(String app, String stream);
+    StreamProxyItem selectOne(@Param("app")String app,
+                              @Param("stream")String stream);
 
     @Select("SELECT st.*, pgs.gbId, pgs.name, pgs.longitude, pgs.latitude FROM stream_proxy st " +
             "LEFT JOIN gb_stream pgs on st.app = pgs.app AND st.stream = pgs.stream " +
             "WHERE st.enable=${enable} and st.mediaServerId = #{id} order by st.createTime desc")
-    List<StreamProxyItem> selectForEnableInMediaServer(String id, boolean enable);
+    List<StreamProxyItem> selectForEnableInMediaServer(@Param("id")String id,
+                                                       @Param("enable") boolean enable);
 
     @Select("SELECT st.*, pgs.gbId, pgs.name, pgs.longitude, pgs.latitude FROM stream_proxy st " +
             "LEFT JOIN gb_stream pgs on st.app = pgs.app AND st.stream = pgs.stream " +
@@ -62,12 +65,15 @@ public interface StreamProxyMapper {
     @Update("UPDATE stream_proxy " +
             "SET status=#{status} " +
             "WHERE mediaServerId=#{mediaServerId}")
-    void updateStatusByMediaServerId(boolean status, String mediaServerId);
+    void updateStatusByMediaServerId(@Param("status")boolean status,
+                                     @Param("mediaServerId")String mediaServerId);
 
     @Update("UPDATE stream_proxy " +
             "SET status=${status} " +
             "WHERE app=#{app} AND stream=#{stream}")
-    int updateStatus(boolean status, String app, String stream);
+    int updateStatus(@Param("status")boolean status,
+                     @Param("app")String app,
+                     @Param("stream")String stream);
 
     @Delete("DELETE FROM stream_proxy WHERE enable_remove_none_reader=true AND mediaServerId=#{mediaServerId}")
     void deleteAutoRemoveItemByMediaServerId(String mediaServerId);

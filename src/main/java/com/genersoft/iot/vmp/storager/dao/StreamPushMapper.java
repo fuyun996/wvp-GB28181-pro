@@ -32,7 +32,8 @@ public interface StreamPushMapper {
     int update(StreamPushItem streamPushItem);
 
     @Delete("DELETE FROM stream_push WHERE app=#{app} AND stream=#{stream}")
-    int del(String app, String stream);
+    int del(@Param("app")String app,
+            @Param("stream")String stream);
 
     @Delete("<script> "+
             "DELETE sp FROM stream_push sp left join gb_stream gs on sp.app = gs.app AND sp.stream = gs.stream where " +
@@ -75,13 +76,16 @@ public interface StreamPushMapper {
             " <if test='mediaServerId != null' > AND st.mediaServerId=#{mediaServerId} </if>" +
             "order by st.createStamp desc" +
             " </script>"})
-    List<StreamPushItem> selectAllForList(String query, Boolean pushing, String mediaServerId);
+    List<StreamPushItem> selectAllForList(@Param("query")String query,
+                                          @Param("pushing") Boolean pushing,
+                                          @Param("mediaServerId") String mediaServerId);
 
     @Select("SELECT st.*, gs.gbId, gs.status, gs.name, gs.longitude, gs.latitude FROM stream_push st LEFT JOIN gb_stream gs on st.app = gs.app AND st.stream = gs.stream order by st.createStamp desc")
     List<StreamPushItem> selectAll();
 
     @Select("SELECT st.*, gs.gbId, gs.status, gs.name, gs.longitude, gs.latitude FROM stream_push st LEFT JOIN gb_stream gs on st.app = gs.app AND st.stream = gs.stream WHERE st.app=#{app} AND st.stream=#{stream}")
-    StreamPushItem selectOne(String app, String stream);
+    StreamPushItem selectOne(@Param("app")String app,
+                             @Param("stream")String stream);
 
     @Insert("<script>"  +
             "Insert IGNORE INTO stream_push (app, stream, totalReaderCount, originType, originTypeStr, " +

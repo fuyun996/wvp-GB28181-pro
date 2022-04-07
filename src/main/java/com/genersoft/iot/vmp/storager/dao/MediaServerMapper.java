@@ -123,13 +123,15 @@ public interface MediaServerMapper {
     void delOne(String id);
 
     @Select("DELETE FROM media_server WHERE ip='${host}' and httpPort=${port}")
-    void delOneByIPAndPort(String host, int port);
+    void delOneByIPAndPort(@Param("host")String host,
+                           @Param("port")int port);
 
     @Delete("DELETE FROM media_server WHERE defaultServer=1")
     int delDefault();
 
     @Select("SELECT * FROM media_server WHERE ip='${host}' and httpPort=${port}")
-    MediaServerItem queryOneByHostAndPort(String host, int port);
+    MediaServerItem queryOneByHostAndPort(@Param("host")String host,
+                                          @Param("port")int port);
 
     @Select("SELECT * FROM media_server WHERE defaultServer=1")
     MediaServerItem queryDefault();
