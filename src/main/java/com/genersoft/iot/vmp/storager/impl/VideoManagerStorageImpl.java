@@ -277,6 +277,8 @@ public class VideoManagerStorageImpl implements IVideoManagerStorage {
 			logger.debug("[目录查询]收到的数据存在重复： {}" , stringBuilder);
 		}
 		try {
+			///////////////不知道这一段代码在忙啥
+			/*
 			int cleanChannelsResult = deviceChannelMapper.cleanChannelsNotInList(deviceId, channels);
 			int limitCount = 300;
 			boolean result = cleanChannelsResult < 0;
@@ -293,10 +295,18 @@ public class VideoManagerStorageImpl implements IVideoManagerStorage {
 					result = result || deviceChannelMapper.batchAdd(channels) < 0;
 				}
 			}
+
 			if (result) {
 				//事务回滚
 				dataSourceTransactionManager.rollback(transactionStatus);
 			}
+			*/
+			//////////////////////////////
+			//////////////////////////////
+			deviceChannelMapper.cleanChannelsByDeviceId(deviceId);
+			deviceChannelMapper.batchAdd(channels);
+			///////////////////////////////
+
 			dataSourceTransactionManager.commit(transactionStatus);     //手动提交
 			return true;
 		}catch (Exception e) {
