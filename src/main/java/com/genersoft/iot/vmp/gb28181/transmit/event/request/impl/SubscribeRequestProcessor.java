@@ -7,7 +7,7 @@ import com.genersoft.iot.vmp.gb28181.bean.CmdType;
 import com.genersoft.iot.vmp.gb28181.bean.ParentPlatform;
 import com.genersoft.iot.vmp.gb28181.bean.SubscribeHolder;
 import com.genersoft.iot.vmp.gb28181.bean.SubscribeInfo;
-import com.genersoft.iot.vmp.gb28181.task.GPSSubscribeTask;
+import com.genersoft.iot.vmp.gb28181.task.impl.MobilePositionSubscribeHandlerTask;
 import com.genersoft.iot.vmp.gb28181.transmit.SIPProcessorObserver;
 import com.genersoft.iot.vmp.gb28181.transmit.cmd.ISIPCommanderForPlatform;
 import com.genersoft.iot.vmp.gb28181.transmit.event.request.ISIPRequestProcessor;
@@ -137,6 +137,9 @@ public class SubscribeRequestProcessor extends SIPRequestProcessorParent impleme
 		String deviceID = XmlUtil.getText(rootElement, "DeviceID");
 		ParentPlatform platform = storager.queryParentPlatByServerGBId(platformId);
 		SubscribeInfo subscribeInfo = new SubscribeInfo(evt, platformId);
+		if (platform == null) {
+			return;
+		}
 		if (evt.getServerTransaction() == null) {
 			ServerTransaction serverTransaction = platform.getTransport().equals("TCP") ? tcpSipProvider.getNewServerTransaction(evt.getRequest())
 					: udpSipProvider.getNewServerTransaction(evt.getRequest());
@@ -147,7 +150,7 @@ public class SubscribeRequestProcessor extends SIPRequestProcessorParent impleme
 		}
 		String sn = XmlUtil.getText(rootElement, "SN");
 		String key = VideoManagerConstants.SIP_SUBSCRIBE_PREFIX + userSetting.getServerId() +  "_MobilePosition_" + platformId;
-		logger.info("接收到{}的MobilePosition订阅", platformId);
+		logger.info("[回复 移动位置订阅]: {}", platformId);
 		StringBuilder resultXml = new StringBuilder(200);
 		resultXml.append("<?xml version=\"1.0\" ?>\r\n")
 				.append("<Response>\r\n")
@@ -158,12 +161,21 @@ public class SubscribeRequestProcessor extends SIPRequestProcessorParent impleme
 				.append("</Response>\r\n");
 
 		if (subscribeInfo.getExpires() > 0) {
-			if (subscribeHolder.getMobilePositionSubscribe(platformId) != null) {
-				dynamicTask.stop(key);
+
+			if (subscribeHolder.getMobilePositionSubscribe(platformId) == null ) {
+				String interval = XmlUtil.getText(rootElement, "Interval"); // GPS上报时间间隔
+				subscribeHolder.putMobilePositionSubscribe(platformId, subscribeInfo);
+				dynamicTask.startCron(key, new MobilePositionSubscribeHandlerTask(redisCatchStorage, sipCommanderForPlatform, storager,  platformId, sn, key, subscribeHolder), Integer.parseInt(interval));
+			}else {
+				if (subscribeHolder.getMobilePositionSubscribe(platformId).getDialog() != null
+						&& subscribeHolder.getMobilePositionSubscribe(platformId).getDialog().getState() != null
+						&& !subscribeHolder.getMobilePositionSubscribe(platformId).getDialog().getState().equals(DialogState.CONFIRMED)) {
+					dynamicTask.stop(key);
+					String interval = XmlUtil.getText(rootElement, "Interval"); // GPS上报时间间隔
+					subscribeHolder.putMobilePositionSubscribe(platformId, subscribeInfo);
+					dynamicTask.startCron(key, new MobilePositionSubscribeHandlerTask(redisCatchStorage, sipCommanderForPlatform, storager,  platformId, sn, key, subscribeHolder), Integer.parseInt(interval));
+				}
 			}
-			String interval = XmlUtil.getText(rootElement, "Interval"); // GPS上报时间间隔
-			dynamicTask.startCron(key, new GPSSubscribeTask(redisCatchStorage, sipCommanderForPlatform, storager,  platformId, sn, key, subscribeHolder), Integer.parseInt(interval));
-			subscribeHolder.putMobilePositionSubscribe(platformId, subscribeInfo);
 		}else if (subscribeInfo.getExpires() == 0) {
 			dynamicTask.stop(key);
 			subscribeHolder.removeMobilePositionSubscribe(platformId);
@@ -200,7 +212,7 @@ public class SubscribeRequestProcessor extends SIPRequestProcessorParent impleme
 		}
 		String sn = XmlUtil.getText(rootElement, "SN");
 		String key = VideoManagerConstants.SIP_SUBSCRIBE_PREFIX + userSetting.getServerId() +  "_Catalog_" + platformId;
-		logger.info("接收到{}的Catalog订阅", platformId);
+		logger.info("[回复 目录订阅]: {}/{}", platformId, deviceID);
 		StringBuilder resultXml = new StringBuilder(200);
 		resultXml.append("<?xml version=\"1.0\" ?>\r\n")
 				.append("<Response>\r\n")
