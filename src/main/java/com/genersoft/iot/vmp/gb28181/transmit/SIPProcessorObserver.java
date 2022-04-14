@@ -72,6 +72,7 @@ public class SIPProcessorObserver implements ISIPProcessorObserver {
     @Override
     @Async
     public void processRequest(RequestEvent requestEvent) {
+        //这个方法统一接收sip消息
         logger.debug("\n收到请求：\n{}", requestEvent.getRequest());
         String method = requestEvent.getRequest().getMethod();
         ISIPRequestProcessor sipRequestProcessor = requestProcessorMap.get(method);

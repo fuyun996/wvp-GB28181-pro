@@ -280,8 +280,8 @@ public interface DeviceChannelMapper {
             " AND channelId NOT IN " +
             "<foreach collection='channels'  item='item'  open='(' separator=',' close=')' > #{item.channelId}</foreach>" +
             " </script>"})
-    int cleanChannelsNotInList(@Param("deviceId")String deviceId,
-                               @Param("channels")List<DeviceChannel> channels);
+    int cleanChannelsNotInList(String deviceId,
+                               List<DeviceChannel> channels);
 
     @Update(" update device_channel" +
             " set subCount = (select *" +
