@@ -274,7 +274,7 @@ public class VideoManagerStorageImpl implements IVideoManagerStorage {
 			channels = deviceChannelList;
 		}
 		if (stringBuilder.length() > 0) {
-			logger.debug("[目录查询]收到的数据存在重复： {}" , stringBuilder);
+			logger.info("[目录查询]收到的数据存在重复： {}" , stringBuilder);
 		}
 		try {
 			///////////////不知道这一段代码在忙啥
@@ -455,8 +455,6 @@ public class VideoManagerStorageImpl implements IVideoManagerStorage {
 		device.setOnline(1);
 		logger.info("更新设备在线: " + deviceId);
 		redisCatchStorage.updateDevice(device);
-		List<DeviceChannel> deviceChannelList = deviceChannelMapper.queryOnlineChannelsByDeviceId(deviceId);
-		eventPublisher.catalogEventPublish(null, deviceChannelList, CatalogEvent.ON);
 		return deviceMapper.update(device) > 0;
 	}
 
