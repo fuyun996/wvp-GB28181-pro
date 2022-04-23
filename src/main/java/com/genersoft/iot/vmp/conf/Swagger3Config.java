@@ -108,8 +108,8 @@ public class Swagger3Config {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("曙光视频云接口文档")
-                .description("曙光云视频云平台，基于wvp开源系统迭代开发。")
+                .title("璧山应急视频云接口文档")
+                .description("璧山应急视频云，基于wvp开源系统迭代开发。")
                 .contact(new Contact("xuych", "", "xuych@sugon.com"))
                 .version("2.0")
                 .build();

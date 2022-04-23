@@ -30,7 +30,7 @@ public class MediaConfig{
     @Value("${media.sdp-ip:${media.ip}}")
     private String sdpIp;
 
-    @Value("${media.stream-ip:${media.ip}}")
+    @Value("${media.stream-ip:${media.streamip}}")
     private String streamIp;
 
     @Value("${media.http-port}")
