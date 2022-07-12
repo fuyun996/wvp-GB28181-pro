@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.sip.DialogState;
+
 /**
  * 设备业务（目录订阅）
  */
@@ -39,19 +41,13 @@ public class DeviceServiceImpl implements IDeviceService {
         if (device == null || device.getSubscribeCycleForCatalog() < 0) {
             return false;
         }
-        if (dynamicTask.contains(device.getDeviceId() + "catalog")) {
-            // 存在则停止现有的，开启新的
-            dynamicTask.stop(device.getDeviceId() + "catalog");
-        }
         logger.info("[添加目录订阅] 设备{}", device.getDeviceId());
         // 添加目录订阅
         CatalogSubscribeTask catalogSubscribeTask = new CatalogSubscribeTask(device, sipCommander);
-        catalogSubscribeTask.run();
         // 提前开始刷新订阅
-        int subscribeCycleForCatalog = device.getSubscribeCycleForCatalog();
+        int subscribeCycleForCatalog = Math.max(device.getSubscribeCycleForCatalog(),30);
         // 设置最小值为30
-        subscribeCycleForCatalog = Math.max(subscribeCycleForCatalog, 30);
-        dynamicTask.startCron(device.getDeviceId() + "catalog", catalogSubscribeTask, subscribeCycleForCatalog);
+        dynamicTask.startCron(device.getDeviceId() + "catalog", catalogSubscribeTask, subscribeCycleForCatalog -1);
         return true;
     }
 
@@ -70,18 +66,12 @@ public class DeviceServiceImpl implements IDeviceService {
         if (device == null || device.getSubscribeCycleForMobilePosition() < 0) {
             return false;
         }
-        if (dynamicTask.contains(device.getDeviceId() + "mobile_position")) {
-            // 存在则停止现有的，开启新的
-            dynamicTask.stop(device.getDeviceId() + "mobile_position");
-        }
         logger.info("[添加移动位置订阅] 设备{}", device.getDeviceId());
         // 添加目录订阅
         MobilePositionSubscribeTask mobilePositionSubscribeTask = new MobilePositionSubscribeTask(device, sipCommander);
-        mobilePositionSubscribeTask.run();
         // 提前开始刷新订阅
-        int subscribeCycleForCatalog = device.getSubscribeCycleForCatalog();
         // 设置最小值为30
-        subscribeCycleForCatalog = Math.max(subscribeCycleForCatalog, 30);
+        int subscribeCycleForCatalog = Math.max(device.getSubscribeCycleForMobilePosition(),30);
         dynamicTask.startCron(device.getDeviceId() + "mobile_position" , mobilePositionSubscribeTask, subscribeCycleForCatalog -1 );
         return true;
     }
@@ -102,12 +92,21 @@ public class DeviceServiceImpl implements IDeviceService {
     }
 
     @Override
-    public void setChannelSyncReady(String deviceId) {
-        catalogResponseMessageHandler.setChannelSyncReady(deviceId);
+    public Boolean isSyncRunning(String deviceId) {
+        return catalogResponseMessageHandler.isSyncRunning(deviceId);
     }
 
     @Override
-    public void setChannelSyncEnd(String deviceId, String errorMsg) {
-        catalogResponseMessageHandler.setChannelSyncEnd(deviceId, errorMsg);
+    public void sync(Device device) {
+        if (catalogResponseMessageHandler.isSyncRunning(device.getDeviceId())) {
+            logger.info("开启同步时发现同步已经存在");
+            return;
+        }
+        int sn = (int)((Math.random()*9+1)*100000);
+        catalogResponseMessageHandler.setChannelSyncReady(device, sn);
+        sipCommander.catalogQuery(device, sn, event -> {
+            String errorMsg = String.format("同步通道失败，错误码： %s, %s", event.statusCode, event.msg);
+            catalogResponseMessageHandler.setChannelSyncEnd(device.getDeviceId(), errorMsg);
+        });
     }
 }

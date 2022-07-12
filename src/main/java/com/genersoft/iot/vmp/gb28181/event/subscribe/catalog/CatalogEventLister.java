@@ -61,12 +61,10 @@ public class CatalogEventLister implements ApplicationListener<CatalogEvent> {
         if (event.getPlatformId() != null) {
             parentPlatform = storager.queryParentPlatByServerGBId(event.getPlatformId());
             if (parentPlatform != null && !parentPlatform.isStatus())return;
-            String key = VideoManagerConstants.SIP_SUBSCRIBE_PREFIX + userSetting.getServerId() +  "_Catalog_" + event.getPlatformId();
-//            subscribe = redisCatchStorage.getSubscribe(key);
             subscribe = subscribeHolder.getCatalogSubscribe(event.getPlatformId());
 
             if (subscribe == null) {
-                logger.debug("发送订阅消息时发现订阅信息已经不存在");
+                logger.info("发送订阅消息时发现订阅信息已经不存在");
                 return;
             }
         }else {
