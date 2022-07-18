@@ -91,8 +91,17 @@ public interface DeviceMapper {
             " </script>"})
     int update(Device device);
 
-    @Select("SELECT *, (SELECT count(0) FROM device_channel WHERE deviceId=de.deviceId) as channelCount  FROM device de")
-    List<Device> getDevices();
+    @Select({"<script>",
+            "SELECT *, " +
+            "(SELECT count(0) FROM device_channel WHERE deviceId=de.deviceId) " +
+            "as channelCount  FROM device de " +
+            "<if  test=\"keyword !=null and  keyword !=''  \">" +
+                "where deviceId like '%${keyword}%'  or name like  '%${keyword}%' " +
+            "</if>",
+            "</script>"}
+    )
+    List<Device> getDevices(String keyword);
+
 
     @Delete("DELETE FROM device WHERE deviceId=#{deviceId}")
     int del(String deviceId);

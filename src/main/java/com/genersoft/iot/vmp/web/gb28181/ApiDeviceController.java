@@ -59,7 +59,7 @@ public class ApiDeviceController {
             devices = storager.queryVideoDeviceList();
             result.put("DeviceCount", devices.size());
         }else {
-            PageInfo<Device> deviceList = storager.queryVideoDeviceList(start/limit, limit);
+            PageInfo<Device> deviceList = storager.queryVideoDeviceList(start/limit, limit,null);
             result.put("DeviceCount", deviceList.getTotal());
             devices = deviceList.getList();
         }

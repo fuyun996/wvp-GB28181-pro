@@ -2,10 +2,17 @@
   <div id="app" style="width: 100%">
     <div class="page-header">
       <div class="page-title">设备列表</div>
+      <div>
+        <el-input @input="search" style="margin-right: 1rem; width: auto;" size="mini" placeholder="关键字"
+                  prefix-icon="el-icon-search" v-model="searchKeyword" clearable></el-input>
+        <el-button type="primary" size="mini" @click="getDeviceList()">搜索</el-button>
+      </div>
+
       <div class="page-header-btn">
         <el-button icon="el-icon-refresh-right" circle size="mini" :loading="getDeviceListLoading"
                    @click="getDeviceList()"></el-button>
       </div>
+
     </div>
     <!-- <devicePlayer ref="devicePlayer"></devicePlayer> -->
     <!--设备列表-->
@@ -44,7 +51,7 @@
       </el-table-column>
       <el-table-column prop="keepaliveTime" label="最近心跳" align="center" width="140">
       </el-table-column>
-      <el-table-column prop="registerTime" label="最近注册" align="center" width="140">
+      <el-table-column prop="registerTime" label="最近注册" align="center" width="140" sortable>
       </el-table-column>
       <el-table-column prop="updateTime" label="更新时间" align="center" width="140">
       </el-table-column>
@@ -60,10 +67,11 @@
             <el-button size="mini" icon="el-icon-video-camera-solid" v-bind:disabled="scope.row.online==0"
                        type="primary" @click="showChannelList(scope.row)">通道
             </el-button>
-            <el-button size="mini" icon="el-icon-location" v-bind:disabled="scope.row.online==0" type="primary"
-                       @click="showDevicePosition(scope.row)">定位
-            </el-button>
-            <el-button size="mini" icon="el-icon-edit" type="primary" @click="edit(scope.row)">编辑</el-button>
+            <!--<el-button size="mini" icon="el-icon-location" v-bind:disabled="scope.row.online==0" type="primary"-->
+                       <!--@click="showDevicePosition(scope.row)">定位-->
+            <!--</el-button>-->
+            <el-button size="mini" icon="el-icon-view" type="primary" @click="detail(scope.row)">查看</el-button>
+            <!--<el-button size="mini" icon="el-icon-edit" type="primary" @click="edit(scope.row)">编辑</el-button>-->
             <el-button size="mini" icon="el-icon-delete" type="danger" @click="deleteDevice(scope.row)">删除</el-button>
           </el-button-group>
         </template>
@@ -80,6 +88,7 @@
       :total="total">
     </el-pagination>
     <deviceEdit ref="deviceEdit"></deviceEdit>
+    <deviceDetail ref="deviceDetail"></deviceDetail>
     <syncChannelProgress ref="syncChannelProgress"></syncChannelProgress>
   </div>
 </template>
@@ -87,6 +96,7 @@
 <script>
 import uiHeader from '../layout/UiHeader.vue'
 import deviceEdit from './dialog/deviceEdit.vue'
+import deviceDetail from './dialog/deviceDetail.vue'
 import syncChannelProgress from './dialog/SyncChannelProgress.vue'
 
 export default {
@@ -94,6 +104,7 @@ export default {
   components: {
     uiHeader,
     deviceEdit,
+    deviceDetail,
     syncChannelProgress,
   },
   data() {
@@ -109,6 +120,7 @@ export default {
       count: 15,
       total: 0,
       getDeviceListLoading: false,
+      searchKeyword:""
     };
   },
   computed: {
@@ -152,7 +164,8 @@ export default {
         url: `/api/device/query/devices`,
         params: {
           page: that.currentPage,
-          count: that.count
+          count: that.count,
+          keyword:that.searchKeyword
         }
       }).then(function (res) {
         that.total = res.data.total;
@@ -289,6 +302,18 @@ export default {
         setTimeout(this.getDeviceList, 200)
 
       })
+    },
+    detail: function (row) {
+      this.$refs.deviceDetail.openDialog(row, () => {
+        this.$refs.deviceEdit.close();
+      this.$message({
+        showClose: true,
+        message: "..........",
+        type: "success",
+      });
+      setTimeout(this.getDeviceList, 200)
+
+    })
     }
 
   }

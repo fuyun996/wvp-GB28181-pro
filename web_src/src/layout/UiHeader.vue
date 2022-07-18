@@ -1,31 +1,48 @@
 <template>
   <div id="UiHeader">
-    <el-menu router :default-active="activeIndex" menu-trigger="click" background-color="#545c64" text-color="#fff"
-             active-text-color="#ffd04b" mode="horizontal">
-      <el-menu-item index="/control">控制台</el-menu-item>
-      <el-menu-item index="/live">实时监控</el-menu-item>
-      <el-menu-item index="/deviceList">国标设备</el-menu-item>
-      <el-menu-item index="/map">电子地图</el-menu-item>
-      <el-menu-item index="/pushVideoList">推流列表</el-menu-item>
-      <el-menu-item index="/streamProxyList">拉流代理</el-menu-item>
-      <el-menu-item index="/cloudRecord">云端录像</el-menu-item>
-      <el-menu-item index="/mediaServerManger">节点管理</el-menu-item>
-      <el-menu-item index="/parentPlatformList/15/1">国标级联</el-menu-item>
-      <el-menu-item @click="openDoc">在线文档</el-menu-item>
-      <!--            <el-submenu index="/setting">-->
-      <!--              <template slot="title">系统设置</template>-->
-      <!--              <el-menu-item index="/setting/web">WEB服务</el-menu-item>-->
-      <!--              <el-menu-item index="/setting/sip">国标服务</el-menu-item>-->
-      <!--              <el-menu-item index="/setting/media">媒体服务</el-menu-item>-->
-      <!--            </el-submenu>-->
-      <el-switch v-model="alarmNotify" active-text="报警信息推送" @change="alarmNotifyChannge"></el-switch>
-      <!--            <el-menu-item style="float: right;" @click="loginout">退出</el-menu-item>-->
-      <el-submenu index="" style="float: right;">
-        <template slot="title">欢迎，{{ this.$cookies.get("session").username }}</template>
-        <el-menu-item @click="changePassword">修改密码</el-menu-item>
-        <el-menu-item @click="loginout">注销</el-menu-item>
-      </el-submenu>
-    </el-menu>
+
+    <el-row :gutter="10">
+
+      <el-col :span="2"  >
+        <el-image :fit="scale-down" :src="require('@static/images/sugonlogo.png')"  style="width: 120px; height: 60px"></el-image>
+      </el-col>
+
+      <el-col :span="22">
+
+
+        <el-menu router :default-active="activeIndex" menu-trigger="click" background-color="#545c64" text-color="#fff"
+                 active-text-color="#ffd04b" mode="horizontal"  >
+          <el-menu-item index="/live">实时监控</el-menu-item>
+          <el-menu-item index="/deviceList">国标设备</el-menu-item>
+
+          <el-menu-item index="/control">控制台</el-menu-item>
+          <el-menu-item index="/map">电子地图</el-menu-item>
+
+          <el-menu-item index="/pushVideoList">推流列表</el-menu-item>
+          <el-menu-item index="/streamProxyList">拉流代理</el-menu-item>
+          <el-menu-item index="/cloudRecord">云端录像</el-menu-item>
+          <el-menu-item index="/mediaServerManger">节点管理</el-menu-item>
+          <el-menu-item index="/parentPlatformList/15/1">国标级联</el-menu-item>
+          <el-menu-item @click="openDoc">在线文档</el-menu-item>
+                      <!--<el-submenu index="/setting">-->
+                        <!--<template slot="title">系统设置</template>-->
+                        <!--<el-menu-item index="/setting/web">WEB服务</el-menu-item>-->
+                        <!--<el-menu-item index="/setting/sip">国标服务</el-menu-item>-->
+                        <!--<el-menu-item index="/setting/media">媒体服务</el-menu-item>-->
+                      <!--</el-submenu>-->
+          <el-switch v-model="alarmNotify" active-text="报警信息推送" @change="alarmNotifyChannge"></el-switch>
+          <!--            <el-menu-item style="float: right;" @click="loginout">退出</el-menu-item>-->
+          <el-submenu index="" style="float: right;">
+            <template slot="title">欢迎，{{ this.$cookies.get("session").username }}</template>
+            <el-menu-item @click="changePassword">修改密码</el-menu-item>
+            <el-menu-item @click="loginout">注销</el-menu-item>
+          </el-submenu>
+        </el-menu>
+
+      </el-col>
+    </el-row>
+
+
     <changePasswordDialog ref="changePasswordDialog"></changePasswordDialog>
   </div>
 </template>

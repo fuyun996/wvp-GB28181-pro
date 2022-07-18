@@ -97,15 +97,16 @@ public class DeviceQuery {
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "page", value = "当前页", required = true, dataTypeClass = Integer.class),
 			@ApiImplicitParam(name = "count", value = "每页查询数量", required = true, dataTypeClass = Integer.class),
+			@ApiImplicitParam(name = "keyword", value = "关键词", required = false, dataTypeClass = String.class)
 	})
 	@GetMapping("/devices")
-	public PageInfo<Device> devices(int page, int count){
+	public PageInfo<Device> devices(int page, int count, String keyword){
 		
 //		if (logger.isDebugEnabled()) {
 //			logger.debug("查询所有视频设备API调用");
 //		}
-		
-		return storager.queryVideoDeviceList(page, count);
+
+		return storager.queryVideoDeviceList(page, count,keyword);
 	}
 
 	/**

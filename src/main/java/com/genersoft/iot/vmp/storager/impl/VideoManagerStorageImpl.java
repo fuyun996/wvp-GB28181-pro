@@ -391,12 +391,13 @@ public class VideoManagerStorageImpl implements IVideoManagerStorage {
 	 *
 	 * @param page 当前页数
 	 * @param count 每页数量
+     * @param keyword 关键词
 	 * @return PageInfo<Device> 分页设备对象数组
 	 */
 	@Override
-	public PageInfo<Device> queryVideoDeviceList(int page, int count) {
+	public PageInfo<Device> queryVideoDeviceList(int page, int count ,String keyword) {
 		PageHelper.startPage(page, count);
-		List<Device> all = deviceMapper.getDevices();
+		List<Device> all = deviceMapper.getDevices(keyword);
 		return new PageInfo<>(all);
 	}
 
@@ -408,7 +409,7 @@ public class VideoManagerStorageImpl implements IVideoManagerStorage {
 	@Override
 	public List<Device> queryVideoDeviceList() {
 
-		List<Device> deviceList =  deviceMapper.getDevices();
+		List<Device> deviceList =  deviceMapper.getDevices(null);
 		return deviceList;
 	}
 

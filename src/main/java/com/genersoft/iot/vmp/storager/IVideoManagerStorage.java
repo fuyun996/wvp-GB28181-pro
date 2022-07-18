@@ -121,9 +121,10 @@ public interface IVideoManagerStorage {
 	 * 获取多个设备
 	 * @param page 当前页数
 	 * @param count 每页数量
+	 * @param keyword 关键词
 	 * @return List<Device> 设备对象数组
 	 */
-	public PageInfo<Device> queryVideoDeviceList(int page, int count);
+	public PageInfo<Device> queryVideoDeviceList(int page, int count,String keyword);
 
 	/**
 	 * 获取多个设备
