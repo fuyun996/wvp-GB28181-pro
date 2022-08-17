@@ -7,11 +7,11 @@ spring:
     # REDIS数据库配置
     redis:
         # [必须修改] Redis服务器IP, REDIS安装在本机的,使用127.0.0.1
-        host: 10.0.13.4
+        host: 172.22.5.109
         # [必须修改] 端口号
         port: 6379
         # [可选] 数据库 DB
-        database: 6
+        database: 7
         # [可选] 访问密码,若你的redis服务器没有设置密码，就不需要用密码去连接
         password: admin1234@sugon
         # [可选] 超时时间
@@ -21,11 +21,12 @@ spring:
     datasource:
         type: com.alibaba.druid.pool.DruidDataSource
         driver-class-name: com.mysql.cj.jdbc.Driver
-#        url: jdbc:mysql://10.0.13.168:3306/wvp?useUnicode=true&characterEncoding=UTF8&rewriteBatchedStatements=true&serverTimezone=PRC&useSSL=false
-        url: jdbc:mysql://10.0.13.226:3306/mvp-test?useUnicode=true&characterEncoding=UTF8&rewriteBatchedStatements=true&serverTimezone=PRC&useSSL=false
+        #url: jdbc:mysql://fuyun996.com:3306/wvp?useUnicode=true&characterEncoding=UTF8&rewriteBatchedStatements=true&serverTimezone=PRC&useSSL=false
+        url: jdbc:mysql://172.22.5.164:3306/wvp?useUnicode=true&characterEncoding=UTF8&rewriteBatchedStatements=true&serverTimezone=PRC&useSSL=false
         username: root
-#        password: admin1234@sugon
-        password: Sugon_456
+        #password: sugon@1234
+        password: admin1234@sugon
+        #password: xuych1234
         druid:
             initialSize: 10                       # 连接池初始化连接数
             maxActive: 200                        # 连接池最大连接数
@@ -52,7 +53,7 @@ server:
 # 作为28181服务器的配置
 sip:
     # [必须修改] 本机的IP
-    ip: 10.0.30.29
+    ip: 192.168.10.155
     # [可选] 28181服务监听的端口
     port: 5060
     # 根据国标6.1.2中规定，domain宜采用ID统一编码的前十位编码。国标附录D中定义前8位为中心编码（由省级、市级、区级、基层编号组成，参照GB/T 2260-2007）
@@ -61,18 +62,19 @@ sip:
     # [可选]
     domain: 4401020049
     # [可选]
-    id: 44010200492000000001
+    id: 44010200492000000002
     # [可选] 默认设备认证密码，后续扩展使用设备单独密码, 移除密码将不进行校验
-    password:
+    password: admin123
 
 #zlm 默认服务器配置
 media:
-    id: your_server_id
+    id: sugonvideo
     # [必须修改] zlm服务器的内网IP
-#    ip: 10.0.30.66
-    ip: 10.0.13.4
+    ip: 172.22.5.114
+    # 对外提供视频流IP
+    streamip: 172.22.5.114
     # [必须修改] zlm服务器的http.port
-    http-port: 8080
+    http-port: 80
     # [可选] zlm服务器的hook.admin_params=secret
     secret: 035c73f7-bb6b-4889-a715-d9eb2d1925cc
     # 启用多端口模式, 多端口模式使用端口区分每路流，兼容性更好。 单端口使用流的ssrc区分， 点播超时建议使用多端口测试
