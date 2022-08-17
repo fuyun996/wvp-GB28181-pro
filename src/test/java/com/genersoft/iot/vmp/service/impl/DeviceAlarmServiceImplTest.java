@@ -2,12 +2,16 @@ package com.genersoft.iot.vmp.service.impl;
 
 import com.genersoft.iot.vmp.gb28181.bean.DeviceAlarm;
 import com.genersoft.iot.vmp.service.IDeviceAlarmService;
+import com.genersoft.iot.vmp.utils.DateUtil;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 
 
@@ -17,8 +21,6 @@ class DeviceAlarmServiceImplTest {
 
     @Resource
     private IDeviceAlarmService deviceAlarmService;
-
-    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @org.junit.jupiter.api.Test
     void getAllAlarm() {
@@ -66,8 +68,8 @@ class DeviceAlarmServiceImplTest {
              * 	 * 7其他报警;可以为直接组合如12为电话报警或 设备报警-
              */
             deviceAlarm.setAlarmMethod((int)(Math.random()*7 + 1) + "");
-            Date date = randomDate("2021-01-01 00:00:00", "2021-06-01 00:00:00");
-            deviceAlarm.setAlarmTime(format.format(date));
+            Instant date = randomDate("2021-01-01 00:00:00", "2021-06-01 00:00:00");
+            deviceAlarm.setAlarmTime(DateUtil.formatter.format(date));
             /**
              * 报警级别, 1为一级警情, 2为二级警情, 3为三级警情, 4为四级 警情-
              */
@@ -87,17 +89,20 @@ class DeviceAlarmServiceImplTest {
 
 
 
-    private Date randomDate(String beginDate, String endDate) {
+    private Instant randomDate(String beginDate, String endDate) {
         try {
 
-            Date start = format.parse(beginDate);//构造开始日期
-            Date end = format.parse(endDate);//构造结束日期
+            //构造开始日期
+            LocalDateTime start = LocalDateTime.parse(beginDate, DateUtil.formatter);
+
+            //构造结束日期
+            LocalDateTime end = LocalDateTime.parse(endDate, DateUtil.formatter);
             //getTime()表示返回自 1970 年 1 月 1 日 00:00:00 GMT 以来此 Date 对象表示的毫秒数。
-            if (start.getTime() >= end.getTime()) {
+            if (start.isAfter(end)) {
                 return null;
             }
-            long date = random(start.getTime(), end.getTime());
-            return new Date(date);
+            long date = random(start.toInstant(ZoneOffset.of("+8")).toEpochMilli(), end.toInstant(ZoneOffset.of("+8")).toEpochMilli());
+            return Instant.ofEpochMilli(date);
         } catch (Exception e) {
             e.printStackTrace();
         }

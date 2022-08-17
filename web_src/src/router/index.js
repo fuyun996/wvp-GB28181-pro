@@ -7,7 +7,7 @@ import deviceList from '../components/DeviceList.vue'
 import channelList from '../components/channelList.vue'
 import pushVideoList from '../components/PushVideoList.vue'
 import streamProxyList from '../components/StreamProxyList.vue'
-import devicePosition from  '../components/devicePosition.vue'
+import map from '../components/map.vue'
 import login from '../components/Login.vue'
 import parentPlatformList from '../components/ParentPlatformList.vue'
 import cloudRecord from '../components/CloudRecord.vue'
@@ -17,6 +17,7 @@ import sip from '../components/setting/Sip.vue'
 import media from '../components/setting/Media.vue'
 import live from '../components/live.vue'
 import deviceTree from '../components/common/DeviceTree.vue'
+import userManager from '../components/UserManager.vue'
 
 import wasmPlayer from '../components/common/jessibuca.vue'
 import rtcPlayer from '../components/dialog/rtcPlayer.vue'
@@ -59,7 +60,7 @@ export default new VueRouter({
           component: streamProxyList,
         },
         {
-          path: '/channelList/:deviceId/:parentChannelId/:count/:page',
+          path: '/channelList/:deviceId/:parentChannelId/',
           name: 'channelList',
           component: channelList,
         },
@@ -69,9 +70,9 @@ export default new VueRouter({
           component: parentPlatformList,
         },
         {
-          path: '/devicePosition/:deviceId/:parentChannelId/:count/:page',
-          name: 'devicePosition',
-          component: devicePosition,
+          path: '/map/:deviceId/:parentChannelId/:count/:page',
+          name: 'map',
+          component: map,
         },
         {
           path: '/cloudRecord',
@@ -99,20 +100,15 @@ export default new VueRouter({
           component: media,
         },
         {
-          path: '/play/wasm/:url',
-          name: 'wasmPlayer',
-          component: wasmPlayer,
-        },
-        {
-          path: '/play/rtc/:url',
-          name: 'rtcPlayer',
-          component: rtcPlayer,
-        },
-        {
           path: '/map',
-          name: 'devicePosition',
-          component: devicePosition,
+          name: 'map',
+          component: map,
         },
+        {
+          path: '/userManager',
+          name: 'userManager',
+          component: userManager,
+        }
         ]
     },
     {
@@ -124,6 +120,16 @@ export default new VueRouter({
       path: '/test',
       name: 'deviceTree',
       component: deviceTree,
+    },
+    {
+      path: '/play/wasm/:url',
+      name: 'wasmPlayer',
+      component: wasmPlayer,
+    },
+    {
+      path: '/play/rtc/:url',
+      name: 'rtcPlayer',
+      component: rtcPlayer,
     },
   ]
 })

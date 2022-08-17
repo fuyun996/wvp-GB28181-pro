@@ -19,7 +19,7 @@ public class UserSetting {
 
     private Boolean seniorSdp = Boolean.FALSE;
 
-    private Long playTimeout = 18000L;
+    private Integer playTimeout = 18000;
 
     private int platformPlayTimeout = 60000;
 
@@ -55,7 +55,7 @@ public class UserSetting {
         return seniorSdp;
     }
 
-    public Long getPlayTimeout() {
+    public Integer getPlayTimeout() {
         return playTimeout;
     }
 
@@ -83,7 +83,7 @@ public class UserSetting {
         this.seniorSdp = seniorSdp;
     }
 
-    public void setPlayTimeout(Long playTimeout) {
+    public void setPlayTimeout(Integer playTimeout) {
         this.playTimeout = playTimeout;
     }
 

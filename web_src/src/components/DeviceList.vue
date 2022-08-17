@@ -12,36 +12,34 @@
         <el-button icon="el-icon-refresh-right" circle size="mini" :loading="getDeviceListLoading"
                    @click="getDeviceList()"></el-button>
       </div>
-
     </div>
-    <!-- <devicePlayer ref="devicePlayer"></devicePlayer> -->
     <!--设备列表-->
-    <el-table :data="deviceList" border style="width: 100%;font-size: 12px;" :height="winHeight">
-      <el-table-column prop="name" label="名称" align="center">
+    <el-table :data="deviceList" style="width: 100%;font-size: 12px;" :height="winHeight" header-row-class-name="table-header">
+      <el-table-column prop="name" label="名称" min-width="160">
       </el-table-column>
-      <el-table-column prop="deviceId" label="设备编号" width="180" align="center">
+      <el-table-column prop="deviceId" label="设备编号" min-width="200" >
       </el-table-column>
-      <el-table-column label="地址" width="180" align="center">
+      <el-table-column label="地址" min-width="160" >
         <template slot-scope="scope">
           <div slot="reference" class="name-wrapper">
             <el-tag size="medium">{{ scope.row.hostAddress }}</el-tag>
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="manufacturer" label="厂家" align="center">
+      <el-table-column prop="manufacturer" label="厂家" min-width="120" >
       </el-table-column>
-      <el-table-column label="流传输模式" align="center" width="120">
+      <el-table-column label="流传输模式"  min-width="160" >
         <template slot-scope="scope">
-          <el-select size="mini" @change="transportChange(scope.row)" v-model="scope.row.streamMode" placeholder="请选择">
+          <el-select size="mini" @change="transportChange(scope.row)" v-model="scope.row.streamMode" placeholder="请选择" style="width: 120px">
             <el-option key="UDP" label="UDP" value="UDP"></el-option>
             <el-option key="TCP-ACTIVE" label="TCP主动模式" :disabled="true" value="TCP-ACTIVE"></el-option>
             <el-option key="TCP-PASSIVE" label="TCP被动模式" value="TCP-PASSIVE"></el-option>
           </el-select>
         </template>
       </el-table-column>
-      <el-table-column prop="channelCount" label="通道数" align="center">
+      <el-table-column prop="channelCount" label="通道数" min-width="120" >
       </el-table-column>
-      <el-table-column label="状态" width="120" align="center">
+      <el-table-column label="状态" min-width="120">
         <template slot-scope="scope">
           <div slot="reference" class="name-wrapper">
             <el-tag size="medium" v-if="scope.row.online == 1">在线</el-tag>
@@ -49,31 +47,32 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="keepaliveTime" label="最近心跳" align="center" width="140">
+      <el-table-column prop="keepaliveTime" label="最近心跳" min-width="160" >
       </el-table-column>
-      <el-table-column prop="registerTime" label="最近注册" align="center" width="140" sortable>
+      <el-table-column prop="registerTime" label="最近注册"  min-width="160">
       </el-table-column>
-      <el-table-column prop="updateTime" label="更新时间" align="center" width="140">
-      </el-table-column>
-      <el-table-column prop="createTime" label="创建时间" align="center" width="140">
-      </el-table-column>
+<!--      <el-table-column prop="updateTime" label="更新时间"  width="140">-->
+<!--      </el-table-column>-->
+<!--      <el-table-column prop="createTime" label="创建时间"  width="140">-->
+<!--      </el-table-column>-->
 
-      <el-table-column label="操作" width="450" align="center" fixed="right">
+      <el-table-column label="操作" min-width="450" fixed="right">
         <template slot-scope="scope">
-          <el-button size="mini" v-if="scope.row.online!=0" icon="el-icon-refresh" @click="refDevice(scope.row)"
+          <el-button type="text" size="medium" v-bind:disabled="scope.row.online==0" icon="el-icon-refresh" @click="refDevice(scope.row)"
                      @mouseover="getTooltipContent(scope.row.deviceId)">刷新
           </el-button>
-          <el-button-group>
-            <el-button size="mini" icon="el-icon-video-camera-solid" v-bind:disabled="scope.row.online==0"
-                       type="primary" @click="showChannelList(scope.row)">通道
-            </el-button>
-            <!--<el-button size="mini" icon="el-icon-location" v-bind:disabled="scope.row.online==0" type="primary"-->
-                       <!--@click="showDevicePosition(scope.row)">定位-->
-            <!--</el-button>-->
-            <el-button size="mini" icon="el-icon-view" type="primary" @click="detail(scope.row)">查看</el-button>
-            <!--<el-button size="mini" icon="el-icon-edit" type="primary" @click="edit(scope.row)">编辑</el-button>-->
-            <el-button size="mini" icon="el-icon-delete" type="danger" @click="deleteDevice(scope.row)">删除</el-button>
-          </el-button-group>
+          <el-divider direction="vertical"></el-divider>
+          <el-button type="text" size="medium" icon="el-icon-video-camera"
+                     @click="showChannelList(scope.row)">通道
+          </el-button>
+          <el-divider direction="vertical"></el-divider>
+          <el-button size="medium" icon="el-icon-location" type="text"
+                     @click="showDevicePosition(scope.row)">定位
+          </el-button>
+          <el-divider direction="vertical"></el-divider>
+          <el-button size="medium" icon="el-icon-edit" type="text" @click="edit(scope.row)">编辑</el-button>
+          <el-divider direction="vertical"></el-divider>
+          <el-button size="medium" icon="el-icon-delete" type="text" @click="deleteDevice(scope.row)" style="color: #f56c6c">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -88,7 +87,6 @@
       :total="total">
     </el-pagination>
     <deviceEdit ref="deviceEdit"></deviceEdit>
-    <deviceDetail ref="deviceDetail"></deviceDetail>
     <syncChannelProgress ref="syncChannelProgress"></syncChannelProgress>
   </div>
 </template>
@@ -96,7 +94,6 @@
 <script>
 import uiHeader from '../layout/UiHeader.vue'
 import deviceEdit from './dialog/deviceEdit.vue'
-import deviceDetail from './dialog/deviceDetail.vue'
 import syncChannelProgress from './dialog/SyncChannelProgress.vue'
 
 export default {
@@ -104,7 +101,6 @@ export default {
   components: {
     uiHeader,
     deviceEdit,
-    deviceDetail,
     syncChannelProgress,
   },
   data() {
@@ -120,7 +116,6 @@ export default {
       count: 15,
       total: 0,
       getDeviceListLoading: false,
-      searchKeyword:""
     };
   },
   computed: {
@@ -164,8 +159,7 @@ export default {
         url: `/api/device/query/devices`,
         params: {
           page: that.currentPage,
-          count: that.count,
-          keyword:that.searchKeyword
+          count: that.count
         }
       }).then(function (res) {
         that.total = res.data.total;
@@ -204,7 +198,7 @@ export default {
 
     },
     showChannelList: function (row) {
-      this.$router.push(`/channelList/${row.deviceId}/0/15/1`);
+      this.$router.push(`/channelList/${row.deviceId}/0`);
     },
     showDevicePosition: function (row) {
       this.$router.push(`/map?deviceId=${row.deviceId}`);
@@ -313,7 +307,7 @@ export default {
       });
       setTimeout(this.getDeviceList, 200)
 
-    })
+      })
     }
 
   }
@@ -372,4 +366,5 @@ export default {
   padding: 0.3rem;
   width: 14.4rem;
 }
+
 </style>

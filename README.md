@@ -1,5 +1,5 @@
 ![logo](https://raw.githubusercontent.com/648540858/wvp-GB28181-pro/wvp-28181-2.0/web_src/static/logo.png)
-# 开箱即用的的28181协议视频平台
+# 开箱即用的28181协议视频平台
 
 [![Build Status](https://travis-ci.org/xia-chu/ZLMediaKit.svg?branch=master)](https://travis-ci.org/xia-chu/ZLMediaKit)
 [![license](http://img.shields.io/badge/license-MIT-green.svg)](https://github.com/xia-chu/ZLMediaKit/blob/master/LICENSE)
@@ -25,7 +25,7 @@ WEB VIDEO PLATFORM是一个基于GB28181-2016标准实现的开箱即用的网�
 旨在打造一个易配置,易使用,便于维护的28181国标信令系统, 依托优秀的开源流媒体服务框架ZLMediaKit, 实现一个完整易用GB28181平台. 
 
 # 部署文档
-[https://github.com/648540858/wvp-GB28181-pro/wiki](https://github.com/648540858/wvp-GB28181-pro/wiki)
+[doc.wvp-pro.cn](https://doc.wvp-pro.cn)
 
 # gitee同步仓库
 https://gitee.com/pan648540858/wvp-GB28181-pro.git
@@ -106,23 +106,48 @@ https://gitee.com/pan648540858/wvp-GB28181-pro.git
 - [X] 添加RTMP视频
 - [X] 云端录像（需要部署单独服务配合使用）
 - [X] 多流媒体节点，自动选择负载最低的节点使用。
-- [X] 支持使用mysql作为数据库，默认sqlite3,开箱即用。
 - [X] WEB端支持播放H264与H265，音频支持G.711A/G.711U/AAC,覆盖国标常用编码格式。
+- [X] 支持电子地图。
+- [X] 支持接入WGS84和GCJ02两种坐标系。
 
-# docker快速体验
-目前作者的docker-compose因为时间有限维护不及时，这里提供第三方提供的供大家使用，维护不易，大家记得给这位小伙伴点个star。  
-https://github.com/SaltFish001/wvp_pro_compose
-[https://github.com/SaltFish001/wvp_pro_compose](https://github.com/SaltFish001/wvp_pro_compose)
-这是作者维护的一个镜像，可能存在不及时的问题。
-```shell
-docker pull 648540858/wvp_pro
+[//]: # (# docker快速体验)
 
-docker run  --env WVP_IP="你的IP" -it -p 18080:18080 -p 30000-30500:30000-30500/udp -p 30000-30500:30000-30500/tcp -p 80:80 -p 5060:5060 -p 5060:5060/udp 648540858/wvp_pro
-```
-docker使用详情查看：[https://hub.docker.com/r/648540858/wvp_pro](https://hub.docker.com/r/648540858/wvp_pro)
+[//]: # (目前作者的docker-compose因为时间有限维护不及时，这里提供第三方提供的供大家使用，维护不易，大家记得给这位小伙伴点个star。  )
+
+[//]: # (https://github.com/SaltFish001/wvp_pro_compose)
+
+[//]: # ([https://github.com/SaltFish001/wvp_pro_compose]&#40;https://github.com/SaltFish001/wvp_pro_compose&#41;)
+
+[//]: # (这是作者维护的一个镜像，可能存在不及时的问题。)
+
+[//]: # (```shell)
+
+[//]: # (docker pull 648540858/wvp_pro)
+
+[//]: # ()
+[//]: # (docker run  --env WVP_IP="你的IP" -it -p 18080:18080 -p 30000-30500:30000-30500/udp -p 30000-30500:30000-30500/tcp -p 80:80 -p 5060:5060 -p 5060:5060/udp 648540858/wvp_pro)
+
+[//]: # (```)
+
+[//]: # (docker使用详情查看：[https://hub.docker.com/r/648540858/wvp_pro]&#40;https://hub.docker.com/r/648540858/wvp_pro&#41;)
 
 # gitee同步仓库
 https://gitee.com/pan648540858/wvp-GB28181-pro.git  
+
+# 遇到问题
+国标最麻烦的地方在于设备的兼容性，所以需要大量的设备来测试，目前作者手里的设备有限，再加上作者水平有限，所以遇到问题在所难免；
+1. 查看wiki，仔细的阅读可以帮你避免几乎所有的问题
+2. 搜索issues，这里有大部分的答案
+3. 加QQ群，这里有大量热心的小伙伴，但是前提新希望你已经仔细阅读了wiki和搜索了issues。
+4. 你可以请作者为你解答，但是我不是免费的。
+5. 你可以把遇到问题的设备寄给我，可以更容易的复现问题。
+
+
+# 合作
+目前很多打着合作的幌子来私聊的，其实大家大可不必，目前作者没有精力，你有问题可以付费找我解答，也可以提PR
+，如果对代码有建议可以提ISSUE；也可以加群一起聊聊。我们欢迎所有有兴趣参与到项目中来的人。
+
+
 
 # 使用帮助
 QQ群: 901799015, ZLM使用文档[https://github.com/ZLMediaKit/ZLMediaKit](https://github.com/ZLMediaKit/ZLMediaKit)  
@@ -140,6 +165,7 @@ QQ私信一般不回, 精力有限.欢迎大家在群里讨论.觉得项目对�
 [hotcoffie](https://github.com/hotcoffie) [xiaomu](https://github.com/nikmu) [TristingChen](https://github.com/TristingChen)
 [chenparty](https://github.com/chenparty) [Hotleave](https://github.com/hotleave) [ydwxb](https://github.com/ydwxb)
 [ydpd](https://github.com/ydpd) [szy833](https://github.com/szy833) [ydwxb](https://github.com/ydwxb) [Albertzhu666](https://github.com/Albertzhu666)
+[mk1990](https://github.com/mk1990)
 
 ps: 刚增加了这个名单，肯定遗漏了一些大佬，欢迎大佬联系我添加。
 

@@ -58,15 +58,16 @@ public class CatalogEventLister implements ApplicationListener<CatalogEvent> {
         ParentPlatform parentPlatform = null;
 
         Map<String, List<ParentPlatform>> parentPlatformMap = new HashMap<>();
-        if (event.getPlatformId() != null) {
-            parentPlatform = storager.queryParentPlatByServerGBId(event.getPlatformId());
-            if (parentPlatform != null && !parentPlatform.isStatus())return;
+        if (!StringUtils.isEmpty(event.getPlatformId())) {
             subscribe = subscribeHolder.getCatalogSubscribe(event.getPlatformId());
-
             if (subscribe == null) {
-                logger.info("发送订阅消息时发现订阅信息已经不存在");
                 return;
             }
+            parentPlatform = storager.queryParentPlatByServerGBId(event.getPlatformId());
+            if (parentPlatform != null && !parentPlatform.isStatus()) {
+                return;
+            }
+
         }else {
             // 获取所用订阅
             List<String> platforms = subscribeHolder.getAllCatalogSubscribePlatform();
@@ -80,7 +81,9 @@ public class CatalogEventLister implements ApplicationListener<CatalogEvent> {
             }else if (event.getGbStreams() != null) {
                 if (platforms.size() > 0) {
                     for (GbStream gbStream : event.getGbStreams()) {
-                        if (gbStream == null || StringUtils.isEmpty(gbStream.getGbId())) continue;
+                        if (gbStream == null || StringUtils.isEmpty(gbStream.getGbId())) {
+                            continue;
+                        }
                         List<ParentPlatform> parentPlatformsForGB = storager.queryPlatFormListForStreamWithGBId(gbStream.getApp(),gbStream.getStream(), platforms);
                         parentPlatformMap.put(gbStream.getGbId(), parentPlatformsForGB);
                     }
@@ -99,7 +102,7 @@ public class CatalogEventLister implements ApplicationListener<CatalogEvent> {
                     }
                     if (event.getGbStreams() != null && event.getGbStreams().size() > 0){
                         for (GbStream gbStream : event.getGbStreams()) {
-                            DeviceChannel deviceChannelByStream = gbStreamService.getDeviceChannelListByStream(gbStream, gbStream.getCatalogId(), parentPlatform.getDeviceGBId());
+                            DeviceChannel deviceChannelByStream = gbStreamService.getDeviceChannelListByStream(gbStream, gbStream.getCatalogId(), parentPlatform);
                             deviceChannelList.add(deviceChannelByStream);
                         }
                     }
@@ -113,7 +116,9 @@ public class CatalogEventLister implements ApplicationListener<CatalogEvent> {
                         if (parentPlatforms != null && parentPlatforms.size() > 0) {
                             for (ParentPlatform platform : parentPlatforms) {
                                 SubscribeInfo subscribeInfo = subscribeHolder.getCatalogSubscribe(platform.getServerGBId());
-                                if (subscribeInfo == null) continue;
+                                if (subscribeInfo == null) {
+                                    continue;
+                                }
                                 logger.info("[Catalog事件: {}]平台：{}，影响通道{}", event.getType(), platform.getServerGBId(), gbId);
                                 List<DeviceChannel> deviceChannelList = new ArrayList<>();
                                 DeviceChannel deviceChannel = new DeviceChannel();
@@ -138,8 +143,8 @@ public class CatalogEventLister implements ApplicationListener<CatalogEvent> {
                      }
                     if (event.getGbStreams() != null && event.getGbStreams().size() > 0){
                         for (GbStream gbStream : event.getGbStreams()) {
-                            DeviceChannel deviceChannelByStream = gbStreamService.getDeviceChannelListByStream(gbStream, gbStream.getCatalogId(), parentPlatform.getDeviceGBId());
-                            deviceChannelList.add(deviceChannelByStream);
+                            deviceChannelList.add(
+                                    gbStreamService.getDeviceChannelListByStream(gbStream, gbStream.getCatalogId(), parentPlatform));
                         }
                     }
                     if (deviceChannelList.size() > 0) {
@@ -152,14 +157,16 @@ public class CatalogEventLister implements ApplicationListener<CatalogEvent> {
                         if (parentPlatforms != null && parentPlatforms.size() > 0) {
                             for (ParentPlatform platform : parentPlatforms) {
                                 SubscribeInfo subscribeInfo = subscribeHolder.getCatalogSubscribe(platform.getServerGBId());
-                                if (subscribeInfo == null) continue;
+                                if (subscribeInfo == null) {
+                                    continue;
+                                }
                                 logger.info("[Catalog事件: {}]平台：{}，影响通道{}", event.getType(), platform.getServerGBId(), gbId);
                                 List<DeviceChannel> deviceChannelList = new ArrayList<>();
                                 DeviceChannel deviceChannel = storager.queryChannelInParentPlatform(platform.getServerGBId(), gbId);
                                 deviceChannelList.add(deviceChannel);
                                 GbStream gbStream = storager.queryStreamInParentPlatform(platform.getServerGBId(), gbId);
                                 if(gbStream != null){
-                                    DeviceChannel deviceChannelByStream = gbStreamService.getDeviceChannelListByStream(gbStream, gbStream.getCatalogId(), platform.getDeviceGBId());
+                                    DeviceChannel deviceChannelByStream = gbStreamService.getDeviceChannelListByStream(gbStream, gbStream.getCatalogId(), platform);
                                     deviceChannelList.add(deviceChannelByStream);
                                 }
                                 sipCommanderFroPlatform.sendNotifyForCatalogAddOrUpdate(event.getType(), platform, deviceChannelList, subscribeInfo, null);

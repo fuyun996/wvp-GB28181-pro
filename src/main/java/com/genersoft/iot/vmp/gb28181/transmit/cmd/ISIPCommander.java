@@ -1,8 +1,7 @@
 package com.genersoft.iot.vmp.gb28181.transmit.cmd;
 
 import com.genersoft.iot.vmp.common.StreamInfo;
-import com.genersoft.iot.vmp.gb28181.bean.Device;
-import com.genersoft.iot.vmp.gb28181.bean.InviteStreamCallback;
+import com.genersoft.iot.vmp.gb28181.bean.*;
 import com.genersoft.iot.vmp.gb28181.event.SipSubscribe;
 import com.genersoft.iot.vmp.media.zlm.ZLMHttpHookSubscribe;
 import com.genersoft.iot.vmp.media.zlm.dto.MediaServerItem;
@@ -94,8 +93,8 @@ public interface ISIPCommander {
 	 * @param device  视频设备
 	 * @param channelId  预览通道
 	 */
-	void playStreamCmd(MediaServerItem mediaServerItem, SSRCInfo ssrcInfo, Device device, String channelId, ZLMHttpHookSubscribe.Event event, SipSubscribe.Event errorEvent);
-	
+	void playStreamCmd(MediaServerItem mediaServerItem, SSRCInfo ssrcInfo, Device device, String channelId, ZLMHttpHookSubscribe.Event event, SipSubscribe.Event okEvent, SipSubscribe.Event errorEvent);
+
 	/**
 	 * 请求回放视频流
 	 * 
@@ -144,6 +143,14 @@ public interface ISIPCommander {
 	 * 回放倍速播放
 	 */
 	void playSpeedCmd(Device device, StreamInfo streamInfo, Double speed);
+	
+	/**
+	 * 回放控制
+	 * @param device
+	 * @param streamInfo
+	 * @param content
+	 */
+	void playbackControlCmd(Device device, StreamInfo streamInfo, String content,SipSubscribe.Event errorEvent, SipSubscribe.Event okEvent);
 
 	/**
 	 * 语音广播
@@ -336,4 +343,13 @@ public interface ISIPCommander {
 	 * @param cmdString 前端控制指令串
 	 */
 	boolean dragZoomCmd(Device device, String channelId, String cmdString);
+
+
+	/**
+	 * 向设备发送报警NOTIFY消息， 用于互联结构下，此时将设备当成一个平级平台看待
+	 * @param device 设备
+	 * @param deviceAlarm 报警信息信息
+	 * @return
+	 */
+	boolean sendAlarmMessage(Device device, DeviceAlarm deviceAlarm);
 }

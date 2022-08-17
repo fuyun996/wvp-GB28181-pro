@@ -26,8 +26,8 @@ import javax.sip.message.Response;
 @Component
 public class RegisterResponseProcessor extends SIPResponseProcessorAbstract {
 
-	private Logger logger = LoggerFactory.getLogger(RegisterResponseProcessor.class);
-	private String method = "REGISTER";
+	private final Logger logger = LoggerFactory.getLogger(RegisterResponseProcessor.class);
+	private final String method = "REGISTER";
 
 	@Autowired
 	private ISIPCommanderForPlatform sipCommanderForPlatform;
@@ -69,11 +69,11 @@ public class RegisterResponseProcessor extends SIPResponseProcessorAbstract {
 
 		ParentPlatformCatch parentPlatformCatch = redisCatchStorage.queryPlatformCatchInfo(platformGBId);
 		if (parentPlatformCatch == null) {
-			logger.warn(String.format("收到 %s 的注册/注销%S请求, 但是平台缓存信息未查询到!!!", platformGBId, response.getStatusCode()));
+			logger.warn(String.format("[收到注册/注销%S请求]平台：%s，但是平台缓存信息未查询到!!!", response.getStatusCode(),platformGBId));
 			return;
 		}
 		String action = parentPlatformCatch.getParentPlatform().getExpires().equals("0") ? "注销" : "注册";
-		logger.info(String.format("收到 %s %s的%S响应", platformGBId, action, response.getStatusCode() ));
+		logger.info(String.format("[%s %S响应]%s ", action, response.getStatusCode(), platformGBId ));
 		ParentPlatform parentPlatform = parentPlatformCatch.getParentPlatform();
 		if (parentPlatform == null) {
 			logger.warn(String.format("收到 %s %s的%S请求, 但是平台信息未查询到!!!", platformGBId, action, response.getStatusCode()));
@@ -90,10 +90,12 @@ public class RegisterResponseProcessor extends SIPResponseProcessorAbstract {
 			redisCatchStorage.delPlatformCatchInfo(platformGBId);
 			// 取回Expires设置，避免注销过程中被置为0
 			ParentPlatform parentPlatformTmp = storager.queryParentPlatByServerGBId(platformGBId);
-			parentPlatformTmp.setStatus("注册".equals(action));
-			redisCatchStorage.updatePlatformRegister(parentPlatformTmp);
-			redisCatchStorage.updatePlatformKeepalive(parentPlatformTmp);
-			parentPlatformCatch.setParentPlatform(parentPlatformTmp);
+			if (parentPlatformTmp != null) {
+				parentPlatformTmp.setStatus("注册".equals(action));
+				redisCatchStorage.updatePlatformRegister(parentPlatformTmp);
+				redisCatchStorage.updatePlatformKeepalive(parentPlatformTmp);
+				parentPlatformCatch.setParentPlatform(parentPlatformTmp);
+			}
 			redisCatchStorage.updatePlatformCatchInfo(parentPlatformCatch);
 			storager.updateParentPlatformStatus(platformGBId, "注册".equals(action));
 			if ("注销".equals(action)) {

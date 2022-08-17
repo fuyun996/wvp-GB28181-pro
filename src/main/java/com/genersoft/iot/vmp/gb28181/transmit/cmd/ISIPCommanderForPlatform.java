@@ -1,9 +1,6 @@
 package com.genersoft.iot.vmp.gb28181.transmit.cmd;
 
-import com.genersoft.iot.vmp.gb28181.bean.DeviceChannel;
-import com.genersoft.iot.vmp.gb28181.bean.ParentPlatform;
-import com.genersoft.iot.vmp.gb28181.bean.RecordInfo;
-import com.genersoft.iot.vmp.gb28181.bean.SubscribeInfo;
+import com.genersoft.iot.vmp.gb28181.bean.*;
 import com.genersoft.iot.vmp.gb28181.event.SipSubscribe;
 import com.genersoft.iot.vmp.service.bean.GPSMsgInfo;
 
@@ -76,6 +73,14 @@ public interface ISIPCommanderForPlatform {
     boolean sendNotifyMobilePosition(ParentPlatform parentPlatform, GPSMsgInfo gpsMsgInfo, SubscribeInfo subscribeInfo);
 
     /**
+     * 向上级回复报警消息
+     * @param parentPlatform 平台信息
+     * @param deviceAlarm 报警信息信息
+     * @return
+     */
+    boolean sendAlarmMessage(ParentPlatform parentPlatform, DeviceAlarm deviceAlarm);
+
+    /**
      * 回复catalog事件-增加/更新
      * @param parentPlatform
      * @param deviceChannels
@@ -97,6 +102,14 @@ public interface ISIPCommanderForPlatform {
      * @param recordInfo 录像信息
      */
     boolean recordInfo(DeviceChannel deviceChannel, ParentPlatform parentPlatform, String fromTag, RecordInfo recordInfo);
+
+    /**
+     * 录像播放推送完成时发送MediaStatus消息
+     * @param platform
+     * @param sendRtpItem
+     * @return
+     */
+    boolean sendMediaStatusNotify(ParentPlatform platform, SendRtpItem sendRtpItem);
 
     /**
      * 向发起点播的上级回复bye

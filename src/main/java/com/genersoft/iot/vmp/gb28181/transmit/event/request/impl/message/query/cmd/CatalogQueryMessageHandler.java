@@ -70,74 +70,24 @@ public class CatalogQueryMessageHandler extends SIPRequestProcessorParent implem
             Element snElement = rootElement.element("SN");
             String sn = snElement.getText();
             // 准备回复通道信息
-            List<DeviceChannelInPlatform> deviceChannelInPlatforms = storager.queryChannelListInParentPlatform(parentPlatform.getServerGBId());
+            List<DeviceChannel> deviceChannelInPlatforms = storager.queryChannelWithCatalog(parentPlatform.getServerGBId());
             // 查询关联的直播通道
-            List<GbStream> gbStreams = storager.queryGbStreamListInPlatform(parentPlatform.getServerGBId());
+            List<DeviceChannel> gbStreams = storager.queryGbStreamListInPlatform(parentPlatform.getServerGBId());
             // 回复目录信息
-            List<PlatformCatalog> catalogs =  storager.queryCatalogInPlatform(parentPlatform.getServerGBId());
+            List<DeviceChannel> catalogs =  storager.queryCatalogInPlatform(parentPlatform.getServerGBId());
 
             List<DeviceChannel> allChannels = new ArrayList<>();
+
             if (catalogs.size() > 0) {
-                for (PlatformCatalog catalog : catalogs) {
-                    if (catalog.getParentId().equals(catalog.getPlatformId())) {
-                        catalog.setParentId(parentPlatform.getDeviceGBId());
-                    }
-                    DeviceChannel deviceChannel = new DeviceChannel();
-                    // 通道的类型，0->国标通道 1->直播流通道 2->业务分组/虚拟组织/行政区划
-                    deviceChannel.setChannelType(2);
-                    deviceChannel.setChannelId(catalog.getId());
-                    deviceChannel.setName(catalog.getName());
-                    deviceChannel.setDeviceId(parentPlatform.getDeviceGBId());
-                    deviceChannel.setManufacture("wvp-pro");
-                    deviceChannel.setStatus(1);
-                    deviceChannel.setParental(1);
-                    deviceChannel.setParentId(catalog.getParentId());
-                    deviceChannel.setRegisterWay(1);
-                    deviceChannel.setCivilCode(parentPlatform.getAdministrativeDivision());
-                    allChannels.add(deviceChannel);
-                }
+                allChannels.addAll(catalogs);
             }
             // 回复级联的通道
             if (deviceChannelInPlatforms.size() > 0) {
-                for (DeviceChannelInPlatform channel : deviceChannelInPlatforms) {
-                    if (channel.getCatalogId().equals(parentPlatform.getServerGBId())) {
-                        channel.setCatalogId(parentPlatform.getDeviceGBId());
-                    }
-                    DeviceChannel deviceChannel = storage.queryChannel(channel.getDeviceId(), channel.getChannelId());
-                    // 通道的类型，0->国标通道 1->直播流通道 2->业务分组/虚拟组织/行政区划
-                    deviceChannel.setChannelType(0);
-                    deviceChannel.setParental(0);
-                    deviceChannel.setParentId(channel.getCatalogId());
-                    deviceChannel.setCivilCode(parentPlatform.getDeviceGBId().substring(0, 6));
-                    allChannels.add(deviceChannel);
-                }
+                allChannels.addAll(deviceChannelInPlatforms);
             }
             // 回复直播的通道
             if (gbStreams.size() > 0) {
-                for (GbStream gbStream : gbStreams) {
-                    if (gbStream.getCatalogId().equals(parentPlatform.getServerGBId())) {
-                        gbStream.setCatalogId(null);
-                    }
-                    DeviceChannel deviceChannel = new DeviceChannel();
-                    // 通道的类型，0->国标通道 1->直播流通道 2->业务分组/虚拟组织/行政区划
-                    deviceChannel.setChannelType(1);
-                    deviceChannel.setChannelId(gbStream.getGbId());
-                    deviceChannel.setName(gbStream.getName());
-                    deviceChannel.setLongitude(gbStream.getLongitude());
-                    deviceChannel.setLatitude(gbStream.getLatitude());
-                    deviceChannel.setDeviceId(parentPlatform.getDeviceGBId());
-                    deviceChannel.setManufacture("wvp-pro");
-//                    deviceChannel.setStatus(gbStream.isStatus()?1:0);
-                    deviceChannel.setStatus(1);
-                    deviceChannel.setParentId(gbStream.getCatalogId());
-                    deviceChannel.setRegisterWay(1);
-                    deviceChannel.setCivilCode(parentPlatform.getAdministrativeDivision());
-                    deviceChannel.setModel("live");
-                    deviceChannel.setOwner("wvp-pro");
-                    deviceChannel.setParental(0);
-                    deviceChannel.setSecrecy("0");
-                    allChannels.add(deviceChannel);
-                }
+                allChannels.addAll(gbStreams);
             }
             if (allChannels.size() > 0) {
                 cmderFroPlatform.catalogQuery(allChannels, parentPlatform, sn, fromHeader.getTag());

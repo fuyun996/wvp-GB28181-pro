@@ -62,15 +62,12 @@ public class SIPRequestHeaderPlarformProvider {
 		// Forwards
 		MaxForwardsHeader maxForwards = sipFactory.createHeaderFactory().createMaxForwardsHeader(70);
 		// ceq
-		CSeqHeader cSeqHeader = sipFactory.createHeaderFactory().createCSeqHeader(redisCatchStorage.getCSEQ(Request.MESSAGE), Request.MESSAGE);
+		CSeqHeader cSeqHeader = sipFactory.createHeaderFactory().createCSeqHeader(redisCatchStorage.getCSEQ(), Request.MESSAGE);
 
 		request = sipFactory.createMessageFactory().createRequest(requestURI, Request.MESSAGE, callIdHeader, cSeqHeader, fromHeader,
 				toHeader, viaHeaders, maxForwards);
 
 		List<String> agentParam = new ArrayList<>();
-		agentParam.add("wvp-pro");
-		UserAgentHeader userAgentHeader = sipFactory.createHeaderFactory().createUserAgentHeader(agentParam);
-		request.addHeader(userAgentHeader);
 
 		ContentTypeHeader contentTypeHeader = sipFactory.createHeaderFactory().createContentTypeHeader("Application", "MANSCDP+xml");
 		request.setContent(content, contentTypeHeader);
@@ -115,10 +112,6 @@ public class SIPRequestHeaderPlarformProvider {
 		ExpiresHeader expires = sipFactory.createHeaderFactory().createExpiresHeader(Integer.parseInt(platform.getExpires()));
 		request.addHeader(expires);
 
-		List<String> agentParam = new ArrayList<>();
-		agentParam.add("wvp-pro");
-		UserAgentHeader userAgentHeader = sipFactory.createHeaderFactory().createUserAgentHeader(agentParam);
-		request.addHeader(userAgentHeader);
 
 		return request;
 	}
@@ -127,7 +120,7 @@ public class SIPRequestHeaderPlarformProvider {
 										 String callId, WWWAuthenticateHeader www , CallIdHeader callIdHeader) throws ParseException, PeerUnavailableException, InvalidArgumentException {
 
 
-		Request registerRequest = createRegisterRequest(parentPlatform, redisCatchStorage.getCSEQ(Request.REGISTER), fromTag, viaTag, callIdHeader);
+		Request registerRequest = createRegisterRequest(parentPlatform, redisCatchStorage.getCSEQ(), fromTag, viaTag, callIdHeader);
 		SipURI requestURI = sipFactory.createAddressFactory().createSipURI(parentPlatform.getServerGBId(), parentPlatform.getServerIP() + ":" + parentPlatform.getServerPort());
 		if (www == null) {
 			AuthorizationHeader authorizationHeader = sipFactory.createHeaderFactory().createAuthorizationHeader("Digest");
@@ -220,16 +213,12 @@ public class SIPRequestHeaderPlarformProvider {
 		// Forwards
 		MaxForwardsHeader maxForwards = sipFactory.createHeaderFactory().createMaxForwardsHeader(70);
 		// ceq
-		CSeqHeader cSeqHeader = sipFactory.createHeaderFactory().createCSeqHeader(redisCatchStorage.getCSEQ(Request.MESSAGE), Request.MESSAGE);
+		CSeqHeader cSeqHeader = sipFactory.createHeaderFactory().createCSeqHeader(redisCatchStorage.getCSEQ(), Request.MESSAGE);
 		MessageFactoryImpl messageFactory = (MessageFactoryImpl) sipFactory.createMessageFactory();
 		// 设置编码， 防止中文乱码
 		messageFactory.setDefaultContentEncodingCharset(parentPlatform.getCharacterSet());
 		request = messageFactory.createRequest(requestURI, Request.MESSAGE, callIdHeader, cSeqHeader, fromHeader,
 				toHeader, viaHeaders, maxForwards);
-		List<String> agentParam = new ArrayList<>();
-		agentParam.add("wvp-pro");
-		UserAgentHeader userAgentHeader = sipFactory.createHeaderFactory().createUserAgentHeader(agentParam);
-		request.addHeader(userAgentHeader);
 
 		ContentTypeHeader contentTypeHeader = sipFactory.createHeaderFactory().createContentTypeHeader("Application", "MANSCDP+xml");
 		request.setContent(content, contentTypeHeader);

@@ -3,9 +3,7 @@ package com.genersoft.iot.vmp.storager;
 import com.alibaba.fastjson.JSONObject;
 import com.genersoft.iot.vmp.common.StreamInfo;
 import com.genersoft.iot.vmp.gb28181.bean.*;
-import com.genersoft.iot.vmp.media.zlm.dto.MediaItem;
-import com.genersoft.iot.vmp.media.zlm.dto.MediaServerItem;
-import com.genersoft.iot.vmp.media.zlm.dto.StreamPushItem;
+import com.genersoft.iot.vmp.media.zlm.dto.*;
 import com.genersoft.iot.vmp.service.bean.GPSMsgInfo;
 import com.genersoft.iot.vmp.service.bean.MessageForPushChannel;
 import com.genersoft.iot.vmp.service.bean.SSRCInfo;
@@ -19,10 +17,9 @@ public interface IRedisCatchStorage {
     /**
      * 计数器。为cseq进行计数
      *
-     * @param method sip 方法
      * @return
      */
-    Long getCSEQ(String method);
+    Long getCSEQ();
 
     /**
      * 开始播放时将流存入
@@ -112,23 +109,6 @@ public interface IRedisCatchStorage {
     void clearCatchByDeviceId(String deviceId);
 
     /**
-     * 获取mediaServer节点
-     * @param mediaServerId
-     * @return
-     */
-//    MediaServerItem getMediaInfo(String mediaServerId);
-
-    /**
-     * 设置所有设备离线
-     */
-    void outlineForAll();
-
-    /**
-     * 获取所有在线的
-     */
-    List<String> getOnlineForAll();
-
-    /**
      * 在redis添加wvp的信息
      */
     void updateWVPInfo(JSONObject jsonObject, int time);
@@ -138,6 +118,12 @@ public interface IRedisCatchStorage {
      * @param jsonObject 消息内容
      */
     void sendStreamChangeMsg(String type, JSONObject jsonObject);
+
+    /**
+     * 发送报警消息
+     * @param msg 消息内容
+     */
+    void sendAlarmMsg(AlarmChannelMessage msg);
 
     /**
      * 添加流信息到redis
@@ -217,4 +203,38 @@ public interface IRedisCatchStorage {
 
     void sendStreamPushRequestedMsg(MessageForPushChannel messageForPushChannel);
 
+    /**
+     * 判断设备状态
+     * @param deviceId 设备ID
+     * @return
+     */
+    public boolean deviceIsOnline(String deviceId);
+
+    /**
+     * 存储推流的鉴权信息
+     * @param app 应用名
+     * @param stream 流
+     * @param streamAuthorityInfo 鉴权信息
+     */
+    void updateStreamAuthorityInfo(String app, String stream, StreamAuthorityInfo streamAuthorityInfo);
+
+    /**
+     * 移除推流的鉴权信息
+     * @param app 应用名
+     * @param streamId 流
+     */
+    void removeStreamAuthorityInfo(String app, String streamId);
+
+    /**
+     * 获取推流的鉴权信息
+     * @param app 应用名
+     * @param stream 流
+     * @return
+     */
+    StreamAuthorityInfo getStreamAuthorityInfo(String app, String stream);
+
+    /**
+     * 发送redis消息 查询所有推流设备的状态
+     */
+    void sendStreamPushRequestedMsgForStatus();
 }

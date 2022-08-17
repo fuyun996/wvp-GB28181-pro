@@ -65,12 +65,14 @@ public interface StreamProxyMapper {
     @Update("UPDATE stream_proxy " +
             "SET status=#{status} " +
             "WHERE mediaServerId=#{mediaServerId}")
+    void updateStatusByMediaServerId(String mediaServerId, boolean status);
     void updateStatusByMediaServerId(@Param("status")boolean status,
                                      @Param("mediaServerId")String mediaServerId);
 
     @Update("UPDATE stream_proxy " +
             "SET status=${status} " +
             "WHERE app=#{app} AND stream=#{stream}")
+    int updateStatus(String app, String stream, boolean status);
     int updateStatus(@Param("status")boolean status,
                      @Param("app")String app,
                      @Param("stream")String stream);

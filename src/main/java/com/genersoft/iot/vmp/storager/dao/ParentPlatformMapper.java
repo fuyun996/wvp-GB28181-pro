@@ -16,10 +16,10 @@ public interface ParentPlatformMapper {
 
     @Insert("INSERT INTO parent_platform (enable, name, serverGBId, serverGBDomain, serverIP, serverPort, deviceGBId, deviceIp,  " +
             "            devicePort, username, password, expires, keepTimeout, transport, characterSet, ptz, rtcp, " +
-            "            status, shareAllLiveStream, startOfflinePush, catalogId, administrativeDivision, catalogGroup) " +
+            "            status, startOfflinePush, catalogId, administrativeDivision, catalogGroup, createTime, updateTime, treeType) " +
             "            VALUES (${enable}, '${name}', '${serverGBId}', '${serverGBDomain}', '${serverIP}', ${serverPort}, '${deviceGBId}', '${deviceIp}', " +
             "            '${devicePort}', '${username}', '${password}', '${expires}', '${keepTimeout}', '${transport}', '${characterSet}', ${ptz}, ${rtcp}, " +
-            "            ${status}, ${shareAllLiveStream},  ${startOfflinePush}, #{catalogId}, #{administrativeDivision}, #{catalogGroup})")
+            "            ${status},  ${startOfflinePush}, #{catalogId}, #{administrativeDivision}, #{catalogGroup}, #{createTime}, #{updateTime}, #{treeType})")
     int addParentPlatform(ParentPlatform parentPlatform);
 
     @Update("UPDATE parent_platform " +
@@ -41,10 +41,12 @@ public interface ParentPlatformMapper {
             "ptz=#{ptz}, " +
             "rtcp=#{rtcp}, " +
             "status=#{status}, " +
-            "shareAllLiveStream=#{shareAllLiveStream}, " +
             "startOfflinePush=${startOfflinePush}, " +
             "catalogGroup=#{catalogGroup}, " +
             "administrativeDivision=#{administrativeDivision}, " +
+            "createTime=#{createTime}, " +
+            "updateTime=#{updateTime}, " +
+            "treeType=#{treeType}, " +
             "catalogId=#{catalogId} " +
             "WHERE id=#{id}")
     int updateParentPlatform(ParentPlatform parentPlatform);
@@ -79,23 +81,17 @@ public interface ParentPlatformMapper {
     int outlineForAllParentPlatform();
 
     @Update("UPDATE parent_platform SET status=#{online} WHERE serverGBId=#{platformGbID}" )
-    int updateParentPlatformStatus(@Param("platformGbID")String platformGbID,
-                                   @Param("online")boolean online);
-
-    @Select("SELECT * FROM parent_platform WHERE shareAllLiveStream=true")
-    List<ParentPlatform> selectAllAhareAllLiveStream();
+    int updateParentPlatformStatus(String platformGbID, boolean online);
 
     @Update(value = {" <script>" +
             "UPDATE parent_platform " +
-            "SET catalogId=#{catalogId}" +
+            "SET catalogId=#{catalogId}, updateTime=#{updateTime}" +
             "WHERE serverGBId=#{platformId}"+
             "</script>"})
-    int setDefaultCatalog(@Param("platformId")String platformId,
-                          @Param("catalogId")String catalogId);
+    int setDefaultCatalog(String platformId, String catalogId, String updateTime);
 
     @Select("select 'channel' as name, count(pgc.platformId) count from platform_gb_channel pgc left join device_channel dc on dc.id = pgc.deviceChannelId where  pgc.platformId=#{platformId} and dc.channelId =#{gbId} " +
             "union " +
             "select 'stream' as name, count(pgs.platformId) count from platform_gb_stream pgs left join gb_stream gs on pgs.gbStreamId = gs.gbStreamId where  pgs.platformId=#{platformId} and gs.gbId = #{gbId}")
-    List<ChannelSourceInfo> getChannelSource(@Param("platformId")String platformId,
-                                             @Param("gbId")String gbId);
+    List<ChannelSourceInfo> getChannelSource(String platformId, String gbId);
 }

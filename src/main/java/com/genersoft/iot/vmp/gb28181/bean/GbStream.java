@@ -15,16 +15,15 @@ public class GbStream extends PlatformGbStream{
     private double latitude;
     private String streamType;
     private boolean status;
-    /**
-     * GMT unix系统时间戳，单位秒
-     */
-    public Long createStamp;
+
+    public String createTime;
 
     @Override
     public Integer getGbStreamId() {
         return gbStreamId;
     }
 
+    @Override
     public void setGbStreamId(Integer gbStreamId) {
         this.gbStreamId = gbStreamId;
     }
@@ -101,12 +100,11 @@ public class GbStream extends PlatformGbStream{
         this.mediaServerId = mediaServerId;
     }
 
-
-    public Long getCreateStamp() {
-        return createStamp;
+    public String getCreateTime() {
+        return createTime;
     }
 
-    public void setCreateStamp(Long createStamp) {
-        this.createStamp = createStamp;
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
     }
 }
