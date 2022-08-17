@@ -49,7 +49,7 @@
       </el-table-column>
       <el-table-column prop="keepaliveTime" label="最近心跳" min-width="160" >
       </el-table-column>
-      <el-table-column prop="registerTime" label="最近注册"  min-width="160">
+      <el-table-column prop="registerTime" label="最近注册"  min-width="160" sortable>
       </el-table-column>
 <!--      <el-table-column prop="updateTime" label="更新时间"  width="140">-->
 <!--      </el-table-column>-->
@@ -71,6 +71,7 @@
           </el-button>
           <el-divider direction="vertical"></el-divider>
           <el-button size="medium" icon="el-icon-edit" type="text" @click="edit(scope.row)">编辑</el-button>
+          <el-button size="mini" icon="el-icon-view" type="primary" @click="detail(scope.row)">查看</el-button>
           <el-divider direction="vertical"></el-divider>
           <el-button size="medium" icon="el-icon-delete" type="text" @click="deleteDevice(scope.row)" style="color: #f56c6c">删除</el-button>
         </template>
@@ -87,6 +88,7 @@
       :total="total">
     </el-pagination>
     <deviceEdit ref="deviceEdit"></deviceEdit>
+    <deviceDetail ref="deviceDetail"></deviceDetail>
     <syncChannelProgress ref="syncChannelProgress"></syncChannelProgress>
   </div>
 </template>
@@ -94,6 +96,7 @@
 <script>
 import uiHeader from '../layout/UiHeader.vue'
 import deviceEdit from './dialog/deviceEdit.vue'
+import deviceDetail from './dialog/deviceDetail.vue'
 import syncChannelProgress from './dialog/SyncChannelProgress.vue'
 
 export default {
@@ -101,6 +104,7 @@ export default {
   components: {
     uiHeader,
     deviceEdit,
+    deviceDetail,
     syncChannelProgress,
   },
   data() {
@@ -116,6 +120,7 @@ export default {
       count: 15,
       total: 0,
       getDeviceListLoading: false,
+      searchKeyword:""
     };
   },
   computed: {
@@ -159,7 +164,8 @@ export default {
         url: `/api/device/query/devices`,
         params: {
           page: that.currentPage,
-          count: that.count
+          count: that.count,
+          keyword:that.searchKeyword
         }
       }).then(function (res) {
         that.total = res.data.total;
