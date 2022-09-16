@@ -367,10 +367,10 @@ public class DeviceServiceImpl implements IDeviceService {
                 return null;
             }
             // 使用行政区划展示树
-            if (parentId.length() > 10) {
-                // TODO 可能是行政区划与业务分组混杂的情形
-                return null;
-            }
+//            if (parentId.length() > 10) {
+//                // TODO 可能是行政区划与业务分组混杂的情形
+//                return null;
+//            }
 
             if (parentId.length() == 10 ) {
                 if (onlyCatalog) {
