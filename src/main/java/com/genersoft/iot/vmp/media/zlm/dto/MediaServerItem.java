@@ -13,6 +13,8 @@ public class MediaServerItem{
 
     private String ip;
 
+    private String extip;
+
     private String hookIp;
 
     private String sdpIp;

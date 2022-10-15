@@ -359,6 +359,7 @@ public class SIPCommander implements ISIPCommander {
 			String streamMode = device.getStreamMode().toUpperCase();
 
 			logger.info("{} 分配的ZLM为: {} [{}:{}]", stream, mediaServerItem.getId(), mediaServerItem.getIp(), ssrcInfo.getPort());
+			logger.info("SdpIp为: {} ", mediaServerItem.getSdpIp());
 			HookSubscribeForStreamChange hookSubscribe = HookSubscribeFactory.on_stream_changed("rtp", stream, true, "rtmp", mediaServerItem.getId());
 			subscribe.addSubscribe(hookSubscribe, (MediaServerItem mediaServerItemInUse, JSONObject json)->{
 				if (event != null) {
@@ -371,7 +372,7 @@ public class SIPCommander implements ISIPCommander {
 			content.append("v=0\r\n");
 			content.append("o="+ channelId+" 0 0 IN IP4 "+ mediaServerItem.getSdpIp() +"\r\n");
 			content.append("s=Play\r\n");
-			content.append("c=IN IP4 "+ mediaServerItem.getSdpIp() +"\r\n");
+			content.append("c=IN IP4 "+ mediaServerItem.getIp() +"\r\n");
 			content.append("t=0 0\r\n");
 
 			if (userSetting.isSeniorSdp()) {
