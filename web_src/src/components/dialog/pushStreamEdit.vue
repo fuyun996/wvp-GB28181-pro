@@ -112,7 +112,7 @@ export default {
           url:`/api/push/save_to_gb`,
           data: this.proxyParam
         }).then( (res) => {
-          if (res.data == "success") {
+          if (res.data.code === 0) {
             this.$message({
               showClose: true,
               message: "保存成功",
@@ -158,7 +158,7 @@ export default {
       var result = false;
       var that = this;
       await that.$axios({
-        method:"post",
+        method:"get",
         url:`/api/platform/exit/${deviceGbId}`
       }).then(function (res) {
         result = res.data;

@@ -2,8 +2,12 @@ package com.genersoft.iot.vmp.conf;
 
 import com.genersoft.iot.vmp.media.zlm.dto.MediaServerItem;
 import com.genersoft.iot.vmp.utils.DateUtil;
+import com.genersoft.iot.vmp.vmanager.gb28181.device.DeviceQuery;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.net.InetAddress;
@@ -13,6 +17,8 @@ import java.util.regex.Pattern;
 
 @Configuration("mediaConfig")
 public class MediaConfig{
+
+    private final static Logger logger = LoggerFactory.getLogger(MediaConfig.class);
 
     // 修改必须配置，不再支持自动获取
     @Value("${media.id}")
@@ -63,8 +69,8 @@ public class MediaConfig{
     @Value("${media.secret}")
     private String secret;
 
-    @Value("${media.stream-none-reader-delay-ms:10000}")
-    private int streamNoneReaderDelayMS = 10000;
+    @Value("${media.stream-none-reader-delay-ms:15000}")
+    private int streamNoneReaderDelayMS = 15000;
 
     @Value("${media.rtp.enable}")
     private boolean rtpEnable;
@@ -88,7 +94,7 @@ public class MediaConfig{
     }
 
     public String getHookIp() {
-        if (StringUtils.isEmpty(hookIp)){
+        if (ObjectUtils.isEmpty(hookIp)){
             return sipIp;
         }else {
             return hookIp;
@@ -162,7 +168,7 @@ public class MediaConfig{
     }
 
     public String getSdpIp() {
-        if (StringUtils.isEmpty(sdpIp)){
+        if (ObjectUtils.isEmpty(sdpIp)){
             return ip;
         }else {
             if (isValidIPAddress(sdpIp)) {
@@ -173,7 +179,7 @@ public class MediaConfig{
                 try {
                     hostAddress = InetAddress.getByName(sdpIp).getHostAddress();
                 } catch (UnknownHostException e) {
-                    throw new RuntimeException(e);
+                    logger.error("[获取SDP IP]: 域名解析失败");
                 }
                 return hostAddress;
             }
@@ -181,7 +187,7 @@ public class MediaConfig{
     }
 
     public String getStreamIp() {
-        if (StringUtils.isEmpty(streamIp)){
+        if (ObjectUtils.isEmpty(streamIp)){
             return ip;
         }else {
             return streamIp;

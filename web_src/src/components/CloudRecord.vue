@@ -1,7 +1,11 @@
 <template>
 	<div id="app" style="width: 100%">
     <div class="page-header">
-      <div class="page-title">云端录像</div>
+      <div class="page-title">
+        <el-page-header v-if="recordDetail" @back="backToList" content="云端录像"></el-page-header>
+        <div v-if="!recordDetail">云端录像</div>
+      </div>
+
       <div class="page-header-btn">
         节点选择:
         <el-select size="mini" @change="chooseMediaChange" style="width: 16rem; margin-right: 1rem;" v-model="mediaServerId" placeholder="请选择" :disabled="recordDetail">
@@ -125,8 +129,10 @@
           }
         }).then(function (res) {
           console.log(res)
-          that.total = res.data.data.total;
-          that.recordList = res.data.data.list;
+          if (res.data.code === 0) {
+            that.total = res.data.data.total;
+            that.recordList = res.data.data.list;
+          }
           that.loading = false;
         }).catch(function (error) {
           console.log(error);
@@ -174,12 +180,14 @@
           }
         }).then(function (res) {
           console.log(res)
-          that.total = res.data.data.total;
-          that.recordList = res.data.data.list;
+          if (res.data.code === 0) {
+            that.total = res.data.data.total;
+            that.recordList = res.data.data.list;
+          }
         }).catch(function (error) {
           console.log(error);
         });
-      }
+      },
 
 
 		}

@@ -1,5 +1,6 @@
 package com.genersoft.iot.vmp.storager.dao;
 
+import com.genersoft.iot.vmp.gb28181.bean.Device;
 import com.genersoft.iot.vmp.gb28181.bean.DeviceChannel;
 import com.genersoft.iot.vmp.gb28181.bean.DeviceChannelInPlatform;
 import com.genersoft.iot.vmp.vmanager.gb28181.platform.bean.ChannelReduce;
@@ -18,11 +19,11 @@ public interface DeviceChannelMapper {
     @Insert("INSERT INTO device_channel (channelId, deviceId, name, manufacture, model, owner, civilCode, block, " +
             "address, parental, parentId, safetyWay, registerWay, certNum, certifiable, errCode, secrecy, " +
             "ipAddress, port, password, PTZType, status, streamId, longitude, latitude, longitudeGcj02, latitudeGcj02, " +
-            "longitudeWgs84, latitudeWgs84, createTime, updateTime, businessGroupId, gpsTime) " +
+            "longitudeWgs84, latitudeWgs84, hasAudio, createTime, updateTime, businessGroupId, gpsTime) " +
             "VALUES ('${channelId}', '${deviceId}', '${name}', '${manufacture}', '${model}', '${owner}', '${civilCode}', '${block}'," +
             "'${address}', ${parental}, '${parentId}', ${safetyWay}, ${registerWay}, '${certNum}', ${certifiable}, ${errCode}, '${secrecy}', " +
             "'${ipAddress}', ${port}, '${password}', ${PTZType}, ${status}, '${streamId}', ${longitude}, ${latitude}, ${longitudeGcj02}, " +
-            "${latitudeGcj02}, ${longitudeWgs84}, ${latitudeWgs84},'${createTime}', '${updateTime}', '${businessGroupId}', '${gpsTime}')")
+            "${latitudeGcj02}, ${longitudeWgs84}, ${latitudeWgs84}, ${hasAudio}, '${createTime}', '${updateTime}', '${businessGroupId}', '${gpsTime}')")
     int add(DeviceChannel channel);
 
     @Update(value = {" <script>" +
@@ -77,31 +78,22 @@ public interface DeviceChannelMapper {
             " <if test='hasSubChannel == false' >  AND dc.subCount = 0 </if>" +
             "ORDER BY dc.channelId " +
             " </script>"})
-    List<DeviceChannel> queryChannels(@Param("deviceId")String deviceId,
-                                      @Param("parentChannelId")String parentChannelId,
-                                      @Param("query")String query,
-                                      @Param("hasSubChannel") Boolean hasSubChannel,
-                                      @Param("online") Boolean online);
+    List<DeviceChannel> queryChannels(String deviceId, String parentChannelId, String query, Boolean hasSubChannel, Boolean online);
 
     @Select("SELECT * FROM device_channel WHERE deviceId=#{deviceId} AND channelId=#{channelId}")
-    DeviceChannel queryChannel(@Param("deviceId")String deviceId,
-                               @Param("channelId")String channelId);
+    DeviceChannel queryChannel(String deviceId, String channelId);
 
     @Delete("DELETE FROM device_channel WHERE deviceId=#{deviceId}")
     int cleanChannelsByDeviceId(String deviceId);
 
     @Delete("DELETE FROM device_channel WHERE deviceId=#{deviceId} AND channelId=#{channelId}")
-    int del(@Param("deviceId")String deviceId,
-            @Param("channelId")String channelId);
+    int del(String deviceId, String channelId);
 
     @Update(value = {"UPDATE device_channel SET streamId=null WHERE deviceId=#{deviceId} AND channelId=#{channelId}"})
-    void stopPlay(@Param("deviceId")String deviceId,
-                  @Param("channelId")String channelId);
+    void stopPlay(String deviceId, String channelId);
 
     @Update(value = {"UPDATE device_channel SET streamId=#{streamId} WHERE deviceId=#{deviceId} AND channelId=#{channelId}"})
-    void startPlay(@Param("deviceId")String deviceId,
-                   @Param("channelId")String channelId,
-                   @Param("streamId")String streamId);
+    void startPlay(String deviceId, String channelId, String streamId);
 
     @Select(value = {" <script>" +
             "SELECT " +
@@ -127,11 +119,7 @@ public interface DeviceChannelMapper {
             " <if test='catalogId != null ' >  AND pgc.platformId = #{platformId} and pgc.catalogId=#{catalogId} </if> " +
             " ORDER BY dc.deviceId, dc.channelId ASC" +
             " </script>"})
-    List<ChannelReduce> queryChannelListInAll(@Param("query")String query,
-                                              @Param("online")Boolean online,
-                                              @Param("hasSubChannel")Boolean hasSubChannel,
-                                              @Param("platformId")String platformId,
-                                              @Param("catalogId")String catalogId);
+    List<ChannelReduce> queryChannelListInAll(String query, Boolean online, Boolean hasSubChannel, String platformId, String catalogId);
 
     @Select(value = {" <script>" +
             "SELECT " +
@@ -150,22 +138,20 @@ public interface DeviceChannelMapper {
     List<DeviceChannel> queryChannelByChannelId( String channelId);
 
     @Update(value = {"UPDATE device_channel SET status=0 WHERE deviceId=#{deviceId} AND channelId=#{channelId}"})
-    void offline(@Param("deviceId")String deviceId,
-                 @Param("channelId")String channelId);
+    void offline(String deviceId,  String channelId);
 
     @Update(value = {"UPDATE device_channel SET status=0 WHERE deviceId=#{deviceId}"})
     void offlineByDeviceId(String deviceId);
 
     @Update(value = {"UPDATE device_channel SET status=1 WHERE deviceId=#{deviceId} AND channelId=#{channelId}"})
-    void online(@Param("deviceId")String deviceId,
-                @Param("channelId")String channelId);
+    void online(String deviceId,  String channelId);
 
     @Insert("<script> " +
             "insert into device_channel " +
             "(channelId, deviceId, name, manufacture, model, owner, civilCode, block, subCount, " +
             "  address, parental, parentId, safetyWay, registerWay, certNum, certifiable, errCode, secrecy, " +
             "  ipAddress, port, password, PTZType, status, streamId, longitude, latitude, longitudeGcj02, latitudeGcj02, " +
-            "  longitudeWgs84, latitudeWgs84, createTime, updateTime, businessGroupId, gpsTime) " +
+            "  longitudeWgs84, latitudeWgs84, hasAudio, createTime, updateTime, businessGroupId, gpsTime) " +
             "values " +
             "<foreach collection='addChannels' index='index' item='item' separator=','> " +
             "('${item.channelId}', '${item.deviceId}', '${item.name}', '${item.manufacture}', '${item.model}', " +
@@ -174,7 +160,7 @@ public interface DeviceChannelMapper {
             "'${item.certNum}', ${item.certifiable}, ${item.errCode}, '${item.secrecy}', " +
             "'${item.ipAddress}', ${item.port}, '${item.password}', ${item.PTZType}, ${item.status}, " +
             "'${item.streamId}', ${item.longitude}, ${item.latitude},${item.longitudeGcj02}, " +
-            "${item.latitudeGcj02},${item.longitudeWgs84}, ${item.latitudeWgs84},'${item.createTime}', '${item.updateTime}', " +
+            "${item.latitudeGcj02},${item.longitudeWgs84}, ${item.latitudeWgs84}, ${item.hasAudio},'${item.createTime}', '${item.updateTime}', " +
             "'${item.businessGroupId}', '${item.gpsTime}') " +
             "</foreach> " +
             "ON DUPLICATE KEY UPDATE " +
@@ -207,6 +193,7 @@ public interface DeviceChannelMapper {
             "latitudeGcj02=VALUES(latitudeGcj02), " +
             "longitudeWgs84=VALUES(longitudeWgs84), " +
             "latitudeWgs84=VALUES(latitudeWgs84), " +
+            "hasAudio=VALUES(hasAudio), " +
             "businessGroupId=VALUES(businessGroupId), " +
             "gpsTime=VALUES(gpsTime)" +
             "</script>")
@@ -270,13 +257,8 @@ public interface DeviceChannelMapper {
             "ORDER BY dc1.channelId ASC " +
             "Limit #{limit} OFFSET #{start}" +
             " </script>"})
-    List<DeviceChannel> queryChannelsByDeviceIdWithStartAndLimit(@Param("deviceId")String deviceId,
-                                                                 @Param("parentChannelId")String parentChannelId,
-                                                                 @Param("query")String query,
-                                                                 @Param("hasSubChannel")Boolean hasSubChannel,
-                                                                 @Param("online")Boolean online,
-                                                                 @Param("start")int start,
-                                                                 @Param("limit")int limit);
+    List<DeviceChannel> queryChannelsByDeviceIdWithStartAndLimit(String deviceId, String parentChannelId, String query,
+                                                                 Boolean hasSubChannel, Boolean online, int start, int limit);
 
     @Select("SELECT * FROM device_channel WHERE deviceId=#{deviceId} AND status=1")
     List<DeviceChannel> queryOnlineChannelsByDeviceId(String deviceId);
@@ -290,8 +272,7 @@ public interface DeviceChannelMapper {
             " AND channelId NOT IN " +
             "<foreach collection='channels'  item='item'  open='(' separator=',' close=')' > #{item.channelId}</foreach>" +
             " </script>"})
-    int cleanChannelsNotInList(String deviceId,
-                               List<DeviceChannel> channels);
+    int cleanChannelsNotInList(String deviceId, List<DeviceChannel> channels);
 
     @Update(" update device_channel" +
             " set subCount = (select *" +
@@ -300,8 +281,7 @@ public interface DeviceChannelMapper {
             "                      where deviceId = #{deviceId} and parentId = #{channelId}) as temp)" +
             " where deviceId = #{deviceId} " +
             " and channelId = #{channelId}")
-    int updateChannelSubCount(@Param("deviceId")String deviceId,
-                              @Param("channelId")String channelId);
+    int updateChannelSubCount(String deviceId, String channelId);
 
     @Update(value = {" <script>" +
             "UPDATE device_channel " +
@@ -362,4 +342,7 @@ public interface DeviceChannelMapper {
             " left join platform_catalog pc on pgc.catalogId = pc.id and pgc.platformId = pc.platformId" +
             " where pgc.platformId=#{serverGBId}")
     List<DeviceChannel> queryChannelWithCatalog(String serverGBId);
+
+    @Select("select * from device_channel where deviceId = #{deviceId}")
+    List<DeviceChannel> queryAllChannels(String deviceId);
 }

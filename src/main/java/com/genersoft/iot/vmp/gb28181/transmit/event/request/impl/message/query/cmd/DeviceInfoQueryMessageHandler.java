@@ -48,15 +48,15 @@ public class DeviceInfoQueryMessageHandler extends SIPRequestProcessorParent imp
         FromHeader fromHeader = (FromHeader) evt.getRequest().getHeader(FromHeader.NAME);
         try {
             // 回复200 OK
-            responseAck(evt, Response.OK);
-        } catch (SipException e) {
-            e.printStackTrace();
-        } catch (InvalidArgumentException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
+            responseAck(getServerTransaction(evt), Response.OK);
+        } catch (SipException | InvalidArgumentException | ParseException e) {
+            logger.error("[命令发送失败] DeviceInfo查询回复: {}", e.getMessage());
         }
         String sn = rootElement.element("SN").getText();
-        cmderFroPlatform.deviceInfoResponse(parentPlatform, sn, fromHeader.getTag());
+        try {
+            cmderFroPlatform.deviceInfoResponse(parentPlatform, sn, fromHeader.getTag());
+        } catch (SipException | InvalidArgumentException | ParseException e) {
+            logger.error("[命令发送失败] 国标级联 DeviceInfo查询回复: {}", e.getMessage());
+        }
     }
 }

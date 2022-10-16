@@ -59,13 +59,9 @@ public class DeviceStatusResponseMessageHandler extends SIPRequestProcessorParen
         }
         // 回复200 OK
         try {
-            responseAck(evt, Response.OK);
-        } catch (SipException e) {
-            e.printStackTrace();
-        } catch (InvalidArgumentException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
+            responseAck(getServerTransaction(evt), Response.OK);
+        } catch (SipException | InvalidArgumentException | ParseException e) {
+            logger.error("[命令发送失败] 国标级联 设备状态应答回复200OK: {}", e.getMessage());
         }
         Element deviceIdElement = element.element("DeviceID");
         Element onlineElement = element.element("Online");
@@ -76,7 +72,7 @@ public class DeviceStatusResponseMessageHandler extends SIPRequestProcessorParen
             logger.debug(json.toJSONString());
         }
         String text = onlineElement.getText();
-        if (Objects.equals(text.trim().toUpperCase(), "ONLINE")) {
+        if ("ONLINE".equalsIgnoreCase(text.trim())) {
             deviceService.online(device);
         }else {
             deviceService.offline(device.getDeviceId());

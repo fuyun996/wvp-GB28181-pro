@@ -167,13 +167,15 @@ export default {
           count: that.count,
           keyword:that.searchKeyword
         }
-      }).then(function (res) {
-        that.total = res.data.total;
-        that.deviceList = res.data.list;
-        that.getDeviceListLoading = false;
-      }).catch(function (error) {
+      }).then( (res)=> {
+        if (res.data.code === 0) {
+          this.total = res.data.data.total;
+          this.deviceList = res.data.data.list;
+        }
+        this.getDeviceListLoading = false;
+      }).catch( (error)=> {
         console.error(error);
-        that.getDeviceListLoading = false;
+        this.getDeviceListLoading = false;
       });
 
     },

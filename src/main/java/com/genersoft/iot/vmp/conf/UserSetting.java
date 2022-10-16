@@ -31,7 +31,7 @@ public class UserSetting {
 
     private Boolean logInDatebase = Boolean.TRUE;
 
-    private Boolean redisConfig = Boolean.TRUE;
+    private Boolean usePushingAsStatus = Boolean.TRUE;
 
     private String serverId = "000000";
 
@@ -123,14 +123,6 @@ public class UserSetting {
         this.thirdPartyGBIdReg = thirdPartyGBIdReg;
     }
 
-    public Boolean getRedisConfig() {
-        return redisConfig;
-    }
-
-    public void setRedisConfig(Boolean redisConfig) {
-        this.redisConfig = redisConfig;
-    }
-
     public Boolean getRecordSip() {
         return recordSip;
     }
@@ -145,5 +137,13 @@ public class UserSetting {
 
     public void setPlatformPlayTimeout(int platformPlayTimeout) {
         this.platformPlayTimeout = platformPlayTimeout;
+    }
+
+    public Boolean isUsePushingAsStatus() {
+        return usePushingAsStatus;
+    }
+
+    public void setUsePushingAsStatus(Boolean usePushingAsStatus) {
+        this.usePushingAsStatus = usePushingAsStatus;
     }
 }

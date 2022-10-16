@@ -15,8 +15,6 @@ public class VideoManagerConstants {
 
 	public static final String MEDIA_SERVER_PREFIX = "VMP_MEDIA_SERVER_";
 
-	public static final String MEDIA_SERVER_KEEPALIVE_PREFIX = "VMP_MEDIA_SERVER_KEEPALIVE_";
-
 	public static final String MEDIA_SERVERS_ONLINE_PREFIX = "VMP_MEDIA_ONLINE_SERVERS_";
 
 	public static final String MEDIA_STREAM_PREFIX = "VMP_MEDIA_STREAM";
@@ -92,11 +90,21 @@ public class VideoManagerConstants {
 	 * 接收推流设备的GPS变化通知
 	 */
 	public static final String VM_MSG_PUSH_STREAM_STATUS_CHANGE = "VM_MSG_PUSH_STREAM_STATUS_CHANGE";
+	/**
+	 * 接收推流设备列表更新变化通知
+	 */
+	public static final String VM_MSG_PUSH_STREAM_LIST_CHANGE = "VM_MSG_PUSH_STREAM_LIST_CHANGE";
 
 	/**
 	 * redis 消息通知设备推流到平台
 	 */
 	public static final String VM_MSG_STREAM_PUSH_REQUESTED = "VM_MSG_STREAM_PUSH_REQUESTED";
+
+
+	/**
+	 * redis 消息通知平台通知设备推流结果
+	 */
+	public static final String VM_MSG_STREAM_PUSH_RESPONSE = "VM_MSG_STREAM_PUSH_RESPONSE";
 
 	/**
 	 * redis 消息请求所有的在线通道

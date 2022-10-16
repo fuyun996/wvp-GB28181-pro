@@ -14,6 +14,7 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.sip.RequestEvent;
@@ -118,12 +119,12 @@ public class XmlUtil {
         // 如果是属性
         for (Object o : element.attributes()) {
             Attribute attr = (Attribute) o;
-            if (!StringUtils.isEmpty(attr.getValue())) {
+            if (!ObjectUtils.isEmpty(attr.getValue())) {
                 json.put("@" + attr.getName(), attr.getValue());
             }
         }
         List<Element> chdEl = element.elements();
-        if (chdEl.isEmpty() && !StringUtils.isEmpty(element.getText())) {// 如果没有子元素,只有一个值
+        if (chdEl.isEmpty() && !ObjectUtils.isEmpty(element.getText())) {// 如果没有子元素,只有一个值
             json.put(element.getName(), element.getText());
         }
 
@@ -154,7 +155,7 @@ public class XmlUtil {
             } else { // 子元素没有子元素
                 for (Object o : element.attributes()) {
                     Attribute attr = (Attribute) o;
-                    if (!StringUtils.isEmpty(attr.getValue())) {
+                    if (!ObjectUtils.isEmpty(attr.getValue())) {
                         json.put("@" + attr.getName(), attr.getValue());
                     }
                 }
@@ -197,7 +198,7 @@ public class XmlUtil {
             return null;
         }
         String channelId = channdelIdElement.getTextTrim();
-        if (StringUtils.isEmpty(channelId)) {
+        if (ObjectUtils.isEmpty(channelId)) {
             logger.warn("解析Catalog消息时发现缺少 DeviceID");
             return null;
         }
@@ -210,17 +211,26 @@ public class XmlUtil {
         ChannelType channelType = ChannelType.Other;
         if (channelId.length() <= 8) {
             channelType = ChannelType.CivilCode;
+            deviceChannel.setHasAudio(false);
         }else {
             if (channelId.length() == 20) {
                 int code = Integer.parseInt(channelId.substring(10, 13));
                 switch (code){
                     case 215:
                         channelType = ChannelType.BusinessGroup;
+                        deviceChannel.setHasAudio(false);
                         break;
                     case 216:
                         channelType = ChannelType.VirtualOrganization;
+                        deviceChannel.setHasAudio(false);
+                        break;
+                    case 136:
+                    case 137:
+                    case 138:
+                        deviceChannel.setHasAudio(true);
                         break;
                     default:
+                        deviceChannel.setHasAudio(false);
                         break;
 
                 }
@@ -316,7 +326,7 @@ public class XmlUtil {
         // 识别自带的目录标识
         String parental = XmlUtil.getText(itemDevice, "Parental");
         // 由于海康会错误的发送65535作为这里的取值,所以这里除非是0否则认为是1
-        if (!StringUtils.isEmpty(parental) && parental.length() == 1 && Integer.parseInt(parental) == 0) {
+        if (!ObjectUtils.isEmpty(parental) && parental.length() == 1 && Integer.parseInt(parental) == 0) {
             deviceChannel.setParental(0);
         }else {
             deviceChannel.setParental(1);
@@ -332,14 +342,14 @@ public class XmlUtil {
         deviceChannel.setPassword(XmlUtil.getText(itemDevice, "Password"));
 
         String safetyWay = XmlUtil.getText(itemDevice, "SafetyWay");
-        if (StringUtils.isEmpty(safetyWay)) {
+        if (ObjectUtils.isEmpty(safetyWay)) {
             deviceChannel.setSafetyWay(0);
         } else {
             deviceChannel.setSafetyWay(Integer.parseInt(safetyWay));
         }
 
         String registerWay = XmlUtil.getText(itemDevice, "RegisterWay");
-        if (StringUtils.isEmpty(registerWay)) {
+        if (ObjectUtils.isEmpty(registerWay)) {
             deviceChannel.setRegisterWay(1);
         } else {
             deviceChannel.setRegisterWay(Integer.parseInt(registerWay));
@@ -395,7 +405,6 @@ public class XmlUtil {
         } else {
             deviceChannel.setPTZType(Integer.parseInt(XmlUtil.getText(itemDevice, "PTZType")));
         }
-        deviceChannel.setHasAudio(true); // 默认含有音频，播放时再检查是否有音频及是否AAC
         return deviceChannel;
     }
 }

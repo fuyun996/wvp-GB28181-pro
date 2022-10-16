@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import javax.sip.InvalidArgumentException;
 import javax.sip.RequestEvent;
+import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.message.Response;
 import java.text.ParseException;
@@ -46,8 +47,9 @@ public class BroadcastResponseMessageHandler extends SIPRequestProcessorParent i
         try {
             String channelId = getText(rootElement, "DeviceID");
             String key = DeferredResultHolder.CALLBACK_CMD_BROADCAST + device.getDeviceId() + channelId;
+            ServerTransaction serverTransaction = getServerTransaction(evt);
             // 回复200 OK
-            responseAck(evt, Response.OK);
+            responseAck(serverTransaction, Response.OK);
             // 此处是对本平台发出Broadcast指令的应答
             JSONObject json = new JSONObject();
             XmlUtil.node2Json(rootElement, json);
@@ -61,7 +63,7 @@ public class BroadcastResponseMessageHandler extends SIPRequestProcessorParent i
 
 
         } catch (ParseException | SipException | InvalidArgumentException e) {
-            e.printStackTrace();
+            logger.error("[命令发送失败] 国标级联 语音喊话: {}", e.getMessage());
         }
     }
 

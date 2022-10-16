@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.sip.InvalidArgumentException;
@@ -25,6 +26,9 @@ import javax.sip.header.ViaHeader;
 import javax.sip.message.Response;
 import java.text.ParseException;
 
+/**
+ * 状态信息(心跳)报送
+ */
 @Component
 public class KeepaliveNotifyMessageHandler extends SIPRequestProcessorParent implements InitializingBean, IMessageHandler {
 
@@ -55,7 +59,7 @@ public class KeepaliveNotifyMessageHandler extends SIPRequestProcessorParent imp
             String received = viaHeader.getReceived();
             int rPort = viaHeader.getRPort();
             // 解析本地地址替代
-            if (StringUtils.isEmpty(received) || rPort == -1) {
+            if (ObjectUtils.isEmpty(received) || rPort == -1) {
                 received = viaHeader.getHost();
                 rPort = viaHeader.getPort();
             }
@@ -65,7 +69,7 @@ public class KeepaliveNotifyMessageHandler extends SIPRequestProcessorParent imp
             }
             device.setKeepaliveTime(DateUtil.getNow());
             // 回复200 OK
-            responseAck(evt, Response.OK);
+            responseAck(getServerTransaction(evt), Response.OK);
             if (device.getOnline() == 1) {
                 deviceService.updateDevice(device);
             }else {
@@ -74,12 +78,8 @@ public class KeepaliveNotifyMessageHandler extends SIPRequestProcessorParent imp
                     deviceService.online(device);
                 }
             }
-        } catch (SipException e) {
-            e.printStackTrace();
-        } catch (InvalidArgumentException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
+        } catch (SipException | InvalidArgumentException | ParseException e) {
+            logger.error("[命令发送失败] 国标级联 心跳回复: {}", e.getMessage());
         }
     }
 

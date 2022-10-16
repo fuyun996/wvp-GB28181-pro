@@ -52,7 +52,7 @@ public class ConfigDownloadResponseMessageHandler extends SIPRequestProcessorPar
         String key = DeferredResultHolder.CALLBACK_CMD_CONFIGDOWNLOAD + device.getDeviceId() + channelId;
         try {
             // 回复200 OK
-            responseAck(evt, Response.OK);
+            responseAck(getServerTransaction(evt), Response.OK);
             // 此处是对本平台发出DeviceControl指令的应答
             JSONObject json = new JSONObject();
             XmlUtil.node2Json(element, json);
@@ -63,12 +63,8 @@ public class ConfigDownloadResponseMessageHandler extends SIPRequestProcessorPar
             msg.setKey(key);
             msg.setData(json);
             deferredResultHolder.invokeAllResult(msg);
-        } catch (SipException e) {
-            e.printStackTrace();
-        } catch (InvalidArgumentException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
+        } catch (SipException | InvalidArgumentException | ParseException e) {
+            logger.error("[命令发送失败] 国标级联 设备配置查询: {}", e.getMessage());
         }
 
     }

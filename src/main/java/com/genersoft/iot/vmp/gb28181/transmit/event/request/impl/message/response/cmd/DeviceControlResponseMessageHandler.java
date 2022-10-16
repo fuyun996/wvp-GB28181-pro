@@ -46,7 +46,7 @@ public class DeviceControlResponseMessageHandler extends SIPRequestProcessorPare
     public void handForDevice(RequestEvent evt, Device device, Element element) {
         // 此处是对本平台发出DeviceControl指令的应答
         try {
-            responseAck(evt, Response.OK);
+            responseAck(getServerTransaction(evt), Response.OK);
             JSONObject json = new JSONObject();
             String channelId = getText(element, "DeviceID");
             XmlUtil.node2Json(element, json);
@@ -58,12 +58,8 @@ public class DeviceControlResponseMessageHandler extends SIPRequestProcessorPare
             msg.setKey(key);
             msg.setData(json);
             deferredResultHolder.invokeAllResult(msg);
-        } catch (SipException e) {
-            e.printStackTrace();
-        } catch (InvalidArgumentException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
+        } catch (SipException | InvalidArgumentException | ParseException e) {
+            logger.error("[命令发送失败] 国标级联 设备控制: {}", e.getMessage());
         }
     }
 

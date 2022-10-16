@@ -50,7 +50,9 @@ public interface IMediaServerService {
 
     SSRCInfo openRTPServer(MediaServerItem mediaServerItem, String streamId, String ssrc, boolean ssrcCheck, boolean isPlayback, Integer port);
 
-    void closeRTPServer(String deviceId, String channelId, String ssrc);
+    void closeRTPServer(MediaServerItem mediaServerItem, String streamId);
+
+    void closeRTPServer(String mediaServerId, String streamId);
 
     void clearRTPServer(MediaServerItem mediaServerItem);
 
@@ -64,7 +66,7 @@ public interface IMediaServerService {
 
     void clearMediaServerForOnline();
 
-    WVPResult<String> add(MediaServerItem mediaSerItem);
+    void add(MediaServerItem mediaSerItem);
 
     int addToDatabase(MediaServerItem mediaSerItem);
 
@@ -72,7 +74,7 @@ public interface IMediaServerService {
 
     void resetOnlineServerItem(MediaServerItem serverItem);
 
-    WVPResult<MediaServerItem> checkMediaServer(String ip, int port, String secret);
+    MediaServerItem checkMediaServer(String ip, int port, String secret);
 
     boolean checkMediaRecordServer(String ip, int port);
 
@@ -83,4 +85,6 @@ public interface IMediaServerService {
     MediaServerItem getDefaultMediaServer();
 
     void updateMediaServerKeepalive(String mediaServerId, JSONObject data);
+
+    boolean checkRtpServer(MediaServerItem mediaServerItem, String rtp, String stream);
 }

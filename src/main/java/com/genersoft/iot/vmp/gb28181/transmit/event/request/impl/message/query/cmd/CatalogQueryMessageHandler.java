@@ -66,7 +66,7 @@ public class CatalogQueryMessageHandler extends SIPRequestProcessorParent implem
         FromHeader fromHeader = (FromHeader) evt.getRequest().getHeader(FromHeader.NAME);
         try {
             // 回复200 OK
-            responseAck(evt, Response.OK);
+            responseAck(getServerTransaction(evt), Response.OK);
             Element snElement = rootElement.element("SN");
             String sn = snElement.getText();
             // 准备回复通道信息
@@ -78,6 +78,11 @@ public class CatalogQueryMessageHandler extends SIPRequestProcessorParent implem
 
             List<DeviceChannel> allChannels = new ArrayList<>();
 
+            // 回复平台
+//            DeviceChannel deviceChannel = getChannelForPlatform(parentPlatform);
+//            allChannels.add(deviceChannel);
+
+            // 回复目录
             if (catalogs.size() > 0) {
                 allChannels.addAll(catalogs);
             }
@@ -95,13 +100,24 @@ public class CatalogQueryMessageHandler extends SIPRequestProcessorParent implem
                 // 回复无通道
                 cmderFroPlatform.catalogQuery(null, parentPlatform, sn, fromHeader.getTag(), 0);
             }
-        } catch (SipException e) {
-            e.printStackTrace();
-        } catch (InvalidArgumentException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
+        } catch (SipException | InvalidArgumentException | ParseException e) {
+            logger.error("[命令发送失败] 国标级联 目录查询: {}", e.getMessage());
         }
 
+    }
+
+    private DeviceChannel getChannelForPlatform(ParentPlatform platform) {
+        DeviceChannel deviceChannel = new DeviceChannel();
+
+        deviceChannel.setChannelId(platform.getDeviceGBId());
+        deviceChannel.setName(platform.getName());
+        deviceChannel.setManufacture("wvp-pro");
+        deviceChannel.setOwner("wvp-pro");
+        deviceChannel.setCivilCode(platform.getAdministrativeDivision());
+        deviceChannel.setAddress("wvp-pro");
+        deviceChannel.setRegisterWay(0);
+        deviceChannel.setSecrecy("0");
+
+        return deviceChannel;
     }
 }

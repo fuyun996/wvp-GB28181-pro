@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
@@ -91,9 +92,24 @@ public class ZLMRTPServerFactory {
         int result = -1;
         // 查询此rtp server 是否已经存在
         JSONObject rtpInfo = zlmresTfulUtils.getRtpInfo(mediaServerItem, streamId);
+        logger.info(JSONObject.toJSONString(rtpInfo));
         if(rtpInfo.getInteger("code") == 0){
             if (rtpInfo.getBoolean("exist")) {
                 result = rtpInfo.getInteger("local_port");
+                if (result == 0) {
+                    // 此时说明rtpServer已经创建但是流还没有推上来
+                    // 此时重新打开rtpServer
+                    Map<String, Object> param = new HashMap<>();
+                    param.put("stream_id", streamId);
+                    JSONObject jsonObject = zlmresTfulUtils.closeRtpServer(mediaServerItem, param);
+                    if (jsonObject != null ) {
+                        if (jsonObject.getInteger("code") == 0) {
+                            return createRTPServer(mediaServerItem, streamId, ssrc, port);
+                        }else {
+                            logger.warn("[开启rtpServer], 重启RtpServer错误");
+                        }
+                    }
+                }
                 return result;
             }
         }else if(rtpInfo.getInteger("code") == -2){
@@ -112,7 +128,7 @@ public class ZLMRTPServerFactory {
         }
         param.put("ssrc", ssrc);
         JSONObject openRtpServerResultJson = zlmresTfulUtils.openRtpServer(mediaServerItem, param);
-
+        logger.info(JSONObject.toJSONString(openRtpServerResultJson));
         if (openRtpServerResultJson != null) {
             if (openRtpServerResultJson.getInteger("code") == 0) {
                 result= openRtpServerResultJson.getInteger("port");
@@ -187,7 +203,7 @@ public class ZLMRTPServerFactory {
 
         // 使用RTPServer 功能找一个可用的端口
         String sendRtpPortRange = serverItem.getSendRtpPortRange();
-        if (StringUtils.isEmpty(sendRtpPortRange)) {
+        if (ObjectUtils.isEmpty(sendRtpPortRange)) {
             return null;
         }
         String[] portRangeStrArray = serverItem.getSendRtpPortRange().split(",");
@@ -229,7 +245,7 @@ public class ZLMRTPServerFactory {
     public SendRtpItem createSendRtpItem(MediaServerItem serverItem, String ip, int port, String ssrc, String platformId, String app, String stream, String channelId, boolean tcp){
         // 使用RTPServer 功能找一个可用的端口
         String sendRtpPortRange = serverItem.getSendRtpPortRange();
-        if (StringUtils.isEmpty(sendRtpPortRange)) {
+        if (ObjectUtils.isEmpty(sendRtpPortRange)) {
             return null;
         }
         String[] portRangeStrArray = serverItem.getSendRtpPortRange().split(",");
@@ -269,7 +285,7 @@ public class ZLMRTPServerFactory {
      * 查询待转推的流是否就绪
      */
     public Boolean isRtpReady(MediaServerItem mediaServerItem, String streamId) {
-        JSONObject mediaInfo = zlmresTfulUtils.getMediaInfo(mediaServerItem,"rtp", "rtmp", streamId);
+        JSONObject mediaInfo = zlmresTfulUtils.getMediaInfo(mediaServerItem,"rtp", "rtsp", streamId);
         return (mediaInfo.getInteger("code") == 0 && mediaInfo.getBoolean("online"));
     }
 
@@ -289,7 +305,7 @@ public class ZLMRTPServerFactory {
      * @return
      */
     public int totalReaderCount(MediaServerItem mediaServerItem, String app, String streamId) {
-        JSONObject mediaInfo = zlmresTfulUtils.getMediaInfo(mediaServerItem, app, "rtmp", streamId);
+        JSONObject mediaInfo = zlmresTfulUtils.getMediaInfo(mediaServerItem, app, "rtsp", streamId);
         if (mediaInfo == null) {
             return 0;
         }
@@ -312,12 +328,12 @@ public class ZLMRTPServerFactory {
         Boolean result = false;
         JSONObject jsonObject = zlmresTfulUtils.stopSendRtp(mediaServerItem, param);
         if (jsonObject == null) {
-            logger.error("停止RTP推流失败: 请检查ZLM服务");
+            logger.error("[停止RTP推流] 失败: 请检查ZLM服务");
         } else if (jsonObject.getInteger("code") == 0) {
             result= true;
-            logger.info("停止RTP推流成功");
+            logger.info("[停止RTP推流] 成功");
         } else {
-            logger.error("停止RTP推流失败: {}, 参数：{}",jsonObject.getString("msg"),JSONObject.toJSON(param));
+            logger.error("[停止RTP推流] 失败: {}, 参数：{}->\r\n{}",jsonObject.getString("msg"),JSONObject.toJSON(param), jsonObject);
         }
         return result;
     }

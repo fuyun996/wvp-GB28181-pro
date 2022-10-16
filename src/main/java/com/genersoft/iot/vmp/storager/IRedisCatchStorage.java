@@ -8,6 +8,7 @@ import com.genersoft.iot.vmp.service.bean.GPSMsgInfo;
 import com.genersoft.iot.vmp.service.bean.MessageForPushChannel;
 import com.genersoft.iot.vmp.service.bean.SSRCInfo;
 import com.genersoft.iot.vmp.service.bean.ThirdPartyGB;
+import com.genersoft.iot.vmp.storager.dao.dto.PlatformRegisterInfo;
 
 import java.util.List;
 import java.util.Map;
@@ -55,23 +56,21 @@ public interface IRedisCatchStorage {
 
     StreamInfo queryPlayback(String deviceId, String channelID, String stream, String callId);
 
+    String queryPlaybackForKey(String deviceId, String channelId, String stream, String callId);
+
     void updatePlatformCatchInfo(ParentPlatformCatch parentPlatformCatch);
 
     ParentPlatformCatch queryPlatformCatchInfo(String platformGbId);
 
     void delPlatformCatchInfo(String platformGbId);
 
-    void updatePlatformKeepalive(ParentPlatform parentPlatform);
-
     void delPlatformKeepalive(String platformGbId);
-
-    void updatePlatformRegister(ParentPlatform parentPlatform);
 
     void delPlatformRegister(String platformGbId);
 
-    void updatePlatformRegisterInfo(String callId, String platformGbId);
+    void updatePlatformRegisterInfo(String callId, PlatformRegisterInfo platformRegisterInfo);
 
-    String queryPlatformRegisterInfo(String callId);
+    PlatformRegisterInfo queryPlatformRegisterInfo(String callId);
 
     void delPlatformRegisterInfo(String callId);
 
@@ -237,4 +236,8 @@ public interface IRedisCatchStorage {
      * 发送redis消息 查询所有推流设备的状态
      */
     void sendStreamPushRequestedMsgForStatus();
+
+    List<SendRtpItem> querySendRTPServerByChnnelId(String channelId);
+
+    List<SendRtpItem> querySendRTPServerByStream(String stream);
 }

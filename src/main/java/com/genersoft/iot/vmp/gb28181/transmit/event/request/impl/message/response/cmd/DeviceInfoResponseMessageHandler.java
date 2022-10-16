@@ -20,10 +20,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.sip.InvalidArgumentException;
 import javax.sip.RequestEvent;
+import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.message.Response;
 import java.text.ParseException;
@@ -73,8 +75,14 @@ public class DeviceInfoResponseMessageHandler extends SIPRequestProcessorParent 
             logger.warn("[接收到DeviceInfo应答消息,但是设备已经离线]：" + (device != null ? device.getDeviceId():"" ));
             return;
         }
+        ServerTransaction serverTransaction = getServerTransaction(evt);
         try {
             rootElement = getRootElement(evt, device.getCharset());
+            if (rootElement == null) {
+                logger.warn("[ 接收到DeviceInfo应答消息 ] content cannot be null, {}", evt.getRequest());
+                responseAck(serverTransaction, Response.BAD_REQUEST);
+                return;
+            }
             Element deviceIdElement = rootElement.element("DeviceID");
             String channelId = deviceIdElement.getTextTrim();
             String key = DeferredResultHolder.CALLBACK_CMD_DEVICEINFO + device.getDeviceId() + channelId;
@@ -83,7 +91,7 @@ public class DeviceInfoResponseMessageHandler extends SIPRequestProcessorParent 
             device.setManufacturer(getText(rootElement, "Manufacturer"));
             device.setModel(getText(rootElement, "Model"));
             device.setFirmware(getText(rootElement, "Firmware"));
-            if (StringUtils.isEmpty(device.getStreamMode())) {
+            if (ObjectUtils.isEmpty(device.getStreamMode())) {
                 device.setStreamMode("UDP");
             }
             deviceService.updateDevice(device);
@@ -93,7 +101,7 @@ public class DeviceInfoResponseMessageHandler extends SIPRequestProcessorParent 
             msg.setData(device);
             deferredResultHolder.invokeAllResult(msg);
             // 回复200 OK
-            responseAck(evt, Response.OK);
+            responseAck(serverTransaction, Response.OK);
         } catch (DocumentException e) {
             e.printStackTrace();
         } catch (InvalidArgumentException e) {
