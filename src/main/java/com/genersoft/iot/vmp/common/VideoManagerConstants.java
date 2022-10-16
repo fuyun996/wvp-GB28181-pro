@@ -6,6 +6,7 @@ package com.genersoft.iot.vmp.common;
  * @date:   2019年5月30日 下午3:04:04   
  *   
  */
+
 public class VideoManagerConstants {
 	
 	public static final String WVP_SERVER_PREFIX = "VMP_SIGNALLING_SERVER_INFO_";
