@@ -3,6 +3,7 @@ package com.genersoft.iot.vmp.vmanager.gb28181.device;
 import com.alibaba.fastjson.JSONObject;
 import com.genersoft.iot.vmp.conf.DynamicTask;
 import com.genersoft.iot.vmp.conf.exception.ControllerException;
+import com.genersoft.iot.vmp.conf.security.SecurityUtils;
 import com.genersoft.iot.vmp.gb28181.bean.Device;
 import com.genersoft.iot.vmp.gb28181.bean.DeviceChannel;
 import com.genersoft.iot.vmp.gb28181.bean.SubscribeHolder;
@@ -105,8 +106,8 @@ public class DeviceQuery {
 	@Parameter(name = "keyword", description = "关键词", required = false)
 	@GetMapping("/devices")
 	public PageInfo<Device> devices(int page, int count,String keyword){
-		
-		return storager.queryVideoDeviceList(page, count,keyword);
+		int roleId = SecurityUtils.getUserInfo().getRole().getId();
+		return storager.queryVideoDeviceListByRoleId(page, count,keyword, roleId);
 	}
 
 	/**

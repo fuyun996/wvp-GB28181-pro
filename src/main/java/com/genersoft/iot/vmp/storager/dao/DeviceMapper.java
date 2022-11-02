@@ -108,6 +108,18 @@ public interface DeviceMapper {
     )
     List<Device> getDevices(String keyword);
 
+    @Select("<script>" +
+            "SELECT * FROM " +
+            "(SELECT *, (SELECT count(0) FROM device_channel WHERE deviceId=de.deviceId and channelId in " +
+            "(SELECT channelId FROM role_device_channel WHERE role_id=#{roleId})) AS channelCount " +
+            "FROM device de) AS decount where decount.channelCount > 0" +
+            "<if  test=\"keyword !=null and  keyword !=''  \">" +
+                "WHERE decount.deviceId like '%${keyword}%'  or decount.name like  '%${keyword}%' " +
+            "</if>" +
+            "</script>"
+    )
+    List<Device> getDevicesByRoleId(String keyword, int roleId);
+
 
     @Delete("DELETE FROM device WHERE deviceId=#{deviceId}")
     int del(String deviceId);

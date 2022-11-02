@@ -3,6 +3,7 @@ package com.genersoft.iot.vmp.storager.impl;
 import com.genersoft.iot.vmp.common.StreamInfo;
 import com.genersoft.iot.vmp.conf.SipConfig;
 import com.genersoft.iot.vmp.conf.UserSetting;
+import com.genersoft.iot.vmp.conf.security.SecurityUtils;
 import com.genersoft.iot.vmp.gb28181.bean.*;
 import com.genersoft.iot.vmp.gb28181.event.EventPublisher;
 import com.genersoft.iot.vmp.gb28181.event.subscribe.catalog.CatalogEvent;
@@ -243,13 +244,15 @@ public class VideoManagerStorageImpl implements IVideoManagerStorage {
 		// 获取到所有正在播放的流
 		PageHelper.startPage(page, count);
 		List<DeviceChannel> all;
+		// 获取用户角色
+		int roleId = SecurityUtils.getUserInfo().getRole().getId();
 		if (catalogUnderDevice != null && catalogUnderDevice) {
-			all = deviceChannelMapper.queryChannels(deviceId, deviceId, query, hasSubChannel, online);
+			all = deviceChannelMapper.queryChannels(deviceId, deviceId, query, hasSubChannel, online, roleId);
 			// 海康设备的parentId是SIP id
-			List<DeviceChannel> deviceChannels = deviceChannelMapper.queryChannels(deviceId, sipConfig.getId(), query, hasSubChannel, online);
+			List<DeviceChannel> deviceChannels = deviceChannelMapper.queryChannels(deviceId, sipConfig.getId(), query, hasSubChannel, online, roleId);
 			all.addAll(deviceChannels);
 		}else {
-			all = deviceChannelMapper.queryChannels(deviceId, null, query, hasSubChannel, online);
+			all = deviceChannelMapper.queryChannels(deviceId, null, query, hasSubChannel, online, roleId);
 		}
 		return new PageInfo<>(all);
 	}
@@ -262,13 +265,13 @@ public class VideoManagerStorageImpl implements IVideoManagerStorage {
 
 	@Override
 	public List<DeviceChannel> queryChannelsByDeviceId(String deviceId) {
-		return deviceChannelMapper.queryChannels(deviceId, null,null, null, null);
+		return deviceChannelMapper.queryChannels(deviceId, null,null, null, null, null);
 	}
 
 	@Override
 	public PageInfo<DeviceChannel> querySubChannels(String deviceId, String parentChannelId, String query, Boolean hasSubChannel, Boolean online, int page, int count) {
 		PageHelper.startPage(page, count);
-		List<DeviceChannel> all = deviceChannelMapper.queryChannels(deviceId, parentChannelId, query, hasSubChannel, online);
+		List<DeviceChannel> all = deviceChannelMapper.queryChannels(deviceId, parentChannelId, query, hasSubChannel, online, null);
 		return new PageInfo<>(all);
 	}
 
@@ -295,6 +298,21 @@ public class VideoManagerStorageImpl implements IVideoManagerStorage {
 	public PageInfo<Device> queryVideoDeviceList(int page, int count ,String keyword) {
 		PageHelper.startPage(page, count);
 		List<Device> all = deviceMapper.getDevices(keyword);
+		return new PageInfo<>(all);
+	}
+
+	/**
+	 * 考虑权限，获取当前用户的多个设备
+	 *
+	 * @param page 当前页数
+	 * @param count 每页数量
+	 * @param keyword 关键词
+	 * @return PageInfo<Device> 分页设备对象数组
+	 */
+	@Override
+	public PageInfo<Device> queryVideoDeviceListByRoleId(int page, int count ,String keyword, int roleId) {
+		PageHelper.startPage(page, count);
+		List<Device> all = deviceMapper.getDevicesByRoleId(keyword, roleId);
 		return new PageInfo<>(all);
 	}
 

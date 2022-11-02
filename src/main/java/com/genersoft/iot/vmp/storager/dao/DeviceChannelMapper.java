@@ -76,9 +76,10 @@ public interface DeviceChannelMapper {
             " <if test='online == false' > AND dc.status=0</if>" +
             " <if test='hasSubChannel == true' >  AND dc.subCount > 0 </if>" +
             " <if test='hasSubChannel == false' >  AND dc.subCount = 0 </if>" +
+            " <if test='roleId != null' >  AND dc.channelId in (select rdc.channelId from role_device_channel rdc where rdc.role_id=#{roleId}) </if>" +
             "ORDER BY dc.channelId " +
             " </script>"})
-    List<DeviceChannel> queryChannels(String deviceId, String parentChannelId, String query, Boolean hasSubChannel, Boolean online);
+    List<DeviceChannel> queryChannels(String deviceId, String parentChannelId, String query, Boolean hasSubChannel, Boolean online, Integer roleId);
 
     @Select("SELECT * FROM device_channel WHERE deviceId=#{deviceId} AND channelId=#{channelId}")
     DeviceChannel queryChannel(String deviceId, String channelId);

@@ -6,6 +6,7 @@ import com.genersoft.iot.vmp.media.zlm.dto.StreamPushItem;
 import com.genersoft.iot.vmp.service.bean.GPSMsgInfo;
 import com.genersoft.iot.vmp.storager.dao.dto.ChannelSourceInfo;
 import com.genersoft.iot.vmp.vmanager.gb28181.platform.bean.ChannelReduce;
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
 import java.util.List;
@@ -93,6 +94,17 @@ public interface IVideoManagerStorage {
 	 * @return List<Device> 设备对象数组
 	 */
 	public PageInfo<Device> queryVideoDeviceList(int page, int count,String keyword);
+
+
+	/**
+	 * 考虑权限，获取当前用户的多个设备
+	 *
+	 * @param page 当前页数
+	 * @param count 每页数量
+	 * @param keyword 关键词
+	 * @return PageInfo<Device> 分页设备对象数组
+	 */
+	public PageInfo<Device> queryVideoDeviceListByRoleId(int page, int count ,String keyword, int roleId);
 
 	/**
 	 * 获取多个设备
