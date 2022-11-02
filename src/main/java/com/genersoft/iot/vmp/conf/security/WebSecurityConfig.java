@@ -131,12 +131,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // 放行接口
                 .antMatchers("/api/user/login","/index/hook/**").permitAll()
                 // 除上面外的所有请求全部需要鉴权认证
+                .antMatchers("/api/play/start/**").access("@rbacService.hasPermission(request, authentication)")
                 .anyRequest().authenticated()
+                //.anyRequest().access("@rbacService.hasPermission(request, authentication)")
                 // 异常处理(权限拒绝、登录失效等)
                 .and().exceptionHandling()
                 //匿名用户访问无权限资源时的异常处理
                 .authenticationEntryPoint(anonymousAuthenticationEntryPoint)
-//                .accessDeniedHandler(accessDeniedHandler)//登录用户没有权限访问资源
+                //.accessDeniedHandler(accessDeniedHandler)//登录用户没有权限访问资源
                 // 登入 允许所有用户
                 .and().formLogin().permitAll()
                 //登录成功处理逻辑

@@ -1,10 +1,14 @@
 package com.genersoft.iot.vmp.conf.security;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+import com.genersoft.iot.vmp.service.IRoleDeviceChannelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -25,6 +29,8 @@ public class DefaultUserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
     private IUserService userService;
+    @Autowired
+    private IRoleDeviceChannelService roleDeviceChannelService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -41,7 +47,15 @@ public class DefaultUserDetailsServiceImpl implements UserDetailsService {
         }
         String password = SecurityUtils.encryptPassword(user.getPassword());
         user.setPassword(password);
-        return new LoginUser(user, LocalDateTime.now());
+
+        // 查询用所具有的权限
+        List<String> authorities = roleDeviceChannelService.getDeviceChannelByRoleId(user.getRole().getId());
+        // 封装
+        List<GrantedAuthority> authorityList = AuthorityUtils.createAuthorityList(authorities.toArray(new String[0]));
+
+        LoginUser loginUser = new LoginUser(user, LocalDateTime.now());
+        loginUser.setAuthorities(authorityList);
+        return loginUser;
     }
 
 

@@ -25,6 +25,11 @@ public class LoginUser implements UserDetails, CredentialsContainer {
      */
     private LocalDateTime loginTime;
 
+    /**
+     * 用户权限(能访问的通道)
+     */
+    private Collection<? extends GrantedAuthority> authorities;
+
     public LoginUser(User user, LocalDateTime loginTime) {
         this.user = user;
         this.loginTime = loginTime;
@@ -33,7 +38,11 @@ public class LoginUser implements UserDetails, CredentialsContainer {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return authorities;
+    }
+
+    public void setAuthorities(Collection<? extends GrantedAuthority> authorities) {
+        this.authorities = authorities;
     }
 
     @Override

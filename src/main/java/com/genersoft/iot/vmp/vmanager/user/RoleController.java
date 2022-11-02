@@ -2,6 +2,7 @@ package com.genersoft.iot.vmp.vmanager.user;
 
 import com.genersoft.iot.vmp.conf.exception.ControllerException;
 import com.genersoft.iot.vmp.conf.security.SecurityUtils;
+import com.genersoft.iot.vmp.service.IRoleMenuService;
 import com.genersoft.iot.vmp.service.IRoleService;
 import com.genersoft.iot.vmp.storager.dao.dto.Role;
 import com.genersoft.iot.vmp.utils.DateUtil;
@@ -26,6 +27,8 @@ public class RoleController {
 
     @Autowired
     private IRoleService roleService;
+    @Autowired
+    private IRoleMenuService roleMenuService;
 
     @PostMapping("/add")
     @Operation(summary = "添加角色")
@@ -75,5 +78,11 @@ public class RoleController {
         // 获取当前登录用户id
         List<Role> allRoles = roleService.getAll();
         return roleService.getAll();
+    }
+
+    @PostMapping("/setRoleMenuAuthority")
+    @Operation(summary = "设置角色菜单权限")
+    public void setRoleMenuAuthority(int[] menuIds, Integer roleId) {
+        roleMenuService.setMenuIdsByRole(menuIds, roleId);
     }
 }
