@@ -65,6 +65,9 @@ public class VideoManagerStorageImpl implements IVideoManagerStorage {
 	private DeviceChannelMapper deviceChannelMapper;
 
 	@Autowired
+	private RoleDeviceChannelMapper roleDeviceChannelMapper;
+
+	@Autowired
 	private DeviceMobilePositionMapper deviceMobilePositionMapper;
 
 	@Autowired
@@ -340,6 +343,7 @@ public class VideoManagerStorageImpl implements IVideoManagerStorage {
 		boolean result = false;
 		try {
 			platformChannelMapper.delChannelForDeviceId(deviceId);
+			roleDeviceChannelMapper.delete(deviceId);
 			deviceChannelMapper.cleanChannelsByDeviceId(deviceId);
 			if ( deviceMapper.del(deviceId) < 0 ) {
 				//事务回滚

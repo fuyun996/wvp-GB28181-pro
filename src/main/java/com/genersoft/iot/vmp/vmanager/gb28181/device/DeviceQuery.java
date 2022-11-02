@@ -108,6 +108,7 @@ public class DeviceQuery {
 	public PageInfo<Device> devices(int page, int count,String keyword){
 		int roleId = SecurityUtils.getUserInfo().getRole().getId();
 		return storager.queryVideoDeviceListByRoleId(page, count,keyword, roleId);
+		//return storager.queryVideoDeviceList(page, count,keyword);
 	}
 
 	/**
