@@ -15,6 +15,7 @@ import com.genersoft.iot.vmp.storager.IRedisCatchStorage;
 import com.genersoft.iot.vmp.storager.IVideoManagerStorage;
 import com.genersoft.iot.vmp.storager.dao.*;
 import com.genersoft.iot.vmp.storager.dao.dto.ChannelSourceInfo;
+import com.genersoft.iot.vmp.storager.dao.dto.Role;
 import com.genersoft.iot.vmp.utils.DateUtil;
 import com.genersoft.iot.vmp.vmanager.gb28181.platform.bean.ChannelReduce;
 import com.github.pagehelper.PageHelper;
@@ -248,14 +249,29 @@ public class VideoManagerStorageImpl implements IVideoManagerStorage {
 		PageHelper.startPage(page, count);
 		List<DeviceChannel> all;
 		// 获取用户角色
-		int roleId = SecurityUtils.getUserInfo().getRole().getId();
+		Role role = SecurityUtils.getUserInfo().getRole();
+		int roleId = 1;
+		if (role != null){
+			if(!"admin".equals(role.getName())){
+				roleId = role.getId();
+			}
+		}
 		if (catalogUnderDevice != null && catalogUnderDevice) {
-			all = deviceChannelMapper.queryChannels(deviceId, deviceId, query, hasSubChannel, online, roleId);
+			if(roleId == 1){
+				all = deviceChannelMapper.queryChannels(deviceId, deviceId, query, hasSubChannel, online, null);
+			}else{
+				all = deviceChannelMapper.queryChannels(deviceId, deviceId, query, hasSubChannel, online, roleId);
+			}
+
 			// 海康设备的parentId是SIP id
 			List<DeviceChannel> deviceChannels = deviceChannelMapper.queryChannels(deviceId, sipConfig.getId(), query, hasSubChannel, online, roleId);
 			all.addAll(deviceChannels);
 		}else {
-			all = deviceChannelMapper.queryChannels(deviceId, null, query, hasSubChannel, online, roleId);
+			if(roleId == 1){
+				all = deviceChannelMapper.queryChannels(deviceId, null, query, hasSubChannel, online, null);
+			}else{
+				all = deviceChannelMapper.queryChannels(deviceId, null, query, hasSubChannel, online, roleId);
+			}
 		}
 		return new PageInfo<>(all);
 	}
@@ -315,7 +331,13 @@ public class VideoManagerStorageImpl implements IVideoManagerStorage {
 	@Override
 	public PageInfo<Device> queryVideoDeviceListByRoleId(int page, int count ,String keyword, int roleId) {
 		PageHelper.startPage(page, count);
-		List<Device> all = deviceMapper.getDevicesByRoleId(keyword, roleId);
+		List<Device> all;
+		if(roleId == 1){
+			all = deviceMapper.getDevices(keyword);
+		}else{
+			all = deviceMapper.getDevicesByRoleId(keyword, roleId);
+		}
+
 		return new PageInfo<>(all);
 	}
 
