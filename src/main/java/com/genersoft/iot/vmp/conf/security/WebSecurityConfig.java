@@ -68,8 +68,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //    /**
 //     * 登录用户没有权限访问资源
 //     */
-//    @Autowired
-//    private LoginUserAccessDeniedHandler accessDeniedHandler;
+    @Autowired
+    private LoginUserAccessDeniedHandler accessDeniedHandler;
 
 
     /**
@@ -138,7 +138,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().exceptionHandling()
                 //匿名用户访问无权限资源时的异常处理
                 .authenticationEntryPoint(anonymousAuthenticationEntryPoint)
-                //.accessDeniedHandler(accessDeniedHandler)//登录用户没有权限访问资源
+                .accessDeniedHandler(accessDeniedHandler)//登录用户没有权限访问资源
                 // 登入 允许所有用户
                 .and().formLogin().permitAll()
                 //登录成功处理逻辑
