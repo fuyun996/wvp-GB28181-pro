@@ -7,6 +7,7 @@ import com.genersoft.iot.vmp.vmanager.bean.WVPResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -53,5 +54,18 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public WVPResult<String> exceptionHandler(BadCredentialsException e) {
         return WVPResult.fail(ErrorCode.ERROR100.getCode(), e.getMessage());
+    }
+
+
+    /**
+     * 权限异常处理
+     * @param e 异常
+     * @return 统一返回结果
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public WVPResult<String> exceptionHandler(AccessDeniedException e) {
+        logger.error("[权限异常]： ", e);
+        return WVPResult.fail(ErrorCode.ERROR403.getCode(), e.getMessage());
     }
 }

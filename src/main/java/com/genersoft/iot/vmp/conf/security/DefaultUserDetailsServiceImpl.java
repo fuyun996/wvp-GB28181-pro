@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -52,6 +53,8 @@ public class DefaultUserDetailsServiceImpl implements UserDetailsService {
         List<String> authorities = roleDeviceChannelService.getDeviceChannelByRoleId(user.getRole().getId());
         // 封装
         List<GrantedAuthority> authorityList = AuthorityUtils.createAuthorityList(authorities.toArray(new String[0]));
+        // 添加用户角色信息，以角色信息作为一种权限
+        authorityList.add(new SimpleGrantedAuthority("ROLE_" + user.getRole().getName()));
 
         LoginUser loginUser = new LoginUser(user, LocalDateTime.now());
         loginUser.setAuthorities(authorityList);
