@@ -2,6 +2,7 @@ package com.genersoft.iot.vmp.vmanager.user;
 
 import com.genersoft.iot.vmp.conf.exception.ControllerException;
 import com.genersoft.iot.vmp.conf.security.SecurityUtils;
+import com.genersoft.iot.vmp.service.IRoleDeviceChannelService;
 import com.genersoft.iot.vmp.service.IRoleMenuService;
 import com.genersoft.iot.vmp.service.IRoleService;
 import com.genersoft.iot.vmp.storager.dao.dto.Role;
@@ -15,6 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,6 +31,9 @@ public class RoleController {
     private IRoleService roleService;
     @Autowired
     private IRoleMenuService roleMenuService;
+
+    @Autowired
+    private IRoleDeviceChannelService roleDeviceChannelService;
 
     @PostMapping("/add")
     @Operation(summary = "添加角色")
@@ -74,6 +79,7 @@ public class RoleController {
 
     @GetMapping("/all")
     @Operation(summary = "查询角色")
+    @Secured("ROLE_admin") // 只有admin角色可调用
     public List<Role> all(){
         // 获取当前登录用户id
         List<Role> allRoles = roleService.getAll();
@@ -82,7 +88,19 @@ public class RoleController {
 
     @PostMapping("/setRoleMenuAuthority")
     @Operation(summary = "设置角色菜单权限")
+    @Parameter(name = "menuIds", description = "菜单ID数组", required = true)
+    @Parameter(name = "roleId", description = "角色ID", required = true)
+    @Secured("ROLE_admin") // 只有admin角色可调用
     public void setRoleMenuAuthority(int[] menuIds, Integer roleId) {
         roleMenuService.setMenuIdsByRole(menuIds, roleId);
+    }
+
+    @PostMapping("/setRoleChannelAuthority")
+    @Operation(summary = "设置角色通道权限")
+    @Parameter(name = "channelIds", description = "通道ID数组", required = true)
+    @Parameter(name = "roleId", description = "角色ID", required = true)
+    @Secured("ROLE_admin") // 只有admin角色可调用
+    public void setRoleChannelAuthority(String[] channelIds, Integer roleId) {
+        roleDeviceChannelService.setChannelIdsByRole(channelIds, roleId);
     }
 }

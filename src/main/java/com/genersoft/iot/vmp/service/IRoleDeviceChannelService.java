@@ -9,4 +9,11 @@ public interface IRoleDeviceChannelService {
      * @return 通道列表
      */
     List<String> getDeviceChannelByRoleId(int roleId);
+
+    /**
+     * 为指定角色添加可访问的通道
+     * @param channelIds 可访问的通道 id 数组
+     * @param roleId 角色id
+     */
+    void setChannelIdsByRole(String[] channelIds, int roleId);
 }

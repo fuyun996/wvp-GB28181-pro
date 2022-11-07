@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.ObjectUtils;
@@ -198,6 +199,18 @@ public class UserController {
             if (!result) {
                 throw new ControllerException(ErrorCode.ERROR100);
             }
+        }
+    }
+
+    @PostMapping("/changeUserRole")
+    @Operation(summary = "修改普通用户角色")
+    @Parameter(name = "adminId", description = "管理员id", required = true)
+    @Secured("ROLE_admin") // 只有admin角色可调用
+    public void changeUserRole(@RequestParam int userId, @RequestParam int roleId) {
+        int changeResult = userService.changeRole(userId, roleId);
+
+        if (changeResult <= 0) {
+            throw new ControllerException(ErrorCode.ERROR100);
         }
     }
 }

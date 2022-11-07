@@ -14,6 +14,9 @@ public interface RoleMenuMapper {
     @Delete("delete from role_menu where role_id=#{roleId}")
     void deleteMenuByRoleId(int roleId);
 
+    @Delete("delete from role_menu where menu_id=#{menuId}")
+    int deleteMenuByMenuId(int menuId);
+
     @Insert("<script>" +
             "insert into role_menu(role_id, menu_id) values" +
             "<foreach collection=\"menuIds\" separator=\",\" item=\"item\">(#{roleId},#{item})</foreach>" +

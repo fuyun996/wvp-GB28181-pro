@@ -4,6 +4,7 @@ import com.genersoft.iot.vmp.service.IRoleDeviceChannelService;
 import com.genersoft.iot.vmp.storager.dao.RoleDeviceChannelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,5 +20,20 @@ public class RoleDeviceChannelServiceImpl implements IRoleDeviceChannelService {
     @Override
     public List<String> getDeviceChannelByRoleId(int roleId) {
         return roleDeviceChannelMapper.getDeviceChannelByRoleId(roleId);
+    }
+
+    /**
+     * 为指定角色添加可访问的通道
+     * @param channelIds 可访问的通道 id 数组
+     * @param roleId 角色id
+     */
+    @Override
+    @Transactional
+    public void setChannelIdsByRole(String[] channelIds, int roleId) {
+        if (roleDeviceChannelMapper.countChannelByRoleId(roleId) > 0) {
+            roleDeviceChannelMapper.deleteByRoleId(roleId);
+        }
+
+        roleDeviceChannelMapper.setChannelIdsByRole(channelIds, roleId);
     }
 }

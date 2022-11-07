@@ -62,4 +62,7 @@ public interface UserMapper {
 
     @Update("update user set pushKey=#{pushKey} where id=#{id}")
     int changePushKey(int id, String pushKey);
+
+    @Update("update user set roleId=#{roleId}, updateTime=#{updateTime} where id=#{id}")
+    int changeRole(int id, int roleId, String updateTime);
 }
