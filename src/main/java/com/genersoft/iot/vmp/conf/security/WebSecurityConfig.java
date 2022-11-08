@@ -131,7 +131,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // 放行接口
                 .antMatchers("/api/user/login","/index/hook/**").permitAll()
                 // 除上面外的所有请求全部需要鉴权认证
-                .antMatchers("/api/play/start/**").access("@rbacService.hasPermission(request, authentication)")
+                .antMatchers("/api/play/start/**", "/api/play/stop/**", "/api/gb_record/query/**").access("@rbacService.hasPermission(request, authentication)")
                 .anyRequest().authenticated()
                 //.anyRequest().access("@rbacService.hasPermission(request, authentication)")
                 // 异常处理(权限拒绝、登录失效等)

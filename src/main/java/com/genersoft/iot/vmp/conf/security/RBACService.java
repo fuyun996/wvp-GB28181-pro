@@ -24,9 +24,8 @@ public class RBACService {
             String[] split = requestURI.split("/");
             String auth = split[split.length - 1];
             SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(auth);
-            boolean contains = userDetails.getAuthorities().contains(simpleGrantedAuthority);
-            System.out.println(contains);
-            return contains;
+            SimpleGrantedAuthority adminAuthority = new SimpleGrantedAuthority("ROLE_admin");
+            return userDetails.getAuthorities().contains(simpleGrantedAuthority) || userDetails.getAuthorities().contains(adminAuthority);
         }
 
         return false;
