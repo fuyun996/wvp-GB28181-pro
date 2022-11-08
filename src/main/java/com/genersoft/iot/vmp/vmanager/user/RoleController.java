@@ -77,6 +77,18 @@ public class RoleController {
         }
     }
 
+    @PostMapping("/update")
+    @Operation(summary = "修改角色")
+    @Parameter(name = "role", description = "角色信息", required = true)
+    public void update(@RequestBody Role role) {
+        role.setUpdateTime(DateUtil.getNow());
+        int updateResult = roleService.update(role);
+
+        if (updateResult <= 0) {
+            throw new ControllerException(ErrorCode.ERROR100);
+        }
+    }
+
     @GetMapping("/all")
     @Operation(summary = "查询角色")
     @Secured("ROLE_admin") // 只有admin角色可调用

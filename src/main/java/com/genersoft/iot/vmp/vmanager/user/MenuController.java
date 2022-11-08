@@ -52,6 +52,18 @@ public class MenuController {
         }
     }
 
+    @PostMapping("/update")
+    @Operation(summary = "修改菜单")
+    @Parameter(name = "menu", description = "菜单对象", required = true)
+    @Secured("ROLE_admin") // 只有admin角色可调用
+    public void update(@RequestBody Menu menu) {
+        menu.setUpdateTime(DateUtil.getNow());
+        int updateResult = menuService.updateById(menu);
+        if (updateResult <= 0) {
+            throw new ControllerException(ErrorCode.ERROR100);
+        }
+    }
+
     @GetMapping("/getMenuByRole")
     @Operation(summary = "查询用户菜单")
     public List<Menu> getMenuByRole() {

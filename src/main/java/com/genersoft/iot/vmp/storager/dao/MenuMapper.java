@@ -17,19 +17,22 @@ public interface MenuMapper {
     @Delete("delete from menu where id=#{menuId}")
     int delete(int menuId);
 
-    @Select("select m.id, m.name, m.url from menu m where m.status = 1 and m.id in (select rm.menu_id from role_menu rm where rm.role_id=#{roleId})")
-    @Results({
-            @Result(property = "id",column = "id"),
-            @Result(property = "name",column = "name"),
-            @Result(property = "url",column = "url")
-    })
+    @Update("<script>" + "update menu " +
+                "<set>" +
+                    "<if test=\"pid != null\">pid=#{pid},</if>" +
+                    "<if test=\"name != null\">name=#{name},</if>" +
+                    "<if test=\"url != null\">url=#{url},</if>" +
+                    "<if test=\"sort != null\">sort=#{sort},</if>" +
+                    "<if test=\"spread != null\">spread=#{spread},</if>" +
+                    "<if test=\"status != null\">status=#{status},</if>" +
+                    "<if test=\"updateTime != null\">updateTime=#{updateTime},</if>" +
+                "</set> where id=#{id}" +
+            "</script>")
+    int update(Menu menu);
+
+    @Select("select m.id, m.pid, m.name, m.url, m.sort, m.spread from menu m where m.status = 1 and m.id in (select rm.menu_id from role_menu rm where rm.role_id=#{roleId})")
     List<Menu> getMenuByRoleId(int roleId);
 
-    @Select("select id, name, url from menu")
-    @Results({
-            @Result(property = "id",column = "id"),
-            @Result(property = "name",column = "name"),
-            @Result(property = "url",column = "url")
-    })
+    @Select("select id, pid, name, url, sort, spread from menu where status = 1")
     List<Menu> listAllMenus();
 }

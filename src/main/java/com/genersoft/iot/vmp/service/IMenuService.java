@@ -21,6 +21,13 @@ public interface IMenuService {
     int delete(int menuId);
 
     /**
+     * 修改菜单信息
+     * @param menu 菜单信息
+     * @return 1 操作成功 0 操作失败
+     */
+    int updateById(Menu menu);
+
+    /**
      * 更具角色获取其对应的菜单
      * @param roleId 角色id
      * @return 当前角色所拥有的菜单

@@ -15,13 +15,13 @@ public interface RoleMapper {
             "('${name}', '${authority}', '${createTime}', '${updateTime}')")
     int add(Role role);
 
-    @Update(value = {" <script>" +
-            "UPDATE user_role " +
-            "SET updateTime='${updateTime}' " +
-            "<if test=\"name != null\">, name='${name}'</if>" +
-            "<if test=\"authority != null\">, authority='${authority}'</if>" +
-            "WHERE id != 1 and id=#{id}" +
-            " </script>"})
+    @Update("<script>" + "update user_role " +
+            "<set>" +
+            "<if test=\"name != null\">name=#{name},</if>" +
+            "<if test=\"authority != null\">authority=#{authority},</if>" +
+            "<if test=\"updateTime != null\">updateTime=#{updateTime},</if>" +
+            "</set> where id != 1 and id=#{id}" +
+            "</script>")
     int update(Role role);
 
     @Delete("DELETE FROM user_role WHERE  id != 1 and id=#{id}")
