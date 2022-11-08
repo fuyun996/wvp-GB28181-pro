@@ -39,6 +39,7 @@ public class RoleController {
     @Operation(summary = "添加角色")
     @Parameter(name = "name", description = "角色名", required = true)
     @Parameter(name = "authority", description = "权限（自行定义内容，目前未使用）", required = true)
+    @Secured("ROLE_admin") // 只有admin角色可调用
     public void add(@RequestParam String name,
                                                   @RequestParam(required = false) String authority){
         // 获取当前登录用户id
@@ -63,6 +64,7 @@ public class RoleController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除角色")
     @Parameter(name = "id", description = "用户Id", required = true)
+    @Secured("ROLE_admin") // 只有admin角色可调用
     public void delete(@RequestParam Integer id){
         // 获取当前登录用户id
         int currenRoleId = SecurityUtils.getUserInfo().getRole().getId();
@@ -80,6 +82,7 @@ public class RoleController {
     @PostMapping("/update")
     @Operation(summary = "修改角色")
     @Parameter(name = "role", description = "角色信息", required = true)
+    @Secured("ROLE_admin") // 只有admin角色可调用
     public void update(@RequestBody Role role) {
         role.setUpdateTime(DateUtil.getNow());
         int updateResult = roleService.update(role);

@@ -144,6 +144,7 @@ public class UserController {
 
     @GetMapping("/all")
     @Operation(summary = "查询用户")
+    @Secured("ROLE_admin") // 只有admin角色可调用
     public List<User> all(){
         // 获取当前登录用户id
         return userService.getAllUsers();
@@ -160,6 +161,7 @@ public class UserController {
     @Operation(summary = "分页查询用户")
     @Parameter(name = "page", description = "当前页", required = true)
     @Parameter(name = "count", description = "每页查询数量", required = true)
+    @Secured("ROLE_admin") // 只有admin角色可调用
     public PageInfo<User> users(int page, int count) {
         return userService.getUsers(page, count);
     }
