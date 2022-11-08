@@ -32,7 +32,6 @@ public class MenuController {
         menu.setCreateTime(DateUtil.getNow());
         menu.setUpdateTime(DateUtil.getNow());
 
-        menuService.add(menu);
         int addResult = menuService.add(menu);
         if (addResult <= 0) {
             throw new ControllerException(ErrorCode.ERROR100);

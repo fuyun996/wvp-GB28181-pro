@@ -10,8 +10,8 @@ import java.util.List;
 @Repository
 public interface MenuMapper {
 
-    @Insert("insert into menu(name, url, status, createTime, updateTime) " +
-            "values(#{name}, #{url}, #{status}, #{createTime}, #{updateTime})")
+    @Insert("insert into menu(pid, name, url, sort, spread, status, createTime, updateTime) " +
+            "values(#{pid}, #{name}, #{url}, #{sort}, #{spread}, #{status}, #{createTime}, #{updateTime})")
     int add(Menu menu);
 
     @Delete("delete from menu where id=#{menuId}")
