@@ -1,23 +1,45 @@
 <template>
   <div id="UiHeader">
     <el-menu router :default-active="activeIndex" menu-trigger="click" background-color="#545c64" text-color="#fff"
-             active-text-color="#ffd04b" mode="horizontal">
-      <el-menu-item index="/control">控制台</el-menu-item>
-      <el-menu-item index="/live">实时监控</el-menu-item>
+      active-text-color="#ffd04b" mode="horizontal">
+      <!-- <el-menu-item index="/live">实时监控</el-menu-item>
       <el-menu-item index="/deviceList">国标设备</el-menu-item>
       <el-menu-item index="/map">电子地图</el-menu-item>
-      <el-menu-item index="/pushVideoList">推流列表</el-menu-item>
+     <el-menu-item index="/pushVideoList">推流列表</el-menu-item>
       <el-menu-item index="/streamProxyList">拉流代理</el-menu-item>
       <el-menu-item index="/cloudRecord">云端录像</el-menu-item>
       <el-menu-item index="/mediaServerManger">节点管理</el-menu-item>
       <el-menu-item index="/parentPlatformList/15/1">国标级联</el-menu-item>
       <el-menu-item @click="openDoc">在线文档</el-menu-item>
-      <!--            <el-submenu index="/setting">-->
-      <!--              <template slot="title">系统设置</template>-->
-      <!--              <el-menu-item index="/setting/web">WEB服务</el-menu-item>-->
-      <!--              <el-menu-item index="/setting/sip">国标服务</el-menu-item>-->
-      <!--              <el-menu-item index="/setting/media">媒体服务</el-menu-item>-->
-      <!--            </el-submenu>-->
+      <el-submenu index="/setting">
+        <template slot="title">系统设置</template>
+        <el-menu-item index="/setting/web">WEB服务</el-menu-item>
+        <el-menu-item index="/setting/sip">国标服务</el-menu-item>
+        <el-menu-item index="/setting/media">媒体服务</el-menu-item>
+      </el-submenu> -->
+      <template v-for="(item, index) in menuList">
+        <template v-if="item.child">
+          <el-submenu :index="item.url" :key="index">
+            <template slot="title">
+              <span slot="title">{{ item.name }}</span>
+            </template>
+            <template v-for="(subItem, inx) in item.child">
+              <el-submenu v-if="subItem.child" :index="subItem.url" :key="inx">
+                <template slot="title">{{ subItem.title }}</template>
+                <el-menu-item v-for="(threeItem, i) in subItem.subs" :key="i" :index="i">{{threeItem.name}}</el-menu-item>
+              </el-submenu>
+              <el-menu-item v-else :index="subItem.url" :key="inx">{{ subItem.name }}</el-menu-item>
+            </template>
+          </el-submenu>
+        </template>
+        <template v-else>
+          <el-menu-item :index="item.url" :key="index">
+            <i :class="item.icon"></i>
+            <span slot="title">{{ item.name }}</span>
+          </el-menu-item>
+        </template>
+      </template>
+
       <el-switch v-model="alarmNotify" active-text="报警信息推送" @change="alarmNotifyChannge"></el-switch>
       <!--            <el-menu-item style="float: right;" @click="loginout">退出</el-menu-item>-->
       <el-submenu index="" style="float: right;">
@@ -31,18 +53,18 @@
 </template>
 
 <script>
-
 import changePasswordDialog from '../components/dialog/changePassword.vue'
 
 export default {
   name: "UiHeader",
-  components: {Notification, changePasswordDialog},
+  components: { Notification, changePasswordDialog },
   data() {
     return {
       alarmNotify: false,
       sseSource: null,
       activeIndex: this.$route.path,
-      editUser: this.$cookies.get("session").roleId==1
+      editUser: this.$cookies.get("session").roleId == 1,
+      menuList: []
     };
   },
   created() {
@@ -55,8 +77,23 @@ export default {
     // window.addEventListener('unload', e => this.unloadHandler(e))
     this.alarmNotify = this.getAlarmSwitchStatus() === "true";
     this.sseControl();
+    this.getMenuList()
   },
   methods: {
+    getMenuList() {
+      this.$axios({
+        method: 'get',
+        url: "/api/role/getMenuByRole"
+      }).then((res) => {
+        if (res.data.code == 0) {
+          this.menuList = res.data.data
+        }
+        console.log(res)
+      }).catch((error) => {
+        console.error("登出失败")
+        console.error(error)
+      });
+    },
     loginout() {
       this.$axios({
         method: 'get',
@@ -73,6 +110,9 @@ export default {
     },
     changePassword() {
       this.$refs.changePasswordDialog.openDialog()
+    },
+    gotoManager() {
+      this.$router.push('/roleManager');
     },
     openDoc() {
       console.log(process.env.BASE_API)
@@ -144,16 +184,19 @@ export default {
 </script>
 <style>
 #UiHeader .el-switch__label {
-  color: white ;
+  color: white;
 }
+
 .el-menu--popup .el-menu-item .el-switch .el-switch__label {
   color: white !important;
 }
-#UiHeader .el-switch__label.is-active{
+
+#UiHeader .el-switch__label.is-active {
   color: #409EFF;
 }
+
 #UiHeader .el-menu-item.is-active {
-  color: #fff!important;
-  background-color: #1890ff!important;
+  color: #fff !important;
+  background-color: #1890ff !important;
 }
 </style>
