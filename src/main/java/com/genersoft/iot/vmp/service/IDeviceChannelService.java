@@ -32,4 +32,11 @@ public interface IDeviceChannelService {
      */
     int updateChannels(String deviceId, List<DeviceChannel> channels);
 
+    /**
+     * 查询指定角色的通道信息
+     * @param roleId 角色id
+     * @return
+     */
+    List<DeviceChannel> getChannelByRoleId(int roleId);
+
 }

@@ -346,4 +346,13 @@ public interface DeviceChannelMapper {
 
     @Select("select * from device_channel where deviceId = #{deviceId}")
     List<DeviceChannel> queryAllChannels(String deviceId);
+
+    @Select("<script>" + "select * from device_channel " +
+                "<where> " +
+                    "<if test=\"roleId != 1\"> " +
+                        "channelId in (select channelId from role_device_channel where role_id=#{roleId})" +
+                    "</if>" +
+                "</where>" +
+            "</script>")
+    List<DeviceChannel> getChannelByRoleId(int roleId);
 }

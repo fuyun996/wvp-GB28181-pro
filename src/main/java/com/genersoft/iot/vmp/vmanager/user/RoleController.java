@@ -2,10 +2,11 @@ package com.genersoft.iot.vmp.vmanager.user;
 
 import com.genersoft.iot.vmp.conf.exception.ControllerException;
 import com.genersoft.iot.vmp.conf.security.SecurityUtils;
-import com.genersoft.iot.vmp.service.IRoleDeviceChannelService;
-import com.genersoft.iot.vmp.service.IRoleMenuService;
-import com.genersoft.iot.vmp.service.IRoleService;
+import com.genersoft.iot.vmp.gb28181.bean.DeviceChannel;
+import com.genersoft.iot.vmp.service.*;
+import com.genersoft.iot.vmp.storager.dao.dto.Menu;
 import com.genersoft.iot.vmp.storager.dao.dto.Role;
+import com.genersoft.iot.vmp.storager.dao.dto.RoleAuthorization;
 import com.genersoft.iot.vmp.utils.DateUtil;
 import com.genersoft.iot.vmp.vmanager.bean.ErrorCode;
 import com.genersoft.iot.vmp.vmanager.bean.WVPResult;
@@ -31,6 +32,12 @@ public class RoleController {
     private IRoleService roleService;
     @Autowired
     private IRoleMenuService roleMenuService;
+
+    @Autowired
+    private IMenuService menuService;
+
+    @Autowired
+    private IDeviceChannelService deviceChannelService;
 
     @Autowired
     private IRoleDeviceChannelService roleDeviceChannelService;
@@ -81,10 +88,20 @@ public class RoleController {
 
     @PostMapping("/update")
     @Operation(summary = "修改角色")
-    @Parameter(name = "role", description = "角色信息", required = true)
+    @Parameter(name = "id", description = "角色id", required = true)
+    @Parameter(name = "name", description = "角色名称", required = true)
+    @Parameter(name = "authority", description = "角色权限编码", required = false)
     @Secured("ROLE_admin") // 只有admin角色可调用
-    public void update(@RequestBody Role role) {
+    public void update(@RequestParam int id,
+                       @RequestParam String name,
+                       @RequestParam(required = false) String authority) {
+
+        Role role = new Role();
+        role.setId(id);
+        role.setName(name);
+        role.setAuthority(authority);
         role.setUpdateTime(DateUtil.getNow());
+
         int updateResult = roleService.update(role);
 
         if (updateResult <= 0) {
@@ -103,19 +120,35 @@ public class RoleController {
 
     @PostMapping("/setRoleMenuAuthority")
     @Operation(summary = "设置角色菜单权限")
-    @Parameter(name = "menuIds", description = "菜单ID数组", required = true)
-    @Parameter(name = "roleId", description = "角色ID", required = true)
     @Secured("ROLE_admin") // 只有admin角色可调用
-    public void setRoleMenuAuthority(int[] menuIds, Integer roleId) {
-        roleMenuService.setMenuIdsByRole(menuIds, roleId);
+    public void setRoleMenuAuthority(@RequestBody RoleAuthorization roleAuthorization) {
+        roleMenuService.setMenuIdsByRole(roleAuthorization.getMenuIds(), roleAuthorization.getRoleId());
     }
 
     @PostMapping("/setRoleChannelAuthority")
     @Operation(summary = "设置角色通道权限")
-    @Parameter(name = "channelIds", description = "通道ID数组", required = true)
-    @Parameter(name = "roleId", description = "角色ID", required = true)
     @Secured("ROLE_admin") // 只有admin角色可调用
-    public void setRoleChannelAuthority(String[] channelIds, Integer roleId) {
-        roleDeviceChannelService.setChannelIdsByRole(channelIds, roleId);
+    public void setRoleChannelAuthority(@RequestBody RoleAuthorization roleAuthorization) {
+        roleDeviceChannelService.setChannelIdsByRole(roleAuthorization.getChannelIds(), roleAuthorization.getRoleId());
+    }
+
+    @GetMapping("/getMenuByRole")
+    @Operation(summary = "查询角色菜单")
+    public List<Menu> getMenuByRole(@RequestParam(required = false) Integer roleId) {
+        if (roleId == null) {
+            roleId = SecurityUtils.getUserInfo().getRole().getId();
+        }
+
+        return menuService.getMenuByRoleId(roleId);
+    }
+
+    @GetMapping("/getChannelByRole")
+    @Operation(summary = "查询角色通道")
+    public List<DeviceChannel> getChannelByRole(@RequestParam(required = false) Integer roleId) {
+        if (roleId == null) {
+            roleId = SecurityUtils.getUserInfo().getRole().getId();
+        }
+
+        return deviceChannelService.getChannelByRoleId(roleId);
     }
 }

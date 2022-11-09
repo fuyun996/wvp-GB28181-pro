@@ -162,4 +162,14 @@ public class DeviceChannelServiceImpl implements IDeviceChannelService {
         }
         return addChannels.size() + updateChannels.size();
     }
+
+    /**
+     * 查询指定角色的通道信息
+     * @param roleId 角色id
+     * @return
+     */
+    @Override
+    public List<DeviceChannel> getChannelByRoleId(int roleId) {
+        return channelMapper.getChannelByRoleId(roleId);
+    }
 }
