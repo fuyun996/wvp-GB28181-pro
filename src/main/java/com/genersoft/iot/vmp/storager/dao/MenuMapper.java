@@ -30,7 +30,11 @@ public interface MenuMapper {
             "</script>")
     int update(Menu menu);
 
-    @Select("select m.id, m.pid, m.name, m.url, m.sort, m.spread from menu m where m.status = 1 and m.id in (select rm.menu_id from role_menu rm where rm.role_id=#{roleId})")
+    @Select("<script>" + "select m.id, m.pid, m.name, m.url, m.sort, m.spread from menu m where m.status = 1 " +
+                "<if test=\"roleId != 1\">" +
+                    "and m.id in (select rm.menu_id from role_menu rm where rm.role_id=#{roleId})" +
+                "</if>" +
+            "</script>")
     List<Menu> getMenuByRoleId(int roleId);
 
     @Select("select id, pid, name, url, sort, spread from menu where status = 1")

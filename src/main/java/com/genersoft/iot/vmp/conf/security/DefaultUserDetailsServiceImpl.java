@@ -2,8 +2,13 @@ package com.genersoft.iot.vmp.conf.security;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import com.genersoft.iot.vmp.service.IMenuService;
 import com.genersoft.iot.vmp.service.IRoleDeviceChannelService;
+import com.genersoft.iot.vmp.service.IRoleMenuService;
+import com.genersoft.iot.vmp.storager.dao.MenuMapper;
+import com.genersoft.iot.vmp.storager.dao.dto.Menu;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +38,12 @@ public class DefaultUserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     private IRoleDeviceChannelService roleDeviceChannelService;
 
+    @Autowired
+    private IRoleMenuService roleMenuService;
+
+    @Autowired
+    private MenuMapper menuMapper;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         if (StringUtils.isBlank(username)) {
@@ -51,6 +62,10 @@ public class DefaultUserDetailsServiceImpl implements UserDetailsService {
 
         // 查询用所具有的权限
         List<String> authorities = roleDeviceChannelService.getDeviceChannelByRoleId(user.getRole().getId());
+        // 获取菜单权限
+        List<String> menuAuthorities = menuMapper.getMenuByRoleId(user.getRole().getId()).stream().map(Menu::getUrl).collect(Collectors.toList());
+        // 合并权限
+        authorities.addAll(menuAuthorities);
         // 封装
         List<GrantedAuthority> authorityList = AuthorityUtils.createAuthorityList(authorities.toArray(new String[0]));
         // 添加用户角色信息，以角色信息作为一种权限

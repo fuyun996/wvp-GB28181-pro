@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,7 +47,7 @@ public class RoleController {
     @Operation(summary = "添加角色")
     @Parameter(name = "name", description = "角色名", required = true)
     @Parameter(name = "authority", description = "权限（自行定义内容，目前未使用）", required = true)
-    @Secured("ROLE_admin") // 只有admin角色可调用
+    @PreAuthorize("hasAuthority('/roleManager')")
     public void add(@RequestParam String name,
                                                   @RequestParam(required = false) String authority){
         // 获取当前登录用户id
@@ -71,7 +72,7 @@ public class RoleController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除角色")
     @Parameter(name = "id", description = "用户Id", required = true)
-    @Secured("ROLE_admin") // 只有admin角色可调用
+    @PreAuthorize("hasAuthority('/roleManager')")
     public void delete(@RequestParam Integer id){
         // 获取当前登录用户id
         int currenRoleId = SecurityUtils.getUserInfo().getRole().getId();
@@ -91,7 +92,7 @@ public class RoleController {
     @Parameter(name = "id", description = "角色id", required = true)
     @Parameter(name = "name", description = "角色名称", required = true)
     @Parameter(name = "authority", description = "角色权限编码", required = false)
-    @Secured("ROLE_admin") // 只有admin角色可调用
+    @PreAuthorize("hasAuthority('/roleManager')")
     public void update(@RequestParam int id,
                        @RequestParam String name,
                        @RequestParam(required = false) String authority) {
@@ -111,7 +112,7 @@ public class RoleController {
 
     @GetMapping("/all")
     @Operation(summary = "查询角色")
-    @Secured("ROLE_admin") // 只有admin角色可调用
+    @PreAuthorize("hasAuthority('/roleManager')")
     public List<Role> all(){
         // 获取当前登录用户id
         List<Role> allRoles = roleService.getAll();
@@ -120,14 +121,14 @@ public class RoleController {
 
     @PostMapping("/setRoleMenuAuthority")
     @Operation(summary = "设置角色菜单权限")
-    @Secured("ROLE_admin") // 只有admin角色可调用
+    @PreAuthorize("hasAuthority('/roleManager')")
     public void setRoleMenuAuthority(@RequestBody RoleAuthorization roleAuthorization) {
         roleMenuService.setMenuIdsByRole(roleAuthorization.getMenuIds(), roleAuthorization.getRoleId());
     }
 
     @PostMapping("/setRoleChannelAuthority")
     @Operation(summary = "设置角色通道权限")
-    @Secured("ROLE_admin") // 只有admin角色可调用
+    @PreAuthorize("hasAuthority('/roleManager')")
     public void setRoleChannelAuthority(@RequestBody RoleAuthorization roleAuthorization) {
         roleDeviceChannelService.setChannelIdsByRole(roleAuthorization.getChannelIds(), roleAuthorization.getRoleId());
     }

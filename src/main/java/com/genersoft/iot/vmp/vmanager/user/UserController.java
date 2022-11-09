@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.ObjectUtils;
@@ -126,7 +127,7 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/删除用户")
+    @DeleteMapping("/delete")
     @Operation(summary = "停止视频回放")
     @Parameter(name = "id", description = "用户Id", required = true)
     public void delete(@RequestParam Integer id){
@@ -144,7 +145,7 @@ public class UserController {
 
     @GetMapping("/all")
     @Operation(summary = "查询用户")
-    @Secured("ROLE_admin") // 只有admin角色可调用
+    @PreAuthorize("hasAuthority('/userManager')")
     public List<User> all(){
         // 获取当前登录用户id
         return userService.getAllUsers();
@@ -161,7 +162,7 @@ public class UserController {
     @Operation(summary = "分页查询用户")
     @Parameter(name = "page", description = "当前页", required = true)
     @Parameter(name = "count", description = "每页查询数量", required = true)
-    @Secured("ROLE_admin") // 只有admin角色可调用
+    @PreAuthorize("hasAuthority('/userManager')")
     public PageInfo<User> users(int page, int count) {
         return userService.getUsers(page, count);
     }
@@ -207,7 +208,7 @@ public class UserController {
     @PostMapping("/changeUserRole")
     @Operation(summary = "修改普通用户角色")
     @Parameter(name = "adminId", description = "管理员id", required = true)
-    @Secured("ROLE_admin") // 只有admin角色可调用
+    @PreAuthorize("hasAuthority('/userManager')")
     public void changeUserRole(@RequestParam int userId, @RequestParam int roleId) {
         int changeResult = userService.changeRole(userId, roleId);
 

@@ -9,7 +9,13 @@ import java.util.List;
 @Mapper
 @Repository
 public interface RoleDeviceChannelMapper {
-    @Select("select channelId from role_device_channel where role_id=#{roleId}")
+    @Select("<script>" + "select channelId from role_device_channel " +
+            "<where>" +
+                "<if test=\"roleId != 1\">" +
+                    "role_id=#{roleId}" +
+                "</if>" +
+            "</where>" +
+            "</script>")
     List<String> getDeviceChannelByRoleId(int roleId);
 
     @Delete("delete from role_device_channel where channelId in (select dev.channelId from device_channel dev where dev.deviceId=#{deviceId})")

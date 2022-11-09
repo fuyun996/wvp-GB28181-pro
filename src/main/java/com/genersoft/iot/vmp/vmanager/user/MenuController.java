@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,7 +26,7 @@ public class MenuController {
 
     @PostMapping("/add")
     @Operation(summary = "添加菜单")
-    @Secured("ROLE_admin") // 只有admin角色可调用
+    @PreAuthorize("hasAuthority('/menuManager')")
     public void add(@RequestBody Menu menu) {
         menu.setStatus(1);
         menu.setCreateTime(DateUtil.getNow());
@@ -40,7 +41,7 @@ public class MenuController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除菜单")
     @Parameter(name = "menuId", description = "菜单id", required = true)
-    @Secured("ROLE_admin") // 只有admin角色可调用
+    @PreAuthorize("hasAuthority('/menuManager')")
     public void delete(int menuId) {
 
         int deleteResult = menuService.delete(menuId);
@@ -52,7 +53,7 @@ public class MenuController {
 
     @PostMapping("/update")
     @Operation(summary = "修改菜单")
-    @Secured("ROLE_admin") // 只有admin角色可调用
+    @PreAuthorize("hasAuthority('/menuManager')")
     public void update(@RequestBody Menu menu) {
         menu.setUpdateTime(DateUtil.getNow());
         int updateResult = menuService.updateById(menu);
@@ -63,7 +64,7 @@ public class MenuController {
 
     @GetMapping("/listAllMenus")
     @Operation(summary = "查询所有菜单")
-    @Secured("ROLE_admin") // 只有admin角色可调用
+    @PreAuthorize("hasAuthority('/menuManager')")
     public List<Menu> listAllMenus() {
         return menuService.listAllMenus();
     }
