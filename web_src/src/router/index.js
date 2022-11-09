@@ -18,6 +18,8 @@ import media from '../components/setting/Media.vue'
 import live from '../components/live.vue'
 import deviceTree from '../components/common/DeviceTree.vue'
 import userManager from '../components/UserManager.vue'
+import roleManager from '../components/RoleManager.vue'
+import menuManager from '../components/MenuManager.vue'
 
 import wasmPlayer from '../components/common/jessibuca.vue'
 import rtcPlayer from '../components/dialog/rtcPlayer.vue'
@@ -31,7 +33,7 @@ Vue.use(VueRouter)
 
 
 export default new VueRouter({
-  mode:'hash',
+  mode: 'hash',
   routes: [
     {
       path: '/',
@@ -108,8 +110,18 @@ export default new VueRouter({
           path: '/userManager',
           name: 'userManager',
           component: userManager,
+        },
+        {
+          path: '/roleManager',
+          name: 'roleManager',
+          component: roleManager,
+        },
+        {
+          path: '/menuManager',
+          name: 'menuManager',
+          component: menuManager,
         }
-        ]
+      ]
     },
     {
       path: '/login',
