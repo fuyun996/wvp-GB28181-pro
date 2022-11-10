@@ -25,7 +25,7 @@
       <div id="shared" style="margin-right: 20px;">
         <el-form>
           <el-form-item>
-            <el-tree :load="loadNode" lazy show-checkbox node-key="channelId" :props="channelDefaultProps"
+            <el-tree :data="channelTreeData" show-checkbox node-key="channelId" :props="channelDefaultProps"
               :default-checked-keys="channelIds" @check="handelChannelCheck">
             </el-tree>
           </el-form-item>
@@ -66,11 +66,11 @@ export default {
       },
 
       showChannelDialog: false,
+      channelTreeData: [],
       channelIds: [],
       channelDefaultProps: {
         children: 'child',
-        label: 'name',
-        isLeaf: 'leaf'
+        label: 'name'
       }
 
     };
@@ -84,7 +84,7 @@ export default {
       this.showChannelDialog = false
     },
     openChannelDialog(data, callback) {
-      this.getMyChannel(data.id)
+      this.getAllChannel()
       this.roleId = data.id
       this.listChangeCallback = callback
       this.showDialog = false
@@ -154,33 +154,35 @@ export default {
     /*
      * 通道 
      */
-    loadNode(node, resolve) {
-      if (node.level === 0) {
-        this.$axios({
-          method: 'get',
-          url: `/api/device/query/devices`,
-          params: { page: 1, count: 10000 }
-        }).then(res => {
-          resolve(res.data.code === 0 ? res.data.data.list : [])
-        }).catch(error => {
-          console.log(error);
-        })
-      } else {
-        this.$axios({
-          method: 'get',
-          url: `/api/device/query/devices/${node.data.deviceId}/channels`,
-          params: { page: 1, count: 10000 }
-        }).then(res => {
-          if (res.data.code === 0) {
-            res.data.data.list.map(item => {
-              item.leaf = true
-            })
-            resolve(res.data.data.list)
-          }
-        }).catch(error => {
-          console.log(error);
-        });
-      }
+    getAllChannel() {
+      this.$axios({
+        method: 'get',
+        url: `/api/device/query/devices`,
+        params: { page: 1, count: 10000 }
+      }).then(result => {
+        if (result.data.code === 0) {
+          this.channelTreeData = result.data.data.list
+
+          result.data.data.list.map((item, inx) => {
+            this.$axios({
+              method: 'get',
+              url: `/api/device/query/devices/${item.deviceId}/channels`,
+              params: { page: 1, count: 10000 }
+            }).then(res => {
+              if (res.data.code === 0 && res.data.data.list && res.data.data.list.length > 0) {
+                this.$set(this.channelTreeData[inx], 'child', res.data.data.list)
+              }
+              if (inx == (this.channelTreeData.length - 1)) {
+                this.getMyChannel(this.roleId)
+              }
+            }).catch(error => {
+              console.log(error);
+            });
+          })
+        }
+      }).catch(error => {
+        console.log(error);
+      })
     },
     getMyChannel(roleId) {
       this.$axios({
@@ -194,20 +196,24 @@ export default {
           res.data.data.map(item => {
             this.channelIds.push(item.channelId)
           })
+          console.log('my', this.channelIds)
         }
       }).catch((error) => {
         console.error(error)
       });
     },
-    handelChannelCheck(checkedNodes, checkedKeys, halfCheckedNodes, halfCheckedKeys) {
-      console.log(checkedKeys)
-      this.channelIds = checkedKeys.checkedKeys
+    handelChannelCheck(checkedNodes, checked) {
+      console.log(checked.checkedKeys)
+      this.channelIds = checked.checkedKeys
       console.log(this.channelIds)
     },
     onChannelSubmit() {
+      const channelIds = this.channelIds.filter((item, index) => {
+        return this.channelIds.indexOf(item) === index;
+      });
       this.$axios.post("/api/role/setRoleChannelAuthority", {
         roleId: this.roleId,
-        channelIds: this.channelIds
+        channelIds: channelIds
       }).then((res) => {
         if (res.data.code === 0) {
           this.$message({ showClose: true, message: '添加成功', type: 'success', });
