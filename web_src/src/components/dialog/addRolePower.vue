@@ -43,7 +43,6 @@
 </template>
 
 <script>
-
 export default {
   name: "addRolePower",
   props: {},
@@ -84,6 +83,8 @@ export default {
       this.showChannelDialog = false
     },
     openChannelDialog(data, callback) {
+      this.channelTreeData = []
+      this.channelIds = []
       this.getAllChannel()
       this.roleId = data.id
       this.listChangeCallback = callback
@@ -208,9 +209,10 @@ export default {
       console.log(this.channelIds)
     },
     onChannelSubmit() {
-      const channelIds = this.channelIds.filter((item, index) => {
+      let channelIds = this.channelIds.filter((item, index) => {
         return this.channelIds.indexOf(item) === index;
       });
+      channelIds = channelIds.filter(o => o != undefined && o != null)
       this.$axios.post("/api/role/setRoleChannelAuthority", {
         roleId: this.roleId,
         channelIds: channelIds
