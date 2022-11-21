@@ -9,6 +9,7 @@ import com.genersoft.iot.vmp.storager.IRedisCatchStorage;
 import com.genersoft.iot.vmp.storager.dao.DeviceChannelMapper;
 import com.genersoft.iot.vmp.storager.dao.DeviceMapper;
 import com.genersoft.iot.vmp.utils.DateUtil;
+import com.genersoft.iot.vmp.vmanager.bean.ResourceBaceInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -171,5 +172,10 @@ public class DeviceChannelServiceImpl implements IDeviceChannelService {
     @Override
     public List<DeviceChannel> getChannelByRoleId(int roleId) {
         return channelMapper.getChannelByRoleId(roleId);
+    }
+
+    @Override
+    public ResourceBaceInfo getOverview() {
+        return channelMapper.getOverview();
     }
 }

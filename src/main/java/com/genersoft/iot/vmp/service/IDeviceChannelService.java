@@ -2,6 +2,7 @@ package com.genersoft.iot.vmp.service;
 
 import com.genersoft.iot.vmp.gb28181.bean.Device;
 import com.genersoft.iot.vmp.gb28181.bean.DeviceChannel;
+import com.genersoft.iot.vmp.vmanager.bean.ResourceBaceInfo;
 
 import java.util.List;
 
@@ -39,4 +40,9 @@ public interface IDeviceChannelService {
      */
     List<DeviceChannel> getChannelByRoleId(int roleId);
 
+    /**
+     * 获取统计信息
+     * @return
+     */
+    ResourceBaceInfo getOverview();
 }

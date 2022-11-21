@@ -18,6 +18,7 @@ import com.genersoft.iot.vmp.service.IMediaServerService;
 import com.genersoft.iot.vmp.service.bean.MessageForPushChannel;
 import com.genersoft.iot.vmp.storager.IRedisCatchStorage;
 import com.genersoft.iot.vmp.storager.IVideoManagerStorage;
+import gov.nist.javax.sip.message.SIPRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -82,7 +83,7 @@ public class ByeRequestProcessor extends SIPRequestProcessorParent implements In
 	public void process(RequestEvent evt) {
 
 		try {
-			responseAck(getServerTransaction(evt), Response.OK);
+			responseAck((SIPRequest) evt.getRequest(), Response.OK);
 		} catch (SipException | InvalidArgumentException | ParseException e) {
 			logger.error("[回复BYE信息失败]，{}", e.getMessage());
 		}
@@ -106,7 +107,7 @@ public class ByeRequestProcessor extends SIPRequestProcessorParent implements In
 				if (totalReaderCount <= 0) {
 					logger.info("[收到bye] {} 无其它观看者，通知设备停止推流", streamId);
 					if (sendRtpItem.getPlayType().equals(InviteStreamType.PLAY)) {
-						Device device = deviceService.queryDevice(sendRtpItem.getDeviceId());
+						Device device = deviceService.getDevice(sendRtpItem.getDeviceId());
 						if (device == null) {
 							logger.info("[收到bye] {} 通知设备停止推流时未找到设备信息", streamId);
 						}

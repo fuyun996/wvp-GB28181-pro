@@ -1,6 +1,6 @@
 package com.genersoft.iot.vmp.gb28181.transmit.event.request.impl;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import com.genersoft.iot.vmp.conf.SipConfig;
 import com.genersoft.iot.vmp.conf.UserSetting;
 import com.genersoft.iot.vmp.gb28181.bean.*;
@@ -20,6 +20,7 @@ import com.genersoft.iot.vmp.storager.IRedisCatchStorage;
 import com.genersoft.iot.vmp.storager.IVideoManagerStorage;
 import com.genersoft.iot.vmp.utils.DateUtil;
 import com.genersoft.iot.vmp.utils.redis.RedisUtil;
+import gov.nist.javax.sip.message.SIPRequest;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.slf4j.Logger;
@@ -34,7 +35,6 @@ import org.springframework.util.StringUtils;
 
 import javax.sip.InvalidArgumentException;
 import javax.sip.RequestEvent;
-import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.header.FromHeader;
 import javax.sip.message.Response;
@@ -94,45 +94,42 @@ public class NotifyRequestProcessor extends SIPRequestProcessorParent implements
 	@Override
 	public void process(RequestEvent evt) {
 		try {
-			taskQueue.offer(new HandlerCatchData(evt, null, null));
-			ServerTransaction serverTransaction = getServerTransaction(evt);
-			responseAck(serverTransaction, Response.OK);
-			if (!taskQueueHandlerRun) {
-				taskQueueHandlerRun = true;
-				taskExecutor.execute(()-> {
-					while (!taskQueue.isEmpty()) {
-						try {
-							HandlerCatchData take = taskQueue.poll();
-							Element rootElement = getRootElement(take.getEvt());
-							if (rootElement == null) {
-								logger.error("处理NOTIFY消息时未获取到消息体,{}", take.getEvt().getRequest());
-								continue;
-							}
-							String cmd = XmlUtil.getText(rootElement, "CmdType");
-
-							if (CmdType.CATALOG.equals(cmd)) {
-								logger.info("接收到Catalog通知");
-								processNotifyCatalogList(take.getEvt());
-							} else if (CmdType.ALARM.equals(cmd)) {
-								logger.info("接收到Alarm通知");
-								processNotifyAlarm(take.getEvt());
-							} else if (CmdType.MOBILE_POSITION.equals(cmd)) {
-								logger.info("接收到MobilePosition通知");
-								processNotifyMobilePosition(take.getEvt());
-							} else {
-								logger.info("接收到消息：" + cmd);
-							}
-						} catch (DocumentException e) {
-							logger.error("处理NOTIFY消息时错误", e);
-						}
-					}
-					taskQueueHandlerRun = false;
-				});
-			}
-		} catch (SipException | InvalidArgumentException | ParseException e) {
+			responseAck((SIPRequest) evt.getRequest(), Response.OK, null, null);
+		}catch (SipException | InvalidArgumentException | ParseException e) {
 			e.printStackTrace();
-		} finally {
-			taskQueueHandlerRun = false;
+		}
+		taskQueue.offer(new HandlerCatchData(evt, null, null));
+		if (!taskQueueHandlerRun) {
+			taskQueueHandlerRun = true;
+			taskExecutor.execute(()-> {
+				while (!taskQueue.isEmpty()) {
+					try {
+						HandlerCatchData take = taskQueue.poll();
+						Element rootElement = getRootElement(take.getEvt());
+						if (rootElement == null) {
+							logger.error("处理NOTIFY消息时未获取到消息体,{}", take.getEvt().getRequest());
+							continue;
+						}
+						String cmd = XmlUtil.getText(rootElement, "CmdType");
+
+						if (CmdType.CATALOG.equals(cmd)) {
+							logger.info("接收到Catalog通知");
+							processNotifyCatalogList(take.getEvt());
+						} else if (CmdType.ALARM.equals(cmd)) {
+							logger.info("接收到Alarm通知");
+							processNotifyAlarm(take.getEvt());
+						} else if (CmdType.MOBILE_POSITION.equals(cmd)) {
+							logger.info("接收到MobilePosition通知");
+							processNotifyMobilePosition(take.getEvt());
+						} else {
+							logger.info("接收到消息：" + cmd);
+						}
+					} catch (DocumentException e) {
+						logger.error("处理NOTIFY消息时错误", e);
+					}
+				}
+				taskQueueHandlerRun = false;
+			});
 		}
 	}
 

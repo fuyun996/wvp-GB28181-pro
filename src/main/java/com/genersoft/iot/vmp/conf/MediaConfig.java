@@ -2,13 +2,11 @@ package com.genersoft.iot.vmp.conf;
 
 import com.genersoft.iot.vmp.media.zlm.dto.MediaServerItem;
 import com.genersoft.iot.vmp.utils.DateUtil;
-import com.genersoft.iot.vmp.vmanager.gb28181.device.DeviceQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -27,7 +25,7 @@ public class MediaConfig{
     @Value("${media.ip}")
     private String ip;
 
-    @Value("${media.hook-ip:${sip.ip}}")
+    @Value("${media.hook-ip:}")
     private String hookIp;
 
     @Value("${sip.ip}")
@@ -69,18 +67,11 @@ public class MediaConfig{
     @Value("${media.secret}")
     private String secret;
 
-    @Value("${media.stream-none-reader-delay-ms:15000}")
-    private int streamNoneReaderDelayMS = 15000;
-
     @Value("${media.rtp.enable}")
     private boolean rtpEnable;
 
     @Value("${media.rtp.port-range}")
     private String rtpPortRange;
-
-
-    @Value("${media.rtp.send-port-range}")
-    private String sendRtpPortRange;
 
     @Value("${media.record-assist-port:0}")
     private Integer recordAssistPort = 0;
@@ -95,7 +86,7 @@ public class MediaConfig{
 
     public String getHookIp() {
         if (ObjectUtils.isEmpty(hookIp)){
-            return sipIp;
+            return sipIp.split(",")[0];
         }else {
             return hookIp;
         }
@@ -151,10 +142,6 @@ public class MediaConfig{
         return secret;
     }
 
-    public int getStreamNoneReaderDelayMS() {
-        return streamNoneReaderDelayMS;
-    }
-
     public boolean isRtpEnable() {
         return rtpEnable;
     }
@@ -198,10 +185,6 @@ public class MediaConfig{
         return sipDomain;
     }
 
-    public String getSendRtpPortRange() {
-        return sendRtpPortRange;
-    }
-
     public MediaServerItem getMediaSerItem(){
         MediaServerItem mediaServerItem = new MediaServerItem();
         mediaServerItem.setId(id);
@@ -219,12 +202,10 @@ public class MediaConfig{
         mediaServerItem.setRtspSSLPort(rtspSSLPort);
         mediaServerItem.setAutoConfig(autoConfig);
         mediaServerItem.setSecret(secret);
-        mediaServerItem.setStreamNoneReaderDelayMS(streamNoneReaderDelayMS);
         mediaServerItem.setRtpEnable(rtpEnable);
         mediaServerItem.setRtpPortRange(rtpPortRange);
-        mediaServerItem.setSendRtpPortRange(sendRtpPortRange);
         mediaServerItem.setRecordAssistPort(recordAssistPort);
-        mediaServerItem.setHookAliveInterval(120);
+        mediaServerItem.setHookAliveInterval(30.00f);
 
         mediaServerItem.setCreateTime(DateUtil.getNow());
         mediaServerItem.setUpdateTime(DateUtil.getNow());

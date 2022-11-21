@@ -128,7 +128,7 @@ public class UserController {
     }
 
     @DeleteMapping("/delete")
-    @Operation(summary = "停止视频回放")
+    @Operation(summary = "删除用户")
     @Parameter(name = "id", description = "用户Id", required = true)
     public void delete(@RequestParam Integer id){
         // 获取当前登录用户id
@@ -145,7 +145,6 @@ public class UserController {
 
     @GetMapping("/all")
     @Operation(summary = "查询用户")
-    @PreAuthorize("hasAuthority('/userManager')")
     public List<User> all(){
         // 获取当前登录用户id
         return userService.getAllUsers();

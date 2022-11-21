@@ -1,6 +1,6 @@
 package com.genersoft.iot.vmp.gb28181.transmit.event.request.impl.message.notify.cmd;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import com.genersoft.iot.vmp.conf.UserSetting;
 import com.genersoft.iot.vmp.gb28181.bean.*;
 import com.genersoft.iot.vmp.gb28181.transmit.event.request.SIPRequestProcessorParent;
@@ -11,6 +11,7 @@ import com.genersoft.iot.vmp.service.IDeviceChannelService;
 import com.genersoft.iot.vmp.storager.IRedisCatchStorage;
 import com.genersoft.iot.vmp.storager.IVideoManagerStorage;
 import com.genersoft.iot.vmp.utils.DateUtil;
+import gov.nist.javax.sip.message.SIPRequest;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.slf4j.Logger;
@@ -81,8 +82,12 @@ public class MobilePositionNotifyMessageHandler extends SIPRequestProcessorParen
                     try {
                         Element rootElementAfterCharset = getRootElement(sipMsgInfo.getEvt(), sipMsgInfo.getDevice().getCharset());
                         if (rootElementAfterCharset == null) {
-                            logger.warn("[ 移动设备位置数据通知 ] content cannot be null, {}", sipMsgInfo.getEvt().getRequest());
-                            responseAck(getServerTransaction(sipMsgInfo.getEvt()), Response.BAD_REQUEST);
+                            try {
+                                logger.warn("[ 移动设备位置数据通知 ] content cannot be null, {}", sipMsgInfo.getEvt().getRequest());
+                                responseAck((SIPRequest) sipMsgInfo.getEvt().getRequest(), Response.BAD_REQUEST);
+                            } catch (SipException | InvalidArgumentException | ParseException e) {
+                                logger.error("[命令发送失败] 移动设备位置数据通知 内容为空: {}", e.getMessage());
+                            }
                             continue;
                         }
                         MobilePosition mobilePosition = new MobilePosition();
@@ -133,7 +138,11 @@ public class MobilePositionNotifyMessageHandler extends SIPRequestProcessorParen
                         }
                         storager.updateChannelPosition(deviceChannel);
                         //回复 200 OK
-                        responseAck(getServerTransaction(sipMsgInfo.getEvt()), Response.OK);
+                        try {
+                            responseAck((SIPRequest) sipMsgInfo.getEvt().getRequest(), Response.OK);
+                        } catch (SipException | InvalidArgumentException | ParseException e) {
+                            logger.error("[命令发送失败] 移动设备位置数据回复200: {}", e.getMessage());
+                        }
 
                         // 发送redis消息。 通知位置信息的变化
                         JSONObject jsonObject = new JSONObject();
@@ -147,7 +156,7 @@ public class MobilePositionNotifyMessageHandler extends SIPRequestProcessorParen
                         jsonObject.put("speed", mobilePosition.getSpeed());
                         redisCatchStorage.sendMobilePositionMsg(jsonObject);
 
-                    } catch (DocumentException | SipException | InvalidArgumentException | ParseException e) {
+                    } catch (DocumentException e) {
                         e.printStackTrace();
                     }
 

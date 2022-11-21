@@ -5,7 +5,6 @@ import com.genersoft.iot.vmp.gb28181.session.SsrcConfig;
 import com.genersoft.iot.vmp.media.zlm.ZLMServerConfig;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
 
@@ -54,11 +53,8 @@ public class MediaServerItem{
     @Schema(description = "ZLM鉴权参数")
     private String secret;
 
-    @Schema(description = "某个流无人观看时，触发hook.on_stream_none_reader事件的最大等待时间，单位毫秒")
-    private int streamNoneReaderDelayMS;
-
     @Schema(description = "keepalive hook触发间隔,单位秒")
-    private int hookAliveInterval;
+    private Float hookAliveInterval;
 
     @Schema(description = "是否使用多端口模式")
     private boolean rtpEnable;
@@ -68,9 +64,6 @@ public class MediaServerItem{
 
     @Schema(description = "多端口RTP收流端口范围")
     private String rtpPortRange;
-
-    @Schema(description = "RTP发流端口范围")
-    private String sendRtpPortRange;
 
     @Schema(description = "assist服务端口")
     private int recordAssistPort;
@@ -119,11 +112,9 @@ public class MediaServerItem{
         rtspSSLPort = zlmServerConfig.getRtspSSlport();
         autoConfig = true; // 默认值true;
         secret = zlmServerConfig.getApiSecret();
-        streamNoneReaderDelayMS = zlmServerConfig.getGeneralStreamNoneReaderDelayMS();
         hookAliveInterval = zlmServerConfig.getHookAliveInterval();
         rtpEnable = false; // 默认使用单端口;直到用户自己设置开启多端口
         rtpPortRange = zlmServerConfig.getPortRange().replace("_",","); // 默认使用30000,30500作为级联时发送流的端口号
-        sendRtpPortRange = "30000,30500"; // 默认使用30000,30500作为级联时发送流的端口号
         recordAssistPort = 0; // 默认关闭
 
     }
@@ -240,14 +231,6 @@ public class MediaServerItem{
         this.secret = secret;
     }
 
-    public int getStreamNoneReaderDelayMS() {
-        return streamNoneReaderDelayMS;
-    }
-
-    public void setStreamNoneReaderDelayMS(int streamNoneReaderDelayMS) {
-        this.streamNoneReaderDelayMS = streamNoneReaderDelayMS;
-    }
-
     public boolean isRtpEnable() {
         return rtpEnable;
     }
@@ -336,19 +319,11 @@ public class MediaServerItem{
         this.lastKeepaliveTime = lastKeepaliveTime;
     }
 
-    public String getSendRtpPortRange() {
-        return sendRtpPortRange;
-    }
-
-    public void setSendRtpPortRange(String sendRtpPortRange) {
-        this.sendRtpPortRange = sendRtpPortRange;
-    }
-
-    public int getHookAliveInterval() {
+    public Float getHookAliveInterval() {
         return hookAliveInterval;
     }
 
-    public void setHookAliveInterval(int hookAliveInterval) {
+    public void setHookAliveInterval(Float hookAliveInterval) {
         this.hookAliveInterval = hookAliveInterval;
     }
 }
