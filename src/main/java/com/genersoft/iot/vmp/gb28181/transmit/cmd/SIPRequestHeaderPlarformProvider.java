@@ -14,7 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
 
-import javax.sip.*;
+import javax.sip.InvalidArgumentException;
+import javax.sip.PeerUnavailableException;
 import javax.sip.address.Address;
 import javax.sip.address.SipURI;
 import javax.sip.header.*;
@@ -22,7 +23,6 @@ import javax.sip.message.Request;
 import javax.validation.constraints.NotNull;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 /**

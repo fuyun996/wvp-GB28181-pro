@@ -1,6 +1,5 @@
 package com.genersoft.iot.vmp.storager.impl;
 
-import com.genersoft.iot.vmp.common.StreamInfo;
 import com.genersoft.iot.vmp.conf.SipConfig;
 import com.genersoft.iot.vmp.conf.UserSetting;
 import com.genersoft.iot.vmp.conf.security.SecurityUtils;
@@ -8,7 +7,6 @@ import com.genersoft.iot.vmp.gb28181.bean.*;
 import com.genersoft.iot.vmp.gb28181.event.EventPublisher;
 import com.genersoft.iot.vmp.gb28181.event.subscribe.catalog.CatalogEvent;
 import com.genersoft.iot.vmp.media.zlm.dto.StreamProxyItem;
-import com.genersoft.iot.vmp.media.zlm.dto.StreamPushItem;
 import com.genersoft.iot.vmp.service.IGbStreamService;
 import com.genersoft.iot.vmp.service.bean.GPSMsgInfo;
 import com.genersoft.iot.vmp.storager.IRedisCatchStorage;
@@ -30,7 +28,6 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -349,7 +346,7 @@ public class VideoManagerStorageImpl implements IVideoManagerStorage {
 	 * @param deviceId 设备ID
 	 * @return true：删除成功  false：删除失败
 	 */
-	@Override
+
 	public boolean delete(String deviceId) {
 		TransactionStatus transactionStatus = dataSourceTransactionManager.getTransaction(transactionDefinition);
 		boolean result = false;
@@ -375,7 +372,7 @@ public class VideoManagerStorageImpl implements IVideoManagerStorage {
 	 * @param deviceId 设备ID
 	 * @return true：更新成功  false：更新失败
 	 */
-	@Override
+
 	public synchronized boolean online(String deviceId) {
 		Device device = deviceMapper.getDeviceByDeviceId(deviceId);
 		if (device == null) {
@@ -393,7 +390,7 @@ public class VideoManagerStorageImpl implements IVideoManagerStorage {
 	 * @param deviceId 设备ID
 	 * @return true：更新成功  false：更新失败
 	 */
-	@Override
+
 	public synchronized boolean outline(String deviceId) {
 		logger.info("更新设备离线: " + deviceId);
 		Device device = deviceMapper.getDeviceByDeviceId(deviceId);
@@ -410,7 +407,7 @@ public class VideoManagerStorageImpl implements IVideoManagerStorage {
 	 *
 	 * @return true：更新成功  false：更新失败
 	 */
-	@Override
+
 	public synchronized boolean outlineForAll() {
 		logger.info("更新所有设备离线");
 		int result = deviceMapper.outlineForAll();

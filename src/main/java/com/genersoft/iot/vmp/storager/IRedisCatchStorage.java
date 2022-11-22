@@ -13,7 +13,6 @@ import com.genersoft.iot.vmp.storager.dao.dto.PlatformRegisterInfo;
 
 import java.util.List;
 import java.util.Map;
-
 public interface IRedisCatchStorage {
 
     /**
@@ -257,5 +256,4 @@ public interface IRedisCatchStorage {
     void addDiskInfo(List<Map<String, Object>> diskInfo);
 
     List<SendRtpItem> queryAllSendRTPServer();
-
 }

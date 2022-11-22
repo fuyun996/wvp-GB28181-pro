@@ -17,10 +17,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import javax.sip.InvalidArgumentException;
 import javax.sip.RequestEvent;
 import javax.sip.SipException;
-import javax.sip.header.*;
+import javax.sip.header.CallIdHeader;
+import javax.sip.header.ContentTypeHeader;
 import javax.sip.message.Response;
 import java.text.ParseException;
 

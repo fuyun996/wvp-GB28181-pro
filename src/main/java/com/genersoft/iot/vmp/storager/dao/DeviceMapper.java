@@ -156,7 +156,7 @@ public interface DeviceMapper {
                     "where deviceId like '%${keyword}%'  or name like  '%${keyword}%' " +
                     "</if>",
             "</script>"})
-    List<Device> getDevices();
+    List<Device> getDevices(String keyword);
 
     @Select("<script>" +
             "SELECT * FROM " +
