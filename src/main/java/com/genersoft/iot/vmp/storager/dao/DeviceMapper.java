@@ -160,7 +160,35 @@ public interface DeviceMapper {
 
     @Select("<script>" +
             "SELECT * FROM " +
-            "(SELECT *, (SELECT count(0) FROM device_channel WHERE deviceId=de.deviceId and channelId in " +
+            "(SELECT " +
+            "deviceId, " +
+            "coalesce(custom_name, name) as name, " +
+            "password, " +
+            "manufacturer, " +
+            "model, " +
+            "firmware, " +
+            "transport," +
+            "streamMode," +
+            "ip," +
+            "sdpIp," +
+            "localIp," +
+            "port," +
+            "hostAddress," +
+            "expires," +
+            "registerTime," +
+            "keepaliveTime," +
+            "createTime," +
+            "updateTime," +
+            "charset," +
+            "subscribeCycleForCatalog," +
+            "subscribeCycleForMobilePosition," +
+            "mobilePositionSubmissionInterval," +
+            "subscribeCycleForAlarm," +
+            "ssrcCheck," +
+            "geoCoordSys," +
+            "treeType," +
+            "online," +
+            "(SELECT count(0) FROM device_channel WHERE deviceId=de.deviceId and channelId in " +
             "(SELECT channelId FROM role_device_channel WHERE role_id=#{roleId})) AS channelCount " +
             "FROM device de) AS decount where decount.channelCount > 0" +
             "<if  test=\"keyword !=null and  keyword !=''  \">" +
