@@ -236,12 +236,14 @@ export default {
       let channelId = itemData.channelId;
       console.log("通知设备推流1：" + deviceId + " : " + channelId);
       let that = this;
+      let devicePlayer = this.$refs.devicePlayer;
       this.$axios({
         method: 'get',
         url: '/api/play/start/' + deviceId + '/' + channelId
       }).then(function (res) {
         console.log(res)
         that.isLoging = false;
+
         if (res.data.code === 0) {
 
           setTimeout(() => {
@@ -251,7 +253,7 @@ export default {
             that.getSnapErrorEvent(snapId)
           }, 5000)
           itemData.streamId = res.data.data.stream;
-          that.$refs.devicePlayer.openDialog("media", deviceId, channelId, {
+          devicePlayer.openDialog("media", deviceId, channelId, {
             streamInfo: res.data.data,
             hasAudio: itemData.hasAudio
           });

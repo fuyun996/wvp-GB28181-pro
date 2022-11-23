@@ -129,18 +129,13 @@
                                   <el-tag >RTMP:</el-tag>
                                   <span>{{ streamInfo.rtmp.url }}</span>
                                 </el-dropdown-item>
-                                <el-dropdown-item :command="streamInfo.rtmps.url">
-                                  <el-tag >RTMPS:</el-tag>
-                                  <span>{{ streamInfo.rtmps.url }}</span>
-                                </el-dropdown-item>
+
                                 <el-dropdown-item :command="streamInfo.rtsp.url">
                                   <el-tag >RTSP:</el-tag>
                                   <span>{{ streamInfo.rtsp.url }}</span>
                                 </el-dropdown-item>
-                                <el-dropdown-item :command="streamInfo.rtsps.url">
-                                  <el-tag >RTSPS:</el-tag>
-                                  <span>{{ streamInfo.rtsps.url }}</span>
-                                </el-dropdown-item>
+
+
                               </el-dropdown-menu>
                             </el-dropdown>
                         </el-input>
@@ -294,13 +289,13 @@
 import rtcPlayer from '../dialog/rtcPlayer.vue'
 import LivePlayer from '@liveqing/liveplayer'
 // import player from '../dialog/easyPlayer.vue'
-import jessibucaPlayer from '../common/jessibuca.vue'
+import jessibuca from '../common/jessibuca.vue'
 import recordDownload from '../dialog/recordDownload.vue'
 export default {
     name: 'devicePlayer',
     props: {},
     components: {
-      LivePlayer, jessibucaPlayer, rtcPlayer, recordDownload,
+      LivePlayer, jessibuca, rtcPlayer, recordDownload,
     },
     computed: {
         getPlayerShared: function () {
@@ -517,7 +512,8 @@ export default {
         playFromStreamInfo: function (realHasAudio, streamInfo) {
           this.showVideoDialog = true;
           this.hasaudio = realHasAudio && this.hasaudio;
-          this.$refs[this.activePlayer].play(this.getUrlByStreamInfo(streamInfo))
+          this.$refs[this.activePlayer].play(this.getUrlByStreamInfo(streamInfo));
+          //this.$refs.jessibuca.play(this.getUrlByStreamInfo(streamInfo))
         },
         close: function () {
             console.log('关闭视频');

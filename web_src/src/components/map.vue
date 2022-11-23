@@ -296,13 +296,14 @@ export default {
       let channelId = channel.channelId;
       console.log("通知设备推流1：" + deviceId + " : " + channelId);
       let that = this;
+      let devicePlayer = this.$refs.devicePlayer;
       this.$axios({
         method: 'get',
         url: '/api/play/start/' + deviceId + '/' + channelId
       }).then(function (res) {
         that.isLoging = false;
         if (res.data.code === 0) {
-          that.$refs.devicePlayer.openDialog("media", deviceId, channelId, {
+          devicePlayer.openDialog("media", deviceId, channelId, {
             streamInfo: res.data.data,
             hasAudio: channel.hasAudio
           });
