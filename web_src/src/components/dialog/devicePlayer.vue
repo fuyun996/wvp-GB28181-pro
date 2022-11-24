@@ -289,13 +289,13 @@
 import rtcPlayer from '../dialog/rtcPlayer.vue'
 import LivePlayer from '@liveqing/liveplayer'
 // import player from '../dialog/easyPlayer.vue'
-import jessibuca from '../common/jessibuca.vue'
+import jessibucaPlayer from '../common/jessibuca.vue'
 import recordDownload from '../dialog/recordDownload.vue'
 export default {
     name: 'devicePlayer',
     props: {},
     components: {
-      LivePlayer, jessibuca, rtcPlayer, recordDownload,
+      LivePlayer, jessibucaPlayer, rtcPlayer, recordDownload,
     },
     computed: {
         getPlayerShared: function () {
