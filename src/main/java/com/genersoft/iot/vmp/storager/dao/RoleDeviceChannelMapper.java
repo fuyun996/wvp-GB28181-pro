@@ -1,10 +1,10 @@
 package com.genersoft.iot.vmp.storager.dao;
 
-import com.genersoft.iot.vmp.storager.dao.dto.Menu;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 @Repository
@@ -32,4 +32,7 @@ public interface RoleDeviceChannelMapper {
             "<foreach collection=\"channelIds\" separator=\",\" item=\"item\">(#{roleId},#{item})</foreach>" +
             "</script>")
     void setChannelIdsByRole(@Param("channelIds") String[] channelIds, int roleId);
+
+    @Select("select * from role_device_channel where role_id=#{roleId} and channelId=#{channelid}")
+    Map getDeviceChannelByRoleIdAndChannelId(int roleId, String channelid);
 }

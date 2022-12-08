@@ -9,7 +9,6 @@ import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -84,5 +83,10 @@ public class UserServiceImpl implements IUserService {
     @Override
     public int changeRole(int id, int roleId) {
         return userMapper.changeRole(id, roleId, DateUtil.getNow());
+    }
+
+    @Override
+    public User getUserByPushKey(String pushKey) {
+        return userMapper.getUserByPushKey(pushKey);
     }
 }

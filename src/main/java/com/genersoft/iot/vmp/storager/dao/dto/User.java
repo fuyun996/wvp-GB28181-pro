@@ -8,6 +8,7 @@ public class User {
     private String createTime;
     private String updateTime;
     private String pushKey;
+    private String pushIp;
     private Role role;
 
     public int getId() {
@@ -64,5 +65,13 @@ public class User {
 
     public void setPushKey(String pushKey) {
         this.pushKey = pushKey;
+    }
+
+    public String getPushIp() {
+        return pushIp;
+    }
+
+    public void setPushIp(String pushIp) {
+        this.pushIp = pushIp;
     }
 }

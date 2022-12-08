@@ -65,4 +65,8 @@ public interface UserMapper {
 
     @Update("update user set roleId=#{roleId}, updateTime=#{updateTime} where id=#{id}")
     int changeRole(int id, int roleId, String updateTime);
+
+    @Select("select u.*, r.id as roleID, r.name as roleName, r.authority as roleAuthority , r.createTime as roleCreateTime , r.updateTime as roleUpdateTime FROM user u, user_role r WHERE u.roleId=r.id and u.pushKey=#{pushKey}")
+    @ResultMap(value="roleMap")
+    User getUserByPushKey(String pushKey);
 }

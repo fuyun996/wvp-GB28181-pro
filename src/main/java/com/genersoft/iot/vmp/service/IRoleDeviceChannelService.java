@@ -1,6 +1,7 @@
 package com.genersoft.iot.vmp.service;
 
 import java.util.List;
+import java.util.Map;
 
 public interface IRoleDeviceChannelService {
     /**
@@ -16,4 +17,6 @@ public interface IRoleDeviceChannelService {
      * @param roleId 角色id
      */
     void setChannelIdsByRole(String[] channelIds, int roleId);
+
+    Map getDeviceChannelByRoleIdAndChannelId(int roleId, String channelid);
 }

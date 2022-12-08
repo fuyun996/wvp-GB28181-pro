@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class RoleDeviceChannelServiceImpl implements IRoleDeviceChannelService {
@@ -35,5 +36,10 @@ public class RoleDeviceChannelServiceImpl implements IRoleDeviceChannelService {
         }
 
         roleDeviceChannelMapper.setChannelIdsByRole(channelIds, roleId);
+    }
+
+    @Override
+    public Map getDeviceChannelByRoleIdAndChannelId(int roleId, String channelid) {
+        return roleDeviceChannelMapper.getDeviceChannelByRoleIdAndChannelId(roleId, channelid);
     }
 }

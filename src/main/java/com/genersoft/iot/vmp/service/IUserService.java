@@ -28,4 +28,6 @@ public interface IUserService {
     int changePushKey(int id, String pushKey);
 
     int changeRole(int id, int roleId);
+
+    User getUserByPushKey(String pushKey);
 }
