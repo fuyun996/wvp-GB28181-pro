@@ -1,5 +1,6 @@
 package com.genersoft.iot.vmp.vmanager.openapi;
 
+import com.alibaba.fastjson.JSONObject;
 import com.genersoft.iot.vmp.common.StreamInfo;
 import com.genersoft.iot.vmp.conf.UserSetting;
 import com.genersoft.iot.vmp.conf.exception.ControllerException;
@@ -137,7 +138,7 @@ public class OpenApiController {
                 onlyCatalog = false;
             }
 
-            List<BaseTree<DeviceChannel>> treeData = deviceService.queryVideoDeviceTree(deviceId, parentId, onlyCatalog);
+            List<BaseTree<JSONObject>> treeData = deviceService.queryVideoDeviceTreeForOpenApi(deviceId, parentId, onlyCatalog);
             if (treeData == null || (page - 1) * count > treeData.size()) {
                 PageInfo<BaseTree<DeviceChannel>> pageInfo = new PageInfo<>();
                 pageInfo.setPageNum(page);
@@ -149,8 +150,8 @@ public class OpenApiController {
 
             int toIndex = Math.min(page * count, treeData.size());
             // 处理分页
-            List<BaseTree<DeviceChannel>> trees = treeData.subList((page - 1) * count, toIndex);
-            PageInfo<BaseTree<DeviceChannel>> pageInfo = new PageInfo<>();
+            List<BaseTree<JSONObject>> trees = treeData.subList((page - 1) * count, toIndex);
+            PageInfo<BaseTree<JSONObject>> pageInfo = new PageInfo<>();
             pageInfo.setPageNum(page);
             pageInfo.setTotal(treeData.size());
             pageInfo.setSize(trees.size());

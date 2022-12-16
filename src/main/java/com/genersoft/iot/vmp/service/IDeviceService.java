@@ -1,5 +1,6 @@
 package com.genersoft.iot.vmp.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.genersoft.iot.vmp.gb28181.bean.Device;
 import com.genersoft.iot.vmp.gb28181.bean.DeviceChannel;
 import com.genersoft.iot.vmp.gb28181.bean.SyncStatus;
@@ -122,6 +123,14 @@ public interface IDeviceService {
      * @return
      */
     List<BaseTree<DeviceChannel>> queryVideoDeviceTree(String deviceId, String parentId, boolean onlyCatalog);
+    /**
+     * 树形查询接口
+     * @param deviceId 设备ID
+     * @param parentId 父ID
+     * @param onlyCatalog 只获取目录
+     * @return
+     */
+    List<BaseTree<JSONObject>> queryVideoDeviceTreeForOpenApi(String deviceId, String parentId, boolean onlyCatalog);
 
     /**
      * 查询树节点下的通道

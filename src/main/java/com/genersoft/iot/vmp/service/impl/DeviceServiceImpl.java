@@ -1,5 +1,6 @@
 package com.genersoft.iot.vmp.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.genersoft.iot.vmp.conf.DynamicTask;
 import com.genersoft.iot.vmp.gb28181.bean.*;
 import com.genersoft.iot.vmp.gb28181.session.VideoStreamSessionManager;
@@ -413,6 +414,69 @@ public class DeviceServiceImpl implements IDeviceService {
 
         return null;
     }
+    public List<BaseTree<JSONObject>> queryVideoDeviceTreeForOpenApi(String deviceId, String parentId, boolean onlyCatalog) {
+        Device device = deviceMapper.getDeviceByDeviceId(deviceId);
+        if (device == null) {
+            return null;
+        }
+        if (parentId == null || parentId.equals(deviceId)) {
+            // 字根节点开始查询
+            List<DeviceChannel> rootNodes = getRootNodes(deviceId, TreeType.CIVIL_CODE.equals(device.getTreeType()), true, !onlyCatalog);
+            return transportChannelsToTreeForOpenApi(rootNodes, "");
+        }
+
+        if (TreeType.CIVIL_CODE.equals(device.getTreeType())) {
+            if (parentId.length()%2 != 0) {
+                return null;
+            }
+            // 使用行政区划展示树
+//            if (parentId.length() > 10) {
+//                // TODO 可能是行政区划与业务分组混杂的情形
+//                return null;
+//            }
+
+            if (parentId.length() == 10 ) {
+                if (onlyCatalog) {
+                    return null;
+                }
+                // parentId为行业编码， 其下不会再有行政区划
+                List<DeviceChannel> channels = deviceChannelMapper.getChannelsByCivilCode(deviceId, parentId);
+                List<BaseTree<JSONObject>> trees = transportChannelsToTreeForOpenApi(channels, parentId);
+                return trees;
+            }
+            // 查询其下的行政区划和摄像机
+            List<DeviceChannel> channelsForCivilCode = deviceChannelMapper.getChannelsWithCivilCodeAndLength(deviceId, parentId, parentId.length() + 2);
+            if (!onlyCatalog) {
+                List<DeviceChannel> channels = deviceChannelMapper.getChannelsByCivilCode(deviceId, parentId);
+
+                for(DeviceChannel channel : channels) {
+                    boolean flag = false;
+                    for(DeviceChannel deviceChannel : channelsForCivilCode) {
+                        if(channel.getChannelId().equals(deviceChannel.getChannelId())) {
+                            flag = true;
+                        }
+                    }
+                    if(!flag) {
+                        channelsForCivilCode.add(channel);
+                    }
+                }
+            }
+            List<BaseTree<JSONObject>> trees = transportChannelsToTreeForOpenApi(channelsForCivilCode, parentId);
+            return trees;
+
+        }
+        // 使用业务分组展示树
+        if (TreeType.BUSINESS_GROUP.equals(device.getTreeType())) {
+            if (parentId.length() < 14 ) {
+                return null;
+            }
+            List<DeviceChannel> deviceChannels = deviceChannelMapper.queryChannels(deviceId, parentId, null, null, null, null);
+            List<BaseTree<JSONObject>> trees = transportChannelsToTreeForOpenApi(deviceChannels, parentId);
+            return trees;
+        }
+
+        return null;
+    }
 
     @Override
     public List<DeviceChannel> queryVideoDeviceInTreeNode(String deviceId, String parentId) {
@@ -474,6 +538,45 @@ public class DeviceServiceImpl implements IDeviceService {
             node.setName(channel.getName());
             node.setPid(parentId);
             node.setBasicData(channel);
+            node.setParent(false);
+            if (channel.getChannelId().length() > 8) {
+                String gbCodeType = channel.getChannelId().substring(10, 13);
+                node.setParent(gbCodeType.equals(ChannelIdType.BUSINESS_GROUP) || gbCodeType.equals(ChannelIdType.VIRTUAL_ORGANIZATION) );
+            }else {
+                node.setParent(true);
+            }
+            treeNotes.add(node);
+        }
+        Collections.sort(treeNotes);
+        return treeNotes;
+    }
+    private List<BaseTree<JSONObject>> transportChannelsToTreeForOpenApi(List<DeviceChannel> channels, String parentId) {
+        if (channels == null) {
+            return null;
+        }
+        List<BaseTree<JSONObject>> treeNotes = new ArrayList<>();
+        if (channels.size() == 0) {
+            return treeNotes;
+        }
+        for (DeviceChannel channel : channels) {
+
+            BaseTree<JSONObject> node = new BaseTree<>();
+            node.setId(channel.getChannelId());
+            node.setDeviceId(channel.getDeviceId());
+            node.setName(channel.getName());
+            node.setPid(parentId);
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("deviceId",channel.getDeviceId());
+            jsonObject.put("channelId",channel.getChannelId());
+            jsonObject.put("name",channel.getName());
+            jsonObject.put("civilCode",channel.getCivilCode());
+            jsonObject.put("latitude",channel.getLatitude());
+            jsonObject.put("longitude",channel.getLongitude());
+            jsonObject.put("parentId",channel.getParentId());
+            jsonObject.put("manufacture",channel.getManufacture());
+            jsonObject.put("model",channel.getModel());
+            jsonObject.put("status",channel.getStatus());
+            node.setBasicData(jsonObject);
             node.setParent(false);
             if (channel.getChannelId().length() > 8) {
                 String gbCodeType = channel.getChannelId().substring(10, 13);
