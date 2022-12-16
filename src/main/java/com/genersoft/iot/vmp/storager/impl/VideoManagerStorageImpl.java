@@ -353,6 +353,7 @@ public class VideoManagerStorageImpl implements IVideoManagerStorage {
 			jsonObject.put("deviceId",item.getDeviceId());
 			jsonObject.put("name",item.getName());
 			jsonObject.put("online",item.getOnline());
+			ret.add(jsonObject);
 		}
 		return new PageInfo<>(ret);
 	}
