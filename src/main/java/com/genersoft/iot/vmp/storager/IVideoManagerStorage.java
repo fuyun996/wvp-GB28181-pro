@@ -1,12 +1,11 @@
 package com.genersoft.iot.vmp.storager;
 
+import com.alibaba.fastjson.JSONObject;
 import com.genersoft.iot.vmp.gb28181.bean.*;
 import com.genersoft.iot.vmp.media.zlm.dto.StreamProxyItem;
-import com.genersoft.iot.vmp.media.zlm.dto.StreamPushItem;
 import com.genersoft.iot.vmp.service.bean.GPSMsgInfo;
 import com.genersoft.iot.vmp.storager.dao.dto.ChannelSourceInfo;
 import com.genersoft.iot.vmp.vmanager.gb28181.platform.bean.ChannelReduce;
-import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
 import java.util.List;
@@ -105,6 +104,8 @@ public interface IVideoManagerStorage {
 	 * @return PageInfo<Device> 分页设备对象数组
 	 */
 	public PageInfo<Device> queryVideoDeviceListByRoleId(int page, int count ,String keyword, int roleId);
+
+	public PageInfo<JSONObject> queryVideoDeviceListByRoleIdForOpenApi(int page, int count , String keyword, int roleId);
 
 	/**
 	 * 获取多个设备

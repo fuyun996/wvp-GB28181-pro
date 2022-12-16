@@ -92,7 +92,7 @@ public class OpenApiController {
         String pushIp = user.getPushIp();
         if(isAccess(serverIP,pushIp)){
             int roleId = user.getRole().getId();
-            return storager.queryVideoDeviceListByRoleId(page, count,keyword, roleId);
+            return storager.queryVideoDeviceListByRoleIdForOpenApi(page, count,keyword, roleId);
         }else {
             throw new ControllerException(101,"白名单验证失败！");
         }

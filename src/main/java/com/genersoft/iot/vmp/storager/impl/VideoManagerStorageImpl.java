@@ -1,5 +1,6 @@
 package com.genersoft.iot.vmp.storager.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.genersoft.iot.vmp.conf.SipConfig;
 import com.genersoft.iot.vmp.conf.UserSetting;
 import com.genersoft.iot.vmp.conf.security.SecurityUtils;
@@ -326,6 +327,34 @@ public class VideoManagerStorageImpl implements IVideoManagerStorage {
 		}
 
 		return new PageInfo<>(all);
+	}
+
+	/**
+	 * 考虑权限，获取当前用户的多个设备
+	 *
+	 * @param page 当前页数
+	 * @param count 每页数量
+	 * @param keyword 关键词
+	 * @return PageInfo<Device> 分页设备对象数组
+	 */
+	@Override
+	public PageInfo<JSONObject> queryVideoDeviceListByRoleIdForOpenApi(int page, int count , String keyword, int roleId) {
+		PageHelper.startPage(page, count);
+		List<Device> all;
+		List<JSONObject> ret = new ArrayList<>();
+		if(roleId == 1){
+			all = deviceMapper.getDevices(keyword);
+		}else{
+			all = deviceMapper.getDevicesByRoleId(keyword, roleId);
+		}
+		for (Device item: all) {
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("channelCount",item.getChannelCount());
+			jsonObject.put("deviceId",item.getDeviceId());
+			jsonObject.put("name",item.getName());
+			jsonObject.put("online",item.getOnline());
+		}
+		return new PageInfo<>(ret);
 	}
 
 	/**
