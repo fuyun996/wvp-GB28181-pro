@@ -34,6 +34,7 @@ public interface MenuMapper {
                 "<if test=\"roleId != 1\">" +
                     "and m.id in (select rm.menu_id from role_menu rm where rm.role_id=#{roleId})" +
                 "</if>" +
+                "order by m.sort" +
             "</script>")
     List<Menu> getMenuByRoleId(int roleId);
 

@@ -154,7 +154,8 @@ public interface DeviceMapper {
             "(SELECT count(0) FROM device_channel WHERE deviceId=de.deviceId) as channelCount  FROM device de" +
                     "<if  test=\"keyword !=null and  keyword !=''  \">" +
                     "where deviceId like '%${keyword}%'  or name like  '%${keyword}%' " +
-                    "</if>",
+                    "</if>"+
+            "order by online desc,deviceId",
             "</script>"})
     List<Device> getDevices(String keyword);
 
@@ -194,6 +195,7 @@ public interface DeviceMapper {
             "<if  test=\"keyword !=null and  keyword !=''  \">" +
             "WHERE decount.deviceId like '%${keyword}%'  or decount.name like  '%${keyword}%' " +
             "</if>" +
+            "order by decount.online desc,decount.deviceId" +
             "</script>"
     )
     List<Device> getDevicesByRoleId(String keyword, int roleId);

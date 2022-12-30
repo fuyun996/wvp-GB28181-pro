@@ -40,7 +40,7 @@
         </template>
       </template>
 
-      <el-switch v-model="alarmNotify" active-text="报警信息推送" @change="alarmNotifyChannge"></el-switch>
+      <!-- <el-switch v-model="alarmNotify" active-text="报警信息推送" @change="alarmNotifyChannge"></el-switch>-->
       <!--            <el-menu-item style="float: right;" @click="loginout">退出</el-menu-item>-->
       <el-submenu index="" style="float: right;">
         <template slot="title">欢迎，{{ this.$cookies.get("session").username }}</template>
