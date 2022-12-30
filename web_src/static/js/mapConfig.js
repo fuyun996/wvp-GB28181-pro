@@ -9,9 +9,9 @@ window.mapParam = {
   // 瓦片大小
   tileSize: 256,
   // 默认层级
-  zoom:10,
+  zoom:13,
   // 默认地图中心点
-  center:[116.41020, 39.915119],
+  center:[106.20,29.58],
   // 地图最大层级
   maxZoom:18,
   // 地图最小层级
