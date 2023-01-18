@@ -1,10 +1,10 @@
 <template>
   <div id="app" style="width: 100%">
     <div class="page-header">
-      <div class="page-title">设备列表</div>
       <div>
+        <span class="page-title">设备列表：</span>
         <el-input @input="search" style="margin-right: 1rem; width: auto;" size="mini" placeholder="关键字"
-                  prefix-icon="el-icon-search" v-model="searchKeyword" clearable></el-input>
+          prefix-icon="el-icon-search" v-model="searchKeyword" clearable></el-input>
         <el-button type="primary" size="mini" @click="getDeviceList()">搜索</el-button>
       </div>
 
@@ -12,83 +12,80 @@
         <el-button icon="el-icon-plus" size="mini" style="margin-right: 1rem;" type="primary" @click="add">添加设备
         </el-button>
         <el-button icon="el-icon-refresh-right" circle size="mini" :loading="getDeviceListLoading"
-                   @click="getDeviceList()"></el-button>
+          @click="getDeviceList()"></el-button>
       </div>
     </div>
-    <!--设备列表-->
-    <el-table :data="deviceList" style="width: 100%;font-size: 12px;" :height="winHeight" header-row-class-name="table-header">
-      <el-table-column prop="name" label="名称" min-width="160">
-      </el-table-column>
-      <el-table-column prop="deviceId" label="设备编号" min-width="200" >
-      </el-table-column>
-      <el-table-column label="地址" min-width="160" >
-        <template slot-scope="scope">
-          <div slot="reference" class="name-wrapper">
-            <el-tag v-if="scope.row.hostAddress" size="medium">{{ scope.row.hostAddress }}</el-tag>
-            <el-tag v-if="!scope.row.hostAddress" size="medium">未知</el-tag>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column prop="manufacturer" label="厂家" min-width="120" >
-      </el-table-column>
-      <el-table-column label="流传输模式"  min-width="160" >
-        <template slot-scope="scope">
-          <el-select size="mini" @change="transportChange(scope.row)" v-model="scope.row.streamMode" placeholder="请选择" style="width: 120px">
-            <el-option key="UDP" label="UDP" value="UDP"></el-option>
-            <el-option key="TCP-ACTIVE" label="TCP主动模式" :disabled="true" value="TCP-ACTIVE"></el-option>
-            <el-option key="TCP-PASSIVE" label="TCP被动模式" value="TCP-PASSIVE"></el-option>
-          </el-select>
-        </template>
-      </el-table-column>
-      <el-table-column prop="channelCount" label="通道数" min-width="120" >
-      </el-table-column>
-      <el-table-column label="状态" min-width="120">
-        <template slot-scope="scope">
-          <div slot="reference" class="name-wrapper">
-            <el-tag size="medium" v-if="scope.row.online == 1">在线</el-tag>
-            <el-tag size="medium" type="info" v-if="scope.row.online == 0">离线</el-tag>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column prop="keepaliveTime" label="最近心跳" min-width="160" >
-      </el-table-column>
-      <el-table-column prop="registerTime" label="最近注册"  min-width="160" sortable>
-      </el-table-column>
-<!--      <el-table-column prop="updateTime" label="更新时间"  width="140">-->
-<!--      </el-table-column>-->
-<!--      <el-table-column prop="createTime" label="创建时间"  width="140">-->
-<!--      </el-table-column>-->
+    <div class="page-content">
+      <!--设备列表-->
+      <el-table :data="deviceList" style="width: 100%;font-size: 12px;" :height="winHeight"
+        header-row-class-name="table-header">
+        <el-table-column prop="name" label="名称" min-width="160">
+        </el-table-column>
+        <el-table-column prop="deviceId" label="设备编号" min-width="200">
+        </el-table-column>
+        <el-table-column label="地址" min-width="160">
+          <template slot-scope="scope">
+            <div slot="reference" class="name-wrapper">
+              <el-tag v-if="scope.row.hostAddress" size="medium">{{ scope.row.hostAddress }}</el-tag>
+              <el-tag v-if="!scope.row.hostAddress" size="medium">未知</el-tag>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="manufacturer" label="厂家" min-width="120">
+        </el-table-column>
+        <el-table-column label="流传输模式" min-width="160">
+          <template slot-scope="scope">
+            <el-select size="mini" @change="transportChange(scope.row)" v-model="scope.row.streamMode" placeholder="请选择"
+              style="width: 120px">
+              <el-option key="UDP" label="UDP" value="UDP"></el-option>
+              <el-option key="TCP-ACTIVE" label="TCP主动模式" :disabled="true" value="TCP-ACTIVE"></el-option>
+              <el-option key="TCP-PASSIVE" label="TCP被动模式" value="TCP-PASSIVE"></el-option>
+            </el-select>
+          </template>
+        </el-table-column>
+        <el-table-column prop="channelCount" label="通道数" min-width="120">
+        </el-table-column>
+        <el-table-column label="状态" min-width="120">
+          <template slot-scope="scope">
+            <div slot="reference" class="name-wrapper">
+              <el-tag size="medium" v-if="scope.row.online == 1">在线</el-tag>
+              <el-tag size="medium" type="info" v-if="scope.row.online == 0">离线</el-tag>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="keepaliveTime" label="最近心跳" min-width="160">
+        </el-table-column>
+        <el-table-column prop="registerTime" label="最近注册" min-width="160" sortable>
+        </el-table-column>
+        <!--      <el-table-column prop="updateTime" label="更新时间"  width="140">-->
+        <!--      </el-table-column>-->
+        <!--      <el-table-column prop="createTime" label="创建时间"  width="140">-->
+        <!--      </el-table-column>-->
 
-      <el-table-column label="操作" min-width="450" fixed="right">
-        <template slot-scope="scope">
-          <el-button type="text" size="medium" v-bind:disabled="scope.row.online==0" icon="el-icon-refresh" @click="refDevice(scope.row)"
-                     @mouseover="getTooltipContent(scope.row.deviceId)">刷新
-          </el-button>
-          <el-divider direction="vertical"></el-divider>
-          <el-button type="text" size="medium" icon="el-icon-video-camera"
-                     @click="showChannelList(scope.row)">通道
-          </el-button>
-          <el-divider direction="vertical"></el-divider>
-          <el-button size="medium" icon="el-icon-location" type="text"
-                     @click="showDevicePosition(scope.row)">定位
-          </el-button>
-          <el-divider direction="vertical"></el-divider>
-          <el-button size="medium" icon="el-icon-edit" type="text" @click="edit(scope.row)">编辑</el-button>
-          <el-divider direction="vertical"></el-divider>
-          <el-button size="medium" icon="el-icon-delete" type="text" @click="deleteDevice(scope.row)" style="color: #f56c6c">删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <el-pagination
-      style="float: right"
-      @size-change="handleSizeChange"
-      @current-change="currentChange"
-      :current-page="currentPage"
-      :page-size="count"
-      :page-sizes="[15, 25, 35, 50]"
-      layout="total, sizes, prev, pager, next"
-      :total="total">
-    </el-pagination>
+        <el-table-column label="操作" min-width="450" fixed="right">
+          <template slot-scope="scope">
+            <el-button type="text" size="medium" v-bind:disabled="scope.row.online == 0" icon="el-icon-refresh"
+              @click="refDevice(scope.row)" @mouseover="getTooltipContent(scope.row.deviceId)">刷新
+            </el-button>
+            <el-divider direction="vertical"></el-divider>
+            <el-button type="text" size="medium" icon="el-icon-video-camera" @click="showChannelList(scope.row)">通道
+            </el-button>
+            <el-divider direction="vertical"></el-divider>
+            <el-button size="medium" icon="el-icon-location" type="text" @click="showDevicePosition(scope.row)">定位
+            </el-button>
+            <el-divider direction="vertical"></el-divider>
+            <el-button size="medium" icon="el-icon-edit" type="text" @click="edit(scope.row)">编辑</el-button>
+            <el-divider direction="vertical"></el-divider>
+            <el-button size="medium" icon="el-icon-delete" type="text" @click="deleteDevice(scope.row)"
+              style="color: #f56c6c">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-pagination style="float: right" @size-change="handleSizeChange" @current-change="currentChange"
+        :current-page="currentPage" :page-size="count" :page-sizes="[15, 25, 35, 50]"
+        layout="total, sizes, prev, pager, next" :total="total">
+      </el-pagination>
+    </div>
     <deviceEdit ref="deviceEdit"></deviceEdit>
     <deviceDetail ref="deviceDetail"></deviceDetail>
     <syncChannelProgress ref="syncChannelProgress"></syncChannelProgress>
@@ -117,12 +114,12 @@ export default {
       videoComponentList: [],
       updateLooper: 0, //数据刷新轮训标志
       currentDeviceChannelsLenth: 0,
-      winHeight: window.innerHeight - 200,
+      winHeight: window.innerHeight - 150,
       currentPage: 1,
       count: 15,
       total: 0,
       getDeviceListLoading: false,
-      searchKeyword:""
+      searchKeyword: ""
     };
   },
   computed: {
@@ -167,15 +164,15 @@ export default {
         params: {
           page: that.currentPage,
           count: that.count,
-          keyword:that.searchKeyword
+          keyword: that.searchKeyword
         }
-      }).then( (res)=> {
+      }).then((res) => {
         if (res.data.code === 0) {
           this.total = res.data.data.total;
           this.deviceList = res.data.data.list;
         }
         this.getDeviceListLoading = false;
-      }).catch( (error)=> {
+      }).catch((error) => {
         console.error(error);
         this.getDeviceListLoading = false;
       });
@@ -294,12 +291,12 @@ export default {
     detail: function (row) {
       this.$refs.deviceDetail.openDialog(row, () => {
         this.$refs.deviceEdit.close();
-      this.$message({
-        showClose: true,
-        message: "..........",
-        type: "success",
-      });
-      setTimeout(this.getDeviceList, 200)
+        this.$message({
+          showClose: true,
+          message: "..........",
+          type: "success",
+        });
+        setTimeout(this.getDeviceList, 200)
 
       })
     },
@@ -372,5 +369,4 @@ export default {
   padding: 0.3rem;
   width: 14.4rem;
 }
-
 </style>

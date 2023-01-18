@@ -3,27 +3,18 @@
   <div class="limiter">
     <div class="container-login100">
       <div class="wrap-login100">
-					<span class="login100-form-title p-b-26">璧山应急视频云</span>
-          <span class="login100-form-title p-b-48">
-						<i class="fa fa-video-camera"></i>
-					</span>
+					<span class="login100-form-title">中科曙光视频云</span>
 
           <div class="wrap-input100 validate-input" data-validate = "Valid email is: a@b.c">
-            <input :class="'input100 ' + (username==''?'':'has-val')" type="text" v-model="username" name="username">
-            <span class="focus-input100" data-placeholder="用户名"></span>
+            <input :class="'input100 ' + (username==''?'':'has-val')" type="text" v-model="username" name="username" placeholder="用户名">
           </div>
 
           <div class="wrap-input100 validate-input" data-validate="Enter password">
-						<span class="btn-show-pass">
-							<i :class="'fa ' + (!showPassword?'fa-eye':'fa-eye-slash')" @click="showPassword = !showPassword"></i>
-						</span>
-            <input :class="'input100 ' + (password==''?'':'has-val')" :type="(!showPassword?'password':'text')" v-model="password" name="password">
-            <span class="focus-input100" data-placeholder="密码"></span>
+            <input :class="'input100 ' + (password==''?'':'has-val')" :type="(!showPassword?'password':'text')" v-model="password" name="password" placeholder="密码">
           </div>
 
           <div class="container-login100-form-btn">
             <div class="wrap-login100-form-btn" :class="{'login-loading': isLoging}" v-loading="isLoging" element-loading-background="rgb(0 0 0 / 0%);" element-loading-custom-class="login-loading-class">
-              <div class="login100-form-bgbtn"></div>
               <button class="login100-form-btn" @click="login">登录</button>
             </div>
           </div>

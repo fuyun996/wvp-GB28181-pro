@@ -2,32 +2,32 @@
 
   <div id="app" style="width: 100%">
     <div class="page-header">
-
       <div class="page-title">菜单列表</div>
       <div class="page-header-btn">
         <el-button icon="el-icon-plus" size="mini" style="margin-right: 1rem;" type="primary" @click="addMenu">
           添加菜单
         </el-button>
-
       </div>
     </div>
-    <!--菜单列表-->
-    <el-table :data="menuList" style="width: 100%;font-size: 12px;" :height="winHeight"
-      header-row-class-name="table-header" row-key="id" :tree-props="{ children: 'child' }">
-      <el-table-column prop="id" label="ID" min-width="160" />
-      <el-table-column prop="name" label="菜单名称" min-width="160" />
-      <el-table-column prop="url" label="路由" min-width="160" />
-      <el-table-column prop="sort" label="排序" min-width="160" />
-      <el-table-column label="操作" min-width="450" fixed="right">
-        <template slot-scope="scope">
-          <el-button size="medium" icon="el-icon-edit" type="text" @click="edit(scope.row)">修改</el-button>
-          <el-divider direction="vertical"></el-divider>
-          <el-button size="medium" icon="el-icon-delete" type="text" @click="deleteMenu(scope.row)"
-            style="color: #f56c6c">删除
-          </el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+    <div class="page-content">
+      <!--菜单列表-->
+      <el-table :data="menuList" style="width: 100%;font-size: 12px;" :height="winHeight"
+        header-row-class-name="table-header" row-key="id" :tree-props="{ children: 'child' }">
+        <el-table-column prop="id" label="ID" min-width="160" />
+        <el-table-column prop="name" label="菜单名称" min-width="160" />
+        <el-table-column prop="url" label="路由" min-width="160" />
+        <el-table-column prop="sort" label="排序" min-width="160" />
+        <el-table-column label="操作" min-width="450" fixed="right">
+          <template slot-scope="scope">
+            <el-button size="medium" icon="el-icon-edit" type="text" @click="edit(scope.row)">修改</el-button>
+            <el-divider direction="vertical"></el-divider>
+            <el-button size="medium" icon="el-icon-delete" type="text" @click="deleteMenu(scope.row)"
+              style="color: #f56c6c">删除
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
     <addMenu ref="addMenu"></addMenu>
   </div>
 </template>
@@ -43,7 +43,7 @@ export default {
   data() {
     return {
       menuList: [],
-      winHeight: window.innerHeight - 200,
+      winHeight: window.innerHeight - 150,
       getMenuListLoading: false
     };
   },

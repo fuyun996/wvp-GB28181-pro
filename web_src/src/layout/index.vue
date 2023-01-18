@@ -1,8 +1,8 @@
 <template>
   <el-container style="height: 100%">
-    <el-header>
-      <ui-header/>
-    </el-header>
+    <div class="layout-aside">
+      <ui-header></ui-header>
+    </div>
     <el-main>
       <el-container>
         <transition name="fade">
@@ -23,30 +23,11 @@ export default {
   },
 }
 </script>
-<style>
-body{
-  font-family: sans-serif;
-}
-/*定义标题栏*/
-.page-header {
-  background-color: #FFFFFF;
-  margin-bottom: 1rem;
-  padding: 0.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.page-title {
-  font-weight: bold;
-  text-align: left;
-}
-
-.page-header-btn {
-  text-align: right;
-}
-</style>
 <style scoped>
+.layout-aside {
+  background: #121212;
+}
+
 .fade-enter {
   visibility: hidden;
   opacity: 0;

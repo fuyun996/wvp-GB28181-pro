@@ -1,107 +1,99 @@
 <template>
   <div id="pushVideoList" style="width: 100%">
     <div class="page-header">
-      <div class="page-title">推流列表</div>
+      <!-- <div class="page-title">推流列表</div> -->
       <div class="page-header-btn">
         搜索:
         <el-input @input="getPushList" style="margin-right: 1rem; width: auto;" size="mini" placeholder="关键字"
-                  prefix-icon="el-icon-search" v-model="searchSrt" clearable></el-input>
+          prefix-icon="el-icon-search" v-model="searchSrt" clearable></el-input>
         流媒体:
-        <el-select size="mini" @change="getPushList" style="margin-right: 1rem;" v-model="mediaServerId"
-                   placeholder="请选择" default-first-option>
+        <el-select size="mini" @change="getPushList" style="margin-right: 1rem;width: 12%;" v-model="mediaServerId"
+          placeholder="请选择" default-first-option>
           <el-option label="全部" value=""></el-option>
-          <el-option
-            v-for="item in mediaServerList"
-            :key="item.id"
-            :label="item.id"
-            :value="item.id">
+          <el-option v-for="item in mediaServerList" :key="item.id" :label="item.id" :value="item.id">
           </el-option>
         </el-select>
         推流状态:
-        <el-select size="mini" style="margin-right: 1rem;" @change="getPushList" v-model="pushing" placeholder="请选择"
-                   default-first-option>
+        <el-select size="mini" style="margin-right: 1rem;width: 12%;" @change="getPushList" v-model="pushing" placeholder="请选择"
+          default-first-option>
           <el-option label="全部" value=""></el-option>
           <el-option label="推流进行中" value="true"></el-option>
           <el-option label="推流未进行" value="false"></el-option>
         </el-select>
-        <el-button icon="el-icon-upload2" size="mini" style="margin-right: 1rem;" type="primary" @click="importChannel">
+        <el-button icon="el-icon-upload2" size="mini" type="primary" @click="importChannel">
           通道导入
         </el-button>
-        <el-button icon="el-icon-download" size="mini" style="margin-right: 1rem;" type="primary">
+        <el-button icon="el-icon-download" size="mini" type="primary">
           <a style="color: #FFFFFF; text-align: center; text-decoration: none" href="/static/file/推流通道导入.zip"
-             download='推流通道导入.zip'>下载模板</a>
+            download='推流通道导入.zip'>下载模板</a>
         </el-button>
-        <el-button icon="el-icon-delete" size="mini" style="margin-right: 1rem;"
-                   :disabled="multipleSelection.length === 0" type="danger" @click="batchDel">批量移除
+        <el-button icon="el-icon-delete" size="mini"
+          :disabled="multipleSelection.length === 0" type="danger" @click="batchDel">批量移除
         </el-button>
-        <el-button icon="el-icon-plus" size="mini" style="margin-right: 1rem;" type="primary" @click="addStream">添加通道
+        <el-button icon="el-icon-plus" size="mini" type="primary" @click="addStream">添加通道
         </el-button>
         <el-button icon="el-icon-refresh-right" circle size="mini" @click="refresh()"></el-button>
       </div>
     </div>
-    <devicePlayer ref="devicePlayer"></devicePlayer>
-    <addStreamTOGB ref="addStreamTOGB"></addStreamTOGB>
-    <el-table ref="pushListTable" :data="pushList" style="width: 100%" :height="winHeight"
-              @selection-change="handleSelectionChange" :row-key="(row)=> row.app + row.stream">
-      <el-table-column  type="selection" :reserve-selection="true" min-width="55">
-      </el-table-column>
-      <el-table-column prop="name" label="名称" min-width="200">
-      </el-table-column>
-      <el-table-column prop="app" label="APP" min-width="200">
-      </el-table-column>
-      <el-table-column prop="stream" label="流ID" min-width="200">
-      </el-table-column>
-      <el-table-column prop="gbId" label="国标编码" min-width="200" >
-      </el-table-column>
-      <el-table-column prop="mediaServerId" label="流媒体" min-width="200" >
-      </el-table-column>
-      <el-table-column label="开始时间"  min-width="200">
-        <template slot-scope="scope">
-          <el-button-group>
-            {{ scope.row.pushTime == null? "-":scope.row.pushTime }}
-          </el-button-group>
-        </template>
-      </el-table-column>
-      <el-table-column label="正在推流"  min-width="100">
-        <template slot-scope="scope">
-          {{scope.row.pushIng ? '是' : '否' }}
-        </template>
-      </el-table-column>
-      <el-table-column label="本平台推流"  min-width="100">
-        <template slot-scope="scope">
-          {{scope.row.pushIng && !!scope.row.self ? '是' : '否' }}
-        </template>
-      </el-table-column>
+    <div class="page-content">
+      <devicePlayer ref="devicePlayer"></devicePlayer>
+      <addStreamTOGB ref="addStreamTOGB"></addStreamTOGB>
+      <el-table ref="pushListTable" :data="pushList" style="width: 100%" :height="winHeight"
+        @selection-change="handleSelectionChange" :row-key="(row) => row.app + row.stream">
+        <el-table-column type="selection" :reserve-selection="true" min-width="55">
+        </el-table-column>
+        <el-table-column prop="name" label="名称" min-width="200">
+        </el-table-column>
+        <el-table-column prop="app" label="APP" min-width="200">
+        </el-table-column>
+        <el-table-column prop="stream" label="流ID" min-width="200">
+        </el-table-column>
+        <el-table-column prop="gbId" label="国标编码" min-width="200">
+        </el-table-column>
+        <el-table-column prop="mediaServerId" label="流媒体" min-width="200">
+        </el-table-column>
+        <el-table-column label="开始时间" min-width="200">
+          <template slot-scope="scope">
+            <el-button-group>
+              {{ scope.row.pushTime == null ? "-" : scope.row.pushTime }}
+            </el-button-group>
+          </template>
+        </el-table-column>
+        <el-table-column label="正在推流" min-width="100">
+          <template slot-scope="scope">
+            {{ scope.row.pushIng ? '是' : '否' }}
+          </template>
+        </el-table-column>
+        <el-table-column label="本平台推流" min-width="100">
+          <template slot-scope="scope">
+            {{ scope.row.pushIng && !!scope.row.self ? '是' : '否' }}
+          </template>
+        </el-table-column>
 
-      <el-table-column label="操作" min-width="360"  fixed="right">
-        <template slot-scope="scope">
-          <el-button size="medium" icon="el-icon-video-play"
-                     v-if="scope.row.pushIng === true"
-                     @click="playPush(scope.row)" type="text">播放
-          </el-button>
-          <el-divider direction="vertical"></el-divider>
-          <el-button size="medium" icon="el-icon-delete" type="text" @click="stopPush(scope.row)" style="color: #f56c6c" >移除</el-button>
-          <el-divider direction="vertical"></el-divider>
-          <el-button size="medium" icon="el-icon-position" type="text" v-if="!!!scope.row.gbId"
-                     @click="addToGB(scope.row)">加入国标
-          </el-button>
-          <el-divider v-if="!!!scope.row.gbId" direction="vertical"></el-divider>
-          <el-button size="medium" icon="el-icon-position" type="text" v-if="!!scope.row.gbId"
-                     @click="removeFromGB(scope.row)">移出国标
-          </el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <el-pagination
-      style="float: right"
-      @size-change="handleSizeChange"
-      @current-change="currentChange"
-      :current-page="currentPage"
-      :page-size="count"
-      :page-sizes="[15, 25, 35, 50]"
-      layout="total, sizes, prev, pager, next"
-      :total="total">
-    </el-pagination>
+        <el-table-column label="操作" min-width="360" fixed="right">
+          <template slot-scope="scope">
+            <el-button size="medium" icon="el-icon-video-play" v-if="scope.row.pushIng === true"
+              @click="playPush(scope.row)" type="text">播放
+            </el-button>
+            <el-divider direction="vertical"></el-divider>
+            <el-button size="medium" icon="el-icon-delete" type="text" @click="stopPush(scope.row)"
+              style="color: #f56c6c">移除</el-button>
+            <el-divider direction="vertical"></el-divider>
+            <el-button size="medium" icon="el-icon-position" type="text" v-if="!!!scope.row.gbId"
+              @click="addToGB(scope.row)">加入国标
+            </el-button>
+            <el-divider v-if="!!!scope.row.gbId" direction="vertical"></el-divider>
+            <el-button size="medium" icon="el-icon-position" type="text" v-if="!!scope.row.gbId"
+              @click="removeFromGB(scope.row)">移出国标
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-pagination style="float: right" @size-change="handleSizeChange" @current-change="currentChange"
+        :current-page="currentPage" :page-size="count" :page-sizes="[15, 25, 35, 50]"
+        layout="total, sizes, prev, pager, next" :total="total">
+      </el-pagination>
+    </div>
     <streamProxyEdit ref="streamProxyEdit"></streamProxyEdit>
     <importChannel ref="importChannel"></importChannel>
   </div>
@@ -180,10 +172,10 @@ export default {
           mediaServerId: that.mediaServerId,
         }
       }).then(function (res) {
-          if (res.data.code === 0) {
-            that.total = res.data.data.total;
-            that.pushList = res.data.data.list;
-          }
+        if (res.data.code === 0) {
+          that.total = res.data.data.total;
+          that.pushList = res.data.data.list;
+        }
 
         that.getDeviceListLoading = false;
       }).catch(function (error) {
@@ -205,12 +197,12 @@ export default {
         }
       }).then(function (res) {
         that.getListLoading = false;
-        if (res.data.code === 0 ) {
+        if (res.data.code === 0) {
           that.$refs.devicePlayer.openDialog("streamPlay", null, null, {
             streamInfo: res.data.data,
             hasAudio: true
           });
-        }else {
+        } else {
           that.$message.error(res.data.msg);
         }
 
@@ -262,7 +254,7 @@ export default {
 
       })
     },
-    addStream: function (){
+    addStream: function () {
       this.$refs.addStreamTOGB.openDialog(null, this.initData);
     },
     batchDel: function () {

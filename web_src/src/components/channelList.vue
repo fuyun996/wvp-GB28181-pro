@@ -147,7 +147,7 @@ export default {
       searchSrt: "",
       channelType: "",
       online: "",
-      winHeight: window.innerHeight - 200,
+      winHeight: window.innerHeight - 150,
       currentPage: 1,
       count: 15,
       total: 0,

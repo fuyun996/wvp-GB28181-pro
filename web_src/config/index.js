@@ -6,22 +6,22 @@ const path = require('path')
 
 module.exports = {
   dev: {
-
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
       '/debug': {
-        target: 'http://localhost:18080',
+        target: 'http://10.125.2.4:18080',
         //target: 'http://10.125.2.12:18080',
         //target: 'http://192.168.1.46:18080',
         changeOrigin: true,
+        secure: false,
         pathRewrite: {
-          '^/debug': '/'
+          '^/debug': ''
         }
       },
       '/static/snap': {
-        target: 'http://localhost:18080',
+        target: 'http://10.125.2.4:18080',
         //target: 'http://10.125.2.12:18080',
         changeOrigin: true,
         // pathRewrite: {
@@ -32,7 +32,7 @@ module.exports = {
     },
 
     // Various Dev Server settings
-    host:"127.0.0.1",
+    host: "127.0.0.1",
     useLocalIp: false, // can be overwritten by process.env.HOST
     port: 8080, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
     autoOpenBrowser: false,

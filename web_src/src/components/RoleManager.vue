@@ -12,26 +12,29 @@
 
       </div>
     </div>
-    <!--角色列表-->
-    <el-table :data="roleList" style="width: 100%;font-size: 12px;" :height="winHeight"
-      header-row-class-name="table-header">
-      <el-table-column prop="name" label="角色名" min-width="160" />
-      <el-table-column prop="authority" label="权限" min-width="160" />
-      <el-table-column label="操作" min-width="450" fixed="right">
-        <template slot-scope="scope" v-if="scope.row.id != 1">
-          <el-button size="medium" icon="el-icon-edit" type="text" @click="editAuthority(scope.row)">设置菜单权限</el-button>
-          <el-divider direction="vertical"></el-divider>
-          <el-button size="medium" icon="el-icon-edit" type="text" @click="editChannelAuthority(scope.row)">设置通道权限
-          </el-button>
-          <el-divider direction="vertical"></el-divider>
-          <el-button size="medium" icon="el-icon-edit" type="text" @click="openRoleDialog(scope.row)">修改</el-button>
-          <el-divider direction="vertical"></el-divider>
-          <el-button size="medium" icon="el-icon-delete" type="text" @click="deleteRole(scope.row)"
-            style="color: #f56c6c">删除
-          </el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+    <div class="page-content">
+      <!--角色列表-->
+      <el-table :data="roleList" style="width: 100%;font-size: 12px;" :height="winHeight"
+        header-row-class-name="table-header">
+        <el-table-column prop="name" label="角色名" min-width="160" />
+        <el-table-column prop="authority" label="权限" min-width="160" />
+        <el-table-column label="操作" min-width="450" fixed="right">
+          <template slot-scope="scope" v-if="scope.row.id != 1">
+            <el-button size="medium" icon="el-icon-edit" type="text"
+              @click="editAuthority(scope.row)">设置菜单权限</el-button>
+            <el-divider direction="vertical"></el-divider>
+            <el-button size="medium" icon="el-icon-edit" type="text" @click="editChannelAuthority(scope.row)">设置通道权限
+            </el-button>
+            <el-divider direction="vertical"></el-divider>
+            <el-button size="medium" icon="el-icon-edit" type="text" @click="openRoleDialog(scope.row)">修改</el-button>
+            <el-divider direction="vertical"></el-divider>
+            <el-button size="medium" icon="el-icon-delete" type="text" @click="deleteRole(scope.row)"
+              style="color: #f56c6c">删除
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
 
     <!-- 修改角色 -->
     <el-dialog :title="curRoleId ? '修改角色' : '添加角色'" width="40%" top="2rem" :close-on-click-modal="false"
