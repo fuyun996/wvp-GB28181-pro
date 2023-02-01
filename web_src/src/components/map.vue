@@ -1,10 +1,10 @@
 <template>
-    <div id="devicePosition" style="width: 100vw; height: 91vh;">
-      <el-container v-if="onOff" style="height: 91vh;" v-loading="isLoging">
+    <div id="devicePosition" style="width: 100vw; height: 100%;">
+      <el-container v-if="onOff" v-loading="isLoging">
         <el-aside width="auto" style="background-color: #ffffff">
           <DeviceTree ref="deviceTree" :clickEvent="clickEvent" :contextMenuEvent="contextmenuEventHandler" ></DeviceTree>
         </el-aside>
-        <el-main style="height: 91vh; padding: 0">
+        <el-main style="padding: 0">
           <MapComponent ref="map"></MapComponent>
         </el-main>
       </el-container>

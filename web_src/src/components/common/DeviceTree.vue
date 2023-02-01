@@ -1,5 +1,5 @@
 <template>
-  <div id="DeviceTree" style="width: 100%;height: 100%; overflow: auto;padding-top: 20px;box-sizing: border-box;">
+  <div id="DeviceTree" style="width: 100%;height: 100%; overflow: auto;padding: 20px 0;box-sizing: border-box;">
     <el-container>
       <el-main>
         <!-- <div>请输入设备名称</div> -->
