@@ -10,8 +10,8 @@ import java.util.List;
 @Repository
 public interface MenuMapper {
 
-    @Insert("insert into menu(pid, name, url, sort, spread, status, createTime, updateTime) " +
-            "values(#{pid}, #{name}, #{url}, #{sort}, #{spread}, #{status}, #{createTime}, #{updateTime})")
+    @Insert("insert into menu(pid, name, url, sort, spread, status, createTime, updateTime,icon) " +
+            "values(#{pid}, #{name}, #{url}, #{sort}, #{spread}, #{status}, #{createTime}, #{updateTime},#{icon})")
     int add(Menu menu);
 
     @Delete("delete from menu where id=#{menuId}")
@@ -26,11 +26,12 @@ public interface MenuMapper {
                     "<if test=\"spread != null\">spread=#{spread},</if>" +
                     "<if test=\"status != null\">status=#{status},</if>" +
                     "<if test=\"updateTime != null\">updateTime=#{updateTime},</if>" +
+                    "<if test=\"icon != null\">icon=#{icon},</if>" +
                 "</set> where id=#{id}" +
             "</script>")
     int update(Menu menu);
 
-    @Select("<script>" + "select m.id, m.pid, m.name, m.url, m.sort, m.spread from menu m where m.status = 1 " +
+    @Select("<script>" + "select m.id, m.pid, m.name, m.url, m.sort, m.spread,m.icon from menu m where m.status = 1 " +
                 "<if test=\"roleId != 1\">" +
                     "and m.id in (select rm.menu_id from role_menu rm where rm.role_id=#{roleId})" +
                 "</if>" +
@@ -38,6 +39,6 @@ public interface MenuMapper {
             "</script>")
     List<Menu> getMenuByRoleId(int roleId);
 
-    @Select("select id, pid, name, url, sort, spread from menu where status = 1")
+    @Select("select id, pid, name, url, sort, spread,icon from menu where status = 1")
     List<Menu> listAllMenus();
 }

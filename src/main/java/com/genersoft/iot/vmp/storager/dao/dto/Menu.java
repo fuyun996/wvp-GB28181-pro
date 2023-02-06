@@ -27,6 +27,8 @@ public class Menu {
     private String createTime;
     @Schema(description = "菜单修改时间")
     private String updateTime;
+    @Schema(description = "菜单图标")
+    private String icon;
 
     private List<Menu> child;
 
@@ -108,5 +110,13 @@ public class Menu {
 
     public void setChild(List<Menu> child) {
         this.child = child;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 }
