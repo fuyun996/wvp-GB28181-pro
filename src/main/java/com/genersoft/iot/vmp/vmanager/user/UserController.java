@@ -92,7 +92,7 @@ public class UserController {
 
 
     @PostMapping("/add")
-    @Operation(summary = "停止视频回放")
+    @Operation(summary = "添加用户")
     @Parameter(name = "username", description = "用户名", required = true)
     @Parameter(name = "password", description = "密码（未md5加密的密码）", required = true)
     @Parameter(name = "roleId", description = "角色ID", required = true)

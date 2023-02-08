@@ -172,4 +172,5 @@ public interface IDeviceService {
      */
     ResourceBaceInfo getOverview();
 
+    void updateDeviceLocation(DeviceChannel deviceChannel);
 }

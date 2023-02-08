@@ -298,6 +298,21 @@ public class DeviceQuery {
 	}
 
 	/**
+	 * 更新设备位置信息
+	 * @param deviceChannel 设备信息
+	 * @return
+	 */
+	@Operation(summary = "更新设备位置信息")
+	@Parameter(name = "deviceChannel", description = "设备频道明细", required = true)
+	@PostMapping("/device/updateLocation/")
+	public void updateDeviceLocation(@RequestBody DeviceChannel deviceChannel){
+
+		if (deviceChannel != null && deviceChannel.getDeviceId() != null) {
+			deviceService.updateDeviceLocation(deviceChannel);
+		}
+	}
+
+	/**
 	 * 更新设备信息
 	 * @param device 设备信息
 	 * @return

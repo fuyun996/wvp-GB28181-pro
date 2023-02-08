@@ -361,4 +361,14 @@ public interface DeviceChannelMapper {
 
     @Select("select count(1) as total, sum(status) as online from device_channel")
     ResourceBaceInfo getOverview();
+
+    @Update(value = {" <script>" +
+            "UPDATE device_channel " +
+            "SET " +
+            "latitude=${latitude}, " +
+            "longitude=${longitude} " +
+            "WHERE deviceId=#{deviceId} " +
+            " <if test='channelId != null' >  AND channelId=#{channelId}</if>" +
+            " </script>"})
+    void updateDeviceLocation(DeviceChannel deviceChannel);
 }

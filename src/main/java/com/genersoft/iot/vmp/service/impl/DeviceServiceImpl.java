@@ -731,4 +731,9 @@ public class DeviceServiceImpl implements IDeviceService {
     public ResourceBaceInfo getOverview() {
         return deviceMapper.getOverview();
     }
+
+    @Override
+    public void updateDeviceLocation(DeviceChannel deviceChannel) {
+        deviceChannelMapper.updateDeviceLocation(deviceChannel);
+    }
 }
