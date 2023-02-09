@@ -349,6 +349,13 @@ public class DeviceServiceImpl implements IDeviceService {
        }
     }
 
+    @Override
+    public List<BaseTree<DeviceChannel>> queryVideoDeviceTreeByName(String name) {
+        List<DeviceChannel> deviceChannels = deviceChannelMapper.queryChannelsByName(name);
+        List<BaseTree<DeviceChannel>> trees = transportChannelsToTreeByName(deviceChannels);
+        return trees;
+    }
+
 
     @Override
     public List<BaseTree<DeviceChannel>> queryVideoDeviceTree(String deviceId, String parentId, boolean onlyCatalog) {
@@ -361,7 +368,6 @@ public class DeviceServiceImpl implements IDeviceService {
             List<DeviceChannel> rootNodes = getRootNodes(deviceId, TreeType.CIVIL_CODE.equals(device.getTreeType()), true, !onlyCatalog);
             return transportChannelsToTree(rootNodes, "");
         }
-
         if (TreeType.CIVIL_CODE.equals(device.getTreeType())) {
             if (parentId.length()%2 != 0) {
                 return null;
@@ -371,7 +377,6 @@ public class DeviceServiceImpl implements IDeviceService {
 //                // TODO 可能是行政区划与业务分组混杂的情形
 //                return null;
 //            }
-
             if (parentId.length() == 10 ) {
                 if (onlyCatalog) {
                     return null;
@@ -411,7 +416,6 @@ public class DeviceServiceImpl implements IDeviceService {
             List<BaseTree<DeviceChannel>> trees = transportChannelsToTree(deviceChannels, parentId);
             return trees;
         }
-
         return null;
     }
     public List<BaseTree<JSONObject>> queryVideoDeviceTreeForOpenApi(String deviceId, String parentId, boolean onlyCatalog) {
@@ -537,6 +541,34 @@ public class DeviceServiceImpl implements IDeviceService {
             node.setDeviceId(channel.getDeviceId());
             node.setName(channel.getName());
             node.setPid(parentId);
+            node.setBasicData(channel);
+            node.setParent(false);
+            if (channel.getChannelId().length() > 8) {
+                String gbCodeType = channel.getChannelId().substring(10, 13);
+                node.setParent(gbCodeType.equals(ChannelIdType.BUSINESS_GROUP) || gbCodeType.equals(ChannelIdType.VIRTUAL_ORGANIZATION) );
+            }else {
+                node.setParent(true);
+            }
+            treeNotes.add(node);
+        }
+        Collections.sort(treeNotes);
+        return treeNotes;
+    }
+    private List<BaseTree<DeviceChannel>> transportChannelsToTreeByName(List<DeviceChannel> channels) {
+        if (channels == null) {
+            return null;
+        }
+        List<BaseTree<DeviceChannel>> treeNotes = new ArrayList<>();
+        if (channels.size() == 0) {
+            return treeNotes;
+        }
+        for (DeviceChannel channel : channels) {
+
+            BaseTree<DeviceChannel> node = new BaseTree<>();
+            node.setId(channel.getChannelId());
+            node.setDeviceId(channel.getDeviceId());
+            node.setName(channel.getName());
+            node.setPid(channel.getCivilCode());
             node.setBasicData(channel);
             node.setParent(false);
             if (channel.getChannelId().length() > 8) {

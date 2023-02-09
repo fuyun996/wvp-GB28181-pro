@@ -173,4 +173,6 @@ public interface IDeviceService {
     ResourceBaceInfo getOverview();
 
     void updateDeviceLocation(DeviceChannel deviceChannel);
+
+    List<BaseTree<DeviceChannel>> queryVideoDeviceTreeByName(String name);
 }

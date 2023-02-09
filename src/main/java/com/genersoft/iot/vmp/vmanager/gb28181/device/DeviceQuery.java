@@ -489,6 +489,12 @@ public class DeviceQuery {
 		}
 	}
 
+//	@GetMapping("/tree")
+//	public ResponseEntity<PageInfo> getTreeByName(@RequestParam String name){
+//		List<BaseTree<DeviceChannel>> treeData = deviceService.queryVideoDeviceTree(deviceId, parentId, onlyCatalog);
+//		return new ResponseEntity<>(treeData,HttpStatus.OK);
+//	}
+
 	/**
 	 * 查询国标树
 	 * @param deviceId 设备ID
@@ -507,6 +513,7 @@ public class DeviceQuery {
 	public ResponseEntity<PageInfo> getTree(@PathVariable String deviceId,
 											@RequestParam(required = false) String parentId,
 											@RequestParam(required = false) Boolean onlyCatalog,
+											@RequestParam(required = false) String name,
 											int page, int count){
 
 
@@ -516,8 +523,12 @@ public class DeviceQuery {
 		if (onlyCatalog == null) {
 			onlyCatalog = false;
 		}
-
-		List<BaseTree<DeviceChannel>> treeData = deviceService.queryVideoDeviceTree(deviceId, parentId, onlyCatalog);
+		List<BaseTree<DeviceChannel>> treeData = null;
+		if(name != null){
+			treeData = deviceService.queryVideoDeviceTreeByName(name);
+		}else{
+			treeData = deviceService.queryVideoDeviceTree(deviceId, parentId, onlyCatalog);
+		}
 		if (treeData == null || (page - 1) * count > treeData.size()) {
 			PageInfo<BaseTree<DeviceChannel>> pageInfo = new PageInfo<>();
 			pageInfo.setPageNum(page);

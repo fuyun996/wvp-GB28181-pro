@@ -82,6 +82,13 @@ public interface DeviceChannelMapper {
             " </script>"})
     List<DeviceChannel> queryChannels(String deviceId, String parentChannelId, String query, Boolean hasSubChannel, Boolean online, Integer roleId);
 
+    @Select(value = {" <script>" +
+            "SELECT * from device_channel where civilCode in ('50012037002168201000','50','5001','500120','50012037') " +
+            "union " +
+            "select * from device_channel where name like '%${name}%' " +
+            " </script>"})
+    List<DeviceChannel> queryChannelsByName(String name);
+
     @Select("SELECT * FROM device_channel WHERE deviceId=#{deviceId} AND channelId=#{channelId}")
     DeviceChannel queryChannel(String deviceId, String channelId);
 
