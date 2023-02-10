@@ -1,25 +1,24 @@
 <template>
-  <el-container style="height: 100%">
-    <div class="layout-aside">
-      <ui-header></ui-header>
-    </div>
-    <el-main>
-      <el-container>
-        <transition name="fade">
-          <router-view></router-view>
-        </transition>
-      </el-container>
-    </el-main>
-  </el-container>
+  <div style="height: 100%">
+    <ui-header></ui-header>
+    <el-container>
+      <ui-aside></ui-aside>
+      <transition name="fade">
+        <router-view></router-view>
+      </transition>
+    </el-container>
+
+  </div>
 </template>
 
 <script>
 import uiHeader from "./UiHeader.vue";
+import UiAside from "./UiAside.vue";
 
 export default {
   name: "index",
   components: {
-    uiHeader
+    uiHeader, UiAside
   },
 }
 </script>

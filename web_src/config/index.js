@@ -11,8 +11,8 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/debug': {
-        target: 'http://10.125.2.4:18080',
-        //target: 'http://10.125.2.12:18080',
+        // target: 'http://10.125.2.4:18080',
+        target: 'http://10.125.2.12:18080',
         //target: 'http://192.168.1.46:18080',
         changeOrigin: true,
         secure: false,
@@ -21,8 +21,8 @@ module.exports = {
         }
       },
       '/static/snap': {
-        target: 'http://10.125.2.4:18080',
-        //target: 'http://10.125.2.12:18080',
+        // target: 'http://10.125.2.4:18080',
+        target: 'http://10.125.2.12:18080',
         changeOrigin: true,
         // pathRewrite: {
         //   '^/static/snap': '/static/snap'

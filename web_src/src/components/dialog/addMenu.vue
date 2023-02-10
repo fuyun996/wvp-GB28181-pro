@@ -15,6 +15,9 @@
           <el-form-item label="路由" prop="url">
             <el-input v-model="form.url" autocomplete="off"></el-input>
           </el-form-item>
+          <el-form-item label="图标" prop="sort">
+            <el-input v-model="form.icon" autocomplete="off"></el-input>
+          </el-form-item>
           <el-form-item label="排序" prop="sort">
             <el-input v-model="form.sort" autocomplete="off"></el-input>
           </el-form-item>
