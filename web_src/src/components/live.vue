@@ -1,32 +1,38 @@
 <template>
-  <div id="devicePosition" style="width:100%; ">
-    <div class="page-header">
-      <el-header height="5vh" style="text-align: left;font-size: 17px;line-height:5vh">
+  <el-container v-loading="loading" style="width:100%; height: 100%;background: #1F1F2F;" element-loading-text="拼命加载中">
+    <!-- 设备列表 -->
+    <el-aside v-if="isCollapse" class="deviceMenu">
+      <div class="wrapper">
+        <div class="title">
+          <span>设备列表</span>
+          <div style="float: right;margin-right: 5px;">
+            <i @click="isCollapse = false" class="el-icon-s-unfold" style="font-size: 18px;cursor: pointer;"></i>
+          </div>
+        </div>
+        <DeviceTree :clickEvent="clickEvent" :contextMenuEvent="contextMenuEvent"></DeviceTree>
+      </div>
+    </el-aside>
+    <div v-else class="deviceMenu-collapse" @click="isCollapse = true">
+      设备列表
+    </div>
+
+    <!-- 视频区域 -->
+    <div class="videoarea">
+      <el-header height="4vh" style="text-align: left;font-size: 17px;line-height:4vh">
         <i class="el-icon-full-screen btn" :class="{ active: spilt == 1 }" @click="spilt = 1" />
         <i class="el-icon-menu btn" :class="{ active: spilt == 4 }" @click="spilt = 4" />
         <i class="el-icon-s-grid btn" :class="{ active: spilt == 9 }" @click="spilt = 9" />
       </el-header>
-    </div>
-    <div class="page-content">
-      <el-container v-loading="loading" style="height: 91vh;" element-loading-text="拼命加载中">
-        <el-aside width="300px" style="background-color: #ffffff">
-          <DeviceTree :clickEvent="clickEvent" :contextMenuEvent="contextMenuEvent"></DeviceTree>
-        </el-aside>
-        <el-container>
-          <el-main style="padding: 0;">
-            <div style="width: 99%;height: 85vh;display: flex;flex-wrap: wrap;background-color: #000;">
-              <div v-for="i in spilt" :key="i" class="play-box" :style="liveStyle"
-                :class="{ redborder: playerIdx == (i - 1) }" @click="playerIdx = (i - 1)">
-                <div v-if="!videoUrl[i - 1]" style="color: #ffffff;font-size: 30px;font-weight: bold;">{{ i }}</div>
-                <player ref="player" v-else :videoUrl="videoUrl[i - 1]" fluent autoplay @screenshot="shot"
-                  @destroy="destroy" />
-              </div>
-            </div>
-          </el-main>
-        </el-container>
-      </el-container>
-    </div>
-  </div>
+      <div style="width: 99%;height: calc(100vh - 60px -4vh);display: flex;flex-wrap: wrap;background-color: #000;">
+        <div v-for="i in spilt" :key="i" class="play-box" :style="liveStyle"
+          :class="{ redborder: playerIdx == (i - 1) }" @click="playerIdx = (i - 1)">
+          <div v-if="!videoUrl[i - 1]" style="color: #ffffff;font-size: 30px;font-weight: bold;">{{ i }}</div>
+          <player ref="player" v-else :videoUrl="videoUrl[i - 1]" fluent autoplay @screenshot="shot"
+            @destroy="destroy" />
+        </div>
+      </div>
+    </div>>
+  </el-container>
 </template>
 
 <script>
@@ -49,8 +55,8 @@ export default {
       count: 15,
       total: 0,
 
-      //channel
-      loading: false
+      loading: false,
+      isCollapse: true
     };
   },
   mounted() {
@@ -211,6 +217,48 @@ export default {
 };
 </script>
 <style>
+.deviceMenu {}
+
+.deviceMenu .wrapper {
+  margin: 3px 10px 15px 3px;
+  border-radius: 3px;
+  background: #15171D;
+  overflow: hidden;
+}
+
+.deviceMenu .title {
+  width: 100%;
+  height: 26px;
+  color: #fff;
+  font-family: PingFang SC;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 26px;
+  background: #E45252;
+  text-align: center;
+}
+
+.deviceMenu-collapse {
+  width: 30px;
+  height: 131px;
+  padding-top: 20px;
+  box-sizing: border-box;
+  background: #E45252;
+  cursor: pointer;
+
+  color: #FFFFFF;
+  font-family: PingFang SC;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 20px;
+  letter-spacing: 0px;
+  text-align: center;
+}
+
+.videoarea {
+  flex: 1;
+}
+
 .btn {
   margin: 0 10px;
 

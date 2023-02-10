@@ -16,6 +16,7 @@
         <el-table-column prop="id" label="ID" min-width="160" />
         <el-table-column prop="name" label="菜单名称" min-width="160" />
         <el-table-column prop="url" label="路由" min-width="160" />
+        <el-table-column prop="icon" label="图标" min-width="160" />
         <el-table-column prop="sort" label="排序" min-width="160" />
         <el-table-column label="操作" min-width="450" fixed="right">
           <template slot-scope="scope">

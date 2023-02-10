@@ -1,50 +1,50 @@
 <template>
-  <div id="DeviceTree" style="width: 100%;height: 100%; overflow: auto;padding: 20px 0;box-sizing: border-box;">
-    <el-container>
-      <el-main>
-        <!-- <div>请输入设备名称</div> -->
-        <div class="device-tree-main-box">
-          <el-tree ref="gdTree" :props="defaultProps" :load="loadNode" lazy @node-click="handleNodeClick"
-            @node-contextmenu="handleContextMenu" node-key="id"
-            style="min-width: 100%; display:inline-block !important;">
-            <span class="custom-tree-node" slot-scope="{ node, data }" style="width: 100%">
-              <span v-if="node.data.type === 0 && node.data.online" title="在线设备"
-                class="device-online iconfont icon-jiedianleizhukongzhongxin2"></span>
-              <span v-if="node.data.type === 0 && !node.data.online" title="离线设备"
-                class="device-offline iconfont icon-jiedianleizhukongzhongxin2"></span>
-              <span v-if="node.data.type === 2 && node.data.online" title="目录"
-                class="device-online iconfont icon-jiedianleilianjipingtai"></span>
-              <span v-if="node.data.type === 2 && !node.data.online" title="目录"
-                class="device-offline iconfont icon-jiedianleilianjipingtai"></span>
-              <span v-if="node.data.type === 3 && node.data.online" title="在线通道"
-                class="device-online iconfont icon-shebeileijiankongdian"></span>
-              <span v-if="node.data.type === 3 && !node.data.online" title="在线通道"
-                class="device-offline iconfont icon-shebeileijiankongdian"></span>
-              <span v-if="node.data.type === 4 && node.data.online" title="在线通道-球机"
-                class="device-online iconfont icon-shebeileiqiuji"></span>
-              <span v-if="node.data.type === 4 && !node.data.online" title="在线通道-球机"
-                class="device-offline iconfont icon-shebeileiqiuji"></span>
-              <span v-if="node.data.type === 5 && node.data.online" title="在线通道-半球"
-                class="device-online iconfont icon-shebeileibanqiu"></span>
-              <span v-if="node.data.type === 5 && !node.data.online" title="在线通道-半球"
-                class="device-offline iconfont icon-shebeileibanqiu"></span>
-              <span v-if="node.data.type === 6 && node.data.online" title="在线通道-枪机"
-                class="device-online iconfont icon-shebeileiqiangjitongdao"></span>
-              <span v-if="node.data.type === 6 && !node.data.online" title="在线通道-枪机"
-                class="device-offline iconfont icon-shebeileiqiangjitongdao"></span>
-              <span v-if="node.data.online" style="padding-left: 1px" class="device-online">{{ node.label }}</span>
-              <span v-if="!node.data.online" style="padding-left: 1px" class="device-offline">{{ node.label }}</span>
-              <span>
-                <i v-if="node.data.hasGPS && node.data.online" style="color: #9d9d9d"
-                  class="device-online iconfont icon-dizhi"></i>
-                <i v-if="node.data.hasGPS && !node.data.online" style="color: #9d9d9d"
-                  class="device-offline iconfont icon-dizhi"></i>
-              </span>
-            </span>
-          </el-tree>
-        </div>
-      </el-main>
-    </el-container>
+  <div id="DeviceTree" class="DeviceTree">
+    <div style="padding: 0 16px;margin-bottom: 10px;">
+      <el-input placeholder="请输入设备名称" v-model="input3" size="small">
+        <el-button slot="append" icon="el-icon-search" size="small"
+          style="background-color: #E45252;border-color: #E45252;color: #fff;"></el-button>
+      </el-input>
+    </div>
+    <div class="device-tree-main-box">
+      <el-tree ref="gdTree" :props="defaultProps" :load="loadNode" lazy @node-click="handleNodeClick"
+        @node-contextmenu="handleContextMenu" node-key="id" style="min-width: 100%; display:inline-block !important;">
+        <span class="custom-tree-node" slot-scope="{ node, data }" style="width: 100%">
+          <!-- <span v-if="node.data.type === 0 && node.data.online" title="在线设备"
+            class="device-online iconfont icon-jiedianleizhukongzhongxin2"></span>
+          <span v-if="node.data.type === 0 && !node.data.online" title="离线设备"
+            class="device-offline iconfont icon-jiedianleizhukongzhongxin2"></span>
+          <span v-if="node.data.type === 2 && node.data.online" title="目录"
+            class="device-online iconfont icon-jiedianleilianjipingtai"></span>
+          <span v-if="node.data.type === 2 && !node.data.online" title="目录"
+            class="device-offline iconfont icon-jiedianleilianjipingtai"></span>
+          <span v-if="node.data.type === 3 && node.data.online" title="在线通道"
+            class="device-online iconfont icon-shebeileijiankongdian"></span>
+          <span v-if="node.data.type === 3 && !node.data.online" title="在线通道"
+            class="device-offline iconfont icon-shebeileijiankongdian"></span>
+          <span v-if="node.data.type === 4 && node.data.online" title="在线通道-球机"
+            class="device-online iconfont icon-shebeileiqiuji"></span>
+          <span v-if="node.data.type === 4 && !node.data.online" title="在线通道-球机"
+            class="device-offline iconfont icon-shebeileiqiuji"></span>
+          <span v-if="node.data.type === 5 && node.data.online" title="在线通道-半球"
+            class="device-online iconfont icon-shebeileibanqiu"></span>
+          <span v-if="node.data.type === 5 && !node.data.online" title="在线通道-半球"
+            class="device-offline iconfont icon-shebeileibanqiu"></span>
+          <span v-if="node.data.type === 6 && node.data.online" title="在线通道-枪机"
+            class="device-online iconfont icon-shebeileiqiangjitongdao"></span>
+          <span v-if="node.data.type === 6 && !node.data.online" title="在线通道-枪机"
+            class="device-offline iconfont icon-shebeileiqiangjitongdao"></span> -->
+          <span v-if="node.data.online" style="padding-left: 1px" class="device-online">{{ node.label }}</span>
+          <span v-if="!node.data.online" style="padding-left: 1px" class="device-offline">{{ node.label }}</span>
+          <span>
+            <i v-if="node.data.hasGPS && node.data.online" style="color: #9d9d9d"
+              class="device-online iconfont icon-dizhi"></i>
+            <i v-if="node.data.hasGPS && !node.data.online" style="color: #9d9d9d"
+              class="device-offline iconfont icon-dizhi"></i>
+          </span>
+        </span>
+      </el-tree>
+    </div>
   </div>
 </template>
 
@@ -192,13 +192,40 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.DeviceTree {
+  padding: 8px 10px 0 3px;
+  box-sizing: border-box;
+}
+
 .device-tree-main-box {
   text-align: left;
+  height: calc(100vh - 153px);
+  overflow: auto;
+}
+</style>
+<style>
+.el-tree {
+  font-size: 12px;
+  background-color: transparent;
+}
+
+.el-tree-node__content:hover {
+  background-color: #E45252 !important;
+}
+
+.el-input-group__append,
+.el-input-group__prepend {
+  background-color: #E45252;
+  border: 1px solid #E45252;
+}
+
+.el-tree-node__expand-icon {
+  color: #6691FF;
 }
 
 .device-online {
-  color: #252525;
+  color: #fff;
 }
 
 .device-offline {
