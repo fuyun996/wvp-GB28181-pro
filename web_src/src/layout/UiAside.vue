@@ -1,6 +1,6 @@
 <template>
   <aside class="layout-aside">
-    <div class="page-left-menu" :class="isCollapse ? 'page-left-menu-collapse' : ''">
+    <div class="page-left-menu scrollbarDiv" :class="isCollapse ? 'page-left-menu-collapse' : ''">
       <el-menu router :default-active="activeIndex" background-color="transparent" text-color="#fff"
         active-text-color="#fff" @open="handleOpen" @close="handleClose" :collapse="isCollapse">
         <template v-for="(item, index) in menuList">
@@ -8,11 +8,13 @@
             <el-submenu :index="item.url" :key="index">
               <template slot="title">
                 <i class="spyfont" :class="item.icon"></i>
-                <span slot="title">{{ item.name }}</span>
+                <span class="mtitle">{{ item.name }}</span>
               </template>
               <template v-for="(subItem, inx) in item.child">
                 <el-submenu v-if="subItem.child" :index="subItem.url" :key="inx">
-                  <template slot="title"><i class="spyfont" :class="subItem.icon"></i>{{ subItem.title }}</template>
+                  <template slot="title"><i class="spyfont" :class="subItem.icon"></i><span class="mtitle">{{
+                    subItem.title
+                  }}</span></template>
                   <el-menu-item v-for="(threeItem, i) in subItem.subs" :key="i" :index="i">{{
                     threeItem.name
                   }}</el-menu-item>
@@ -24,7 +26,7 @@
           <template v-else>
             <el-menu-item :index="item.url" :key="index">
               <i class="spyfont" :class="item.icon"></i>
-              <span slot="title">{{ item.name }}</span>
+              <span class="mtitle">{{ item.name }}</span>
             </el-menu-item>
           </template>
         </template>
@@ -172,6 +174,10 @@ export default {
   color: #fff;
 }
 
+.mtitle {
+  margin-left: 6px;
+}
+
 .page-left-menu {
   width: 208px;
   height: 100%;
@@ -183,24 +189,6 @@ export default {
 
 .page-left-menu-collapse {
   width: auto;
-}
-
-/*滚动条样式*/
-.page-left-menu::-webkit-scrollbar {
-  width: 5px
-}
-
-/*滚动条滑块*/
-.page-left-menu::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  background: #BCEDFD3D;
-  -webkit-box-shadow: inset006pxrgba(0, 0, 0, 0.5);
-}
-
-/*滚动槽*/
-.page-left-menu::-webkit-scrollbar-track-piece {
-  width: 2px;
-  background: #121212;
 }
 </style>
 <style>
@@ -220,6 +208,20 @@ export default {
 .el-submenu__title {
   height: 48px;
   line-height: 48px;
+}
+
+.el-menu-item i,
+.el-submenu__title i {
+  color: #fff;
+}
+
+.el-menu--collapse {
+  width: 42px;
+}
+
+.el-menu--collapse .el-menu-item,
+.el-menu--collapse .el-submenu__title {
+  padding-left: 12px !important
 }
 
 .el-tooltip {

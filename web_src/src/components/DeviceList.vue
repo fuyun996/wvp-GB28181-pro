@@ -62,22 +62,36 @@
         <!--      <el-table-column prop="createTime" label="创建时间"  width="140">-->
         <!--      </el-table-column>-->
 
-        <el-table-column label="操作" min-width="450" fixed="right">
+        <el-table-column label="操作" min-width="100" fixed="right">
           <template slot-scope="scope">
-            <el-button type="text" size="medium" v-bind:disabled="scope.row.online == 0" icon="el-icon-refresh"
-              @click="refDevice(scope.row)" @mouseover="getTooltipContent(scope.row.deviceId)">刷新
-            </el-button>
-            <el-divider direction="vertical"></el-divider>
-            <el-button type="text" size="medium" icon="el-icon-video-camera" @click="showChannelList(scope.row)">通道
-            </el-button>
-            <el-divider direction="vertical"></el-divider>
-            <el-button size="medium" icon="el-icon-location" type="text" @click="showDevicePosition(scope.row)">定位
-            </el-button>
-            <el-divider direction="vertical"></el-divider>
-            <el-button size="medium" icon="el-icon-edit" type="text" @click="edit(scope.row)">编辑</el-button>
-            <el-divider direction="vertical"></el-divider>
-            <el-button size="medium" icon="el-icon-delete" type="text" @click="deleteDevice(scope.row)"
-              style="color: #f56c6c">删除</el-button>
+            <el-dropdown>
+              <span class="el-dropdown-link">
+                更多<i class="el-icon-arrow-down el-icon--right"></i>
+              </span>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item>
+                  <el-button type="text" size="medium" v-bind:disabled="scope.row.online == 0" icon="el-icon-refresh"
+                    @click="refDevice(scope.row)" @mouseover="getTooltipContent(scope.row.deviceId)">刷新
+                  </el-button>
+                </el-dropdown-item>
+                <el-dropdown-item>
+                  <el-button type="text" size="medium" icon="el-icon-video-camera"
+                    @click="showChannelList(scope.row)">通道
+                  </el-button>
+                </el-dropdown-item>
+                <el-dropdown-item>
+                  <el-button size="medium" icon="el-icon-location" type="text" @click="showDevicePosition(scope.row)">定位
+                  </el-button>
+                </el-dropdown-item>
+                <el-dropdown-item>
+                  <el-button size="medium" icon="el-icon-edit" type="text" @click="edit(scope.row)">编辑</el-button>
+                </el-dropdown-item>
+                <el-dropdown-item>
+                  <el-button size="medium" icon="el-icon-delete" type="text" @click="deleteDevice(scope.row)"
+                    style="color: #f56c6c">删除</el-button>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
           </template>
         </el-table-column>
       </el-table>

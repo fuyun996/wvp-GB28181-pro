@@ -1,12 +1,12 @@
 <template>
-  <el-container v-loading="loading" style="width:100%; height: 100%;background: #1F1F2F;" element-loading-text="拼命加载中">
+  <el-container style="width:100%; height: 100%;background: #1F1F2F;" element-loading-text="拼命加载中">
     <!-- 设备列表 -->
     <el-aside v-if="isCollapse" class="deviceMenu">
       <div class="wrapper">
         <div class="title">
           <span>设备列表</span>
           <div style="float: right;margin-right: 5px;">
-            <i @click="isCollapse = false" class="el-icon-s-unfold" style="font-size: 18px;cursor: pointer;"></i>
+            <i @click="isCollapse = false" class="el-icon-s-fold" style="font-size: 18px;cursor: pointer;"></i>
           </div>
         </div>
         <DeviceTree :clickEvent="clickEvent" :contextMenuEvent="contextMenuEvent"></DeviceTree>
@@ -18,12 +18,21 @@
 
     <!-- 视频区域 -->
     <div class="videoarea">
-      <el-header height="4vh" style="text-align: left;font-size: 17px;line-height:4vh">
-        <i class="el-icon-full-screen btn" :class="{ active: spilt == 1 }" @click="spilt = 1" />
-        <i class="el-icon-menu btn" :class="{ active: spilt == 4 }" @click="spilt = 4" />
-        <i class="el-icon-s-grid btn" :class="{ active: spilt == 9 }" @click="spilt = 9" />
+      <el-header height="4vh"
+        style="text-align: left;font-size: 17px;line-height:4vh;color:#fff; display: flex;align-items: center;justify-content: space-between;">
+        <div>
+          <i class="spyfont icon-danshipin btn" :class="{ active: spilt == 1 }" @click="spilt = 1" />
+          <i class="spyfont icon-sigongge btn" :class="{ active: spilt == 4 }" @click="spilt = 4" />
+          <i class="spyfont icon-jiugongge btn" :class="{ active: spilt == 9 }" @click="spilt = 9" />
+        </div>
+        <div>
+          <i class="spyfont icon-luxiang btn" :class="{ active: operation == 1 }" @click="operation = 1" />
+          <i class="spyfont icon-lunxun btn" :class="{ active: operation == 2 }" @click="operation = 2" />
+          <i class="spyfont icon-jietu btn" :class="{ active: operation == 3 }" @click="operation = 3" />
+          <i class="spyfont icon-quanping btn" @click="fullScreen()" />
+        </div>
       </el-header>
-      <div style="width: 99%;height: calc(100vh - 60px -4vh);display: flex;flex-wrap: wrap;background-color: #000;">
+      <div ref="vbox" class="videobox" :class="operation == 4 ? 'videobox-fullscreen' : ''">
         <div v-for="i in spilt" :key="i" class="play-box" :style="liveStyle"
           :class="{ redborder: playerIdx == (i - 1) }" @click="playerIdx = (i - 1)">
           <div v-if="!videoUrl[i - 1]" style="color: #ffffff;font-size: 30px;font-weight: bold;">{{ i }}</div>
@@ -49,6 +58,7 @@ export default {
     return {
       videoUrl: [''],
       spilt: 1,//分屏
+      operation: -1, //操作
       playerIdx: 0,//激活播放器
 
       updateLooper: 0, //数据刷新轮训标志
@@ -56,16 +66,15 @@ export default {
       total: 0,
 
       loading: false,
-      isCollapse: true
+      isCollapse: true,
+
     };
   },
   mounted() {
-
   },
   created() {
     this.checkPlayByParam()
   },
-
   computed: {
     liveStyle() {
       let style = { width: '100%', height: '100%' }
@@ -213,6 +222,20 @@ export default {
       console.log(data);
       window.localStorage.setItem('playData', JSON.stringify(data))
     },
+    fullScreen() {
+      let element = this.$refs.vbox;
+
+      if (element.requestFullscreen) {
+        element.requestFullscreen();
+      } else if (element.webkitRequestFullScreen) {
+        element.webkitRequestFullScreen();
+      } else if (element.mozRequestFullScreen) {
+        element.mozRequestFullScreen();
+      } else if (element.msRequestFullscreen) {
+        element.msRequestFullscreen();
+      }
+      this.fullscreen = !this.fullscreen
+    }
   }
 };
 </script>
@@ -260,8 +283,8 @@ export default {
 }
 
 .btn {
-  margin: 0 10px;
-
+  margin: 0 8px;
+  cursor: pointer;
 }
 
 .btn:hover {
@@ -278,11 +301,28 @@ export default {
 }
 
 .play-box {
+  margin: 0 0.5% 1%;
+  box-sizing: border-box;
   background-color: #000000;
   border: 2px solid #505050;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.videobox {
+  height: calc(96vh - 66px);
+  display: flex;
+  flex-wrap: wrap;
+  background-color: #000;
+}
+
+.videobox-fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 </style>
 <style>

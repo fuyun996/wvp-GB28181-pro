@@ -3,9 +3,11 @@
     <ui-header></ui-header>
     <el-container>
       <ui-aside></ui-aside>
-      <transition name="fade">
-        <router-view></router-view>
-      </transition>
+      <el-main>
+        <transition name="fade">
+          <router-view></router-view>
+        </transition>
+      </el-main>
     </el-container>
 
   </div>

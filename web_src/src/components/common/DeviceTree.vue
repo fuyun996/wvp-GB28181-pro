@@ -1,16 +1,33 @@
 <template>
   <div id="DeviceTree" class="DeviceTree">
     <div style="padding: 0 16px;margin-bottom: 10px;">
-      <el-input placeholder="请输入设备名称" v-model="input3" size="small">
-        <el-button slot="append" icon="el-icon-search" size="small"
+      <el-input placeholder="请输入设备名称" v-model="keyword" size="small">
+        <el-button slot="append" icon="el-icon-search" @click="searchDeviceTree()" size="small"
           style="background-color: #E45252;border-color: #E45252;color: #fff;"></el-button>
       </el-input>
     </div>
-    <div class="device-tree-main-box">
-      <el-tree ref="gdTree" :props="defaultProps" :load="loadNode" lazy @node-click="handleNodeClick"
-        @node-contextmenu="handleContextMenu" node-key="id" style="min-width: 100%; display:inline-block !important;">
-        <span class="custom-tree-node" slot-scope="{ node, data }" style="width: 100%">
-          <!-- <span v-if="node.data.type === 0 && node.data.online" title="在线设备"
+    <div class="device-tree-main-box" v-loading="mloading" element-loading-background="rgba(0, 0, 0, 0.8)">
+      <div v-show="keyword && dlist.length > 0">
+        <el-tree ref="searchGdTree" :data="dlist" :props="defaultProps" @node-click="handleSearchNodeClick"
+          @node-contextmenu="handleSearchContextMenu" node-key="id"
+          style="min-width: 100%; display:inline-block !important;">
+          <span class="custom-tree-node" slot-scope="{ node, data }" style="width: 100%">
+            <span v-if="node.data.online" class="device-online">{{ node.label }}</span>
+            <span v-if="!node.data.online" class="device-offline">{{ node.label }}</span>
+            <span>
+              <i v-if="node.data.hasGPS && node.data.online" style="color: #9d9d9d"
+                class="device-online iconfont icon-dizhi"></i>
+              <i v-if="node.data.hasGPS && !node.data.online" style="color: #9d9d9d"
+                class="device-offline iconfont icon-dizhi"></i>
+            </span>
+          </span>
+        </el-tree>
+      </div>
+      <div v-show="!keyword">
+        <el-tree ref="gdTree" :props="defaultProps" :load="loadNode" lazy @node-click="handleNodeClick"
+          @node-contextmenu="handleContextMenu" node-key="id" style="min-width: 100%; display:inline-block !important;">
+          <span class="custom-tree-node" slot-scope="{ node, data }" style="width: 100%">
+            <!-- <span v-if="node.data.type === 0 && node.data.online" title="在线设备"
             class="device-online iconfont icon-jiedianleizhukongzhongxin2"></span>
           <span v-if="node.data.type === 0 && !node.data.online" title="离线设备"
             class="device-offline iconfont icon-jiedianleizhukongzhongxin2"></span>
@@ -34,16 +51,17 @@
             class="device-online iconfont icon-shebeileiqiangjitongdao"></span>
           <span v-if="node.data.type === 6 && !node.data.online" title="在线通道-枪机"
             class="device-offline iconfont icon-shebeileiqiangjitongdao"></span> -->
-          <span v-if="node.data.online" style="padding-left: 1px" class="device-online">{{ node.label }}</span>
-          <span v-if="!node.data.online" style="padding-left: 1px" class="device-offline">{{ node.label }}</span>
-          <span>
-            <i v-if="node.data.hasGPS && node.data.online" style="color: #9d9d9d"
-              class="device-online iconfont icon-dizhi"></i>
-            <i v-if="node.data.hasGPS && !node.data.online" style="color: #9d9d9d"
-              class="device-offline iconfont icon-dizhi"></i>
+            <span v-if="node.data.online" class="device-online">{{ node.label }}</span>
+            <span v-if="!node.data.online" class="device-offline">{{ node.label }}</span>
+            <span>
+              <i v-if="node.data.hasGPS && node.data.online" style="color: #9d9d9d"
+                class="device-online iconfont icon-dizhi"></i>
+              <i v-if="node.data.hasGPS && !node.data.online" style="color: #9d9d9d"
+                class="device-offline iconfont icon-dizhi"></i>
+            </span>
           </span>
-        </span>
-      </el-tree>
+        </el-tree>
+      </div>
     </div>
   </div>
 </template>
@@ -60,7 +78,10 @@ export default {
         children: 'children',
         label: 'name',
         isLeaf: 'isLeaf'
-      }
+      },
+      mloading: false,
+      keyword: '虎峰社区芝麻坪2',
+      dlist: []
     };
   },
   props: ['device', 'onlyCatalog', 'clickEvent', 'contextMenuEvent'],
@@ -79,7 +100,8 @@ export default {
       }
     },
     loadNode: function (node, resolve) {
-      console.log(this.device)
+      this.keyword = ''
+      this.dlist = []
       if (node.level === 0) {
         if (this.device) {
           let node = {
@@ -165,6 +187,7 @@ export default {
             isLeaf: type !== 2,
             id: item.id,
             deviceId: item.deviceId,
+            pid: item.pid ? item.pid : undefined,
             type: type,
             online: item.basicData.status === 1,
             hasGPS: item.basicData.longitude * item.basicData.latitude !== 0,
@@ -172,10 +195,62 @@ export default {
           }
           nodeList.push(node);
         }
-        resolve(nodeList)
+        if (resolve) {
+          resolve(nodeList)
+        }
+        else {
+          return nodeList
+        }
       } else {
-        resolve([])
+        if (resolve) {
+          resolve([])
+        }
+        else {
+          return []
+        }
       }
+    },
+
+    handleSearchNodeClick(data, node, element) {
+      let deviceNode = this.$refs.searchGdTree.getCurrentNode()
+      if (typeof (this.clickEvent) == "function") {
+        this.clickEvent(deviceNode.userData, data.userData, data.type === 2)
+      }
+    },
+    handleSearchContextMenu(event, data, node, element) {
+      console.log("右键点击事件")
+      let deviceNode = this.$refs.searchGdTree.getNode(data.userData.deviceId)
+      if (typeof (this.contextMenuEvent) == "function") {
+        this.contextMenuEvent(deviceNode.data.userData, event, data.userData, data.type === 2)
+      }
+    },
+    searchDeviceTree() {
+      this.mloading = true
+      this.deviceService.getDeviceTreeByName('50122700002000000123', {
+        page: 1,
+        count: 100000,
+        name: this.keyword,
+      }, (res) => {
+        this.dlist = this.tranListToTreeData(this.channelDataHandler(res.data.list));
+        this.mloading = false
+      })
+    },
+
+    tranListToTreeData(data) {
+      let result;
+      let map = {};
+      data.forEach(item => {
+        map[item.id] = item;
+      });
+      data.forEach(item => {
+        let parent = map[item.pid];
+        if (parent) {
+          (parent.children || (parent.children = [])).push(item);
+        } else {
+          result = item;
+        }
+      });
+      return [result];
     },
     reset: function () {
       this.$forceUpdate();

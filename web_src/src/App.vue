@@ -89,6 +89,37 @@ body,
   height: 100%;
 }
 
+.table-header {
+  color: #727272;
+  font-weight: 600;
+}
+
+.page-header {
+  padding: 16px 20px;
+  background: #fff;
+  border-bottom: 1px solid #dcdcdc;
+  box-shadow: 0px 1px 3px 0px #0000001E, 0px 1px 1px 0px #00000023, 0px 2px 1px -1px #00000033;
+  box-sizing: border-box;
+  word-break: keep-all;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.page-content {
+  padding: 12px 0 0 12px;
+  background-color: #fafafa;
+  height: calc(100% - 60px);
+  box-sizing: border-box;
+  overflow-y: scroll;
+}
+
+.flex-center-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 /*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/
 ::-webkit-scrollbar {
   width: 8px;
@@ -109,25 +140,28 @@ body,
   -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .1);
 }
 
-.table-header {
-  color: #727272;
-  font-weight: 600;
+/*滚动条样式*/
+.scrollbarDiv::-webkit-scrollbar {
+  width: 5px
 }
 
-.page-header {
-  padding: 16px 38px;
-  background: #FFFFFF;
-  border-bottom: 1px solid #dcdcdc;
-  box-shadow: 0px 1px 3px 0px #0000001E, 0px 1px 1px 0px #00000023, 0px 2px 1px -1px #00000033;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+/*滚动条滑块*/
+.scrollbarDiv::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: #BCEDFD3D;
+  -webkit-box-shadow: inset006pxrgba(0, 0, 0, 0.5);
 }
-.page-content{
-  padding: 12px 0 0 12px;
-  background-color: #fafafa;
-  height: calc(100% - 60px);
-  box-sizing: border-box;
-  overflow-y: scroll;
+
+/*滚动槽*/
+.scrollbarDiv::-webkit-scrollbar-track-piece {
+  width: 2px;
+  background: #121212;
+}
+</style>
+<style>
+/* element UI 重置 */
+.el-table .cell.el-tooltip {
+  width: 90% !important;
+  text-align: left;
 }
 </style>

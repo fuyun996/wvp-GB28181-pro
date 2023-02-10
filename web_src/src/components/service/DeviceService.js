@@ -1,18 +1,19 @@
 import axios from 'axios';
 
-class DeviceService{
+class DeviceService {
 
   constructor() {
     this.$axios = axios;
   }
 
-  getDeviceList(currentPage, count, callback, errorCallback){
+  getDeviceList(currentPage, count, callback, errorCallback) {
     this.$axios({
       method: 'get',
-      url:`/api/device/query/devices`,
+      url: `/api/device/query/devices`,
       params: {
         page: currentPage,
-        count: count
+        count: count,
+        name: name
       }
     }).then((res) => {
       if (typeof (callback) == "function") callback(res.data)
@@ -22,10 +23,10 @@ class DeviceService{
     });
   }
 
-  getDevice(deviceId, callback, errorCallback){
+  getDevice(deviceId, callback, errorCallback) {
     this.$axios({
       method: 'get',
-      url:`/api/device/query/devices/${deviceId}`,
+      url: `/api/device/query/devices/${deviceId}`,
     }).then((res) => {
       if (typeof (callback) == "function") callback(res.data)
     }).catch((error) => {
@@ -34,7 +35,7 @@ class DeviceService{
     });
   }
 
-  getAllDeviceList(callback,endCallback, errorCallback) {
+  getAllDeviceList(callback, endCallback, errorCallback) {
     let currentPage = 1;
     let count = 100;
     let deviceList = []
@@ -47,9 +48,9 @@ class DeviceService{
         if (typeof (callback) == "function") callback(data.data.list)
         deviceList = deviceList.concat(data.data.list);
         if (deviceList.length < data.data.total) {
-          currentPage ++
-          this.getAllDeviceListIteration(deviceList, currentPage, count, callback,  endCallback, errorCallback)
-        }else {
+          currentPage++
+          this.getAllDeviceListIteration(deviceList, currentPage, count, callback, endCallback, errorCallback)
+        } else {
           if (typeof (endCallback) == "function") endCallback(deviceList)
         }
       }
@@ -70,9 +71,9 @@ class DeviceService{
         if (typeof (callback) == "function") callback(data.list)
         catalogList = catalogList.concat(data.list);
         if (catalogList.length < data.total) {
-          currentPage ++
-          this.getAllChannelIteration(isCatalog,catalogUnderDevice, deviceId, catalogList, currentPage, count, callback, errorCallback)
-        }else {
+          currentPage++
+          this.getAllChannelIteration(isCatalog, catalogUnderDevice, deviceId, catalogList, currentPage, count, callback, errorCallback)
+        } else {
           console.log(1)
           if (typeof (endCallback) == "function") endCallback(catalogList)
         }
@@ -83,7 +84,7 @@ class DeviceService{
     this.$axios({
       method: 'get',
       url: `/api/device/query/devices/${deviceId}/channels`,
-      params:{
+      params: {
         page: currentPage,
         count: count,
         query: "",
@@ -91,7 +92,7 @@ class DeviceService{
         channelType: isCatalog,
         catalogUnderDevice: catalogUnderDevice
       }
-    }).then((res) =>{
+    }).then((res) => {
       if (typeof (callback) == "function") callback(res.data)
     }).catch(errorCallback);
   }
@@ -104,15 +105,15 @@ class DeviceService{
     this.getAllSubChannelIteration(isCatalog, deviceId, channelId, catalogList, currentPage, count, callback, endCallback, errorCallback)
   }
 
-  getAllSubChannelIteration(isCatalog, deviceId,channelId, catalogList, currentPage, count, callback, endCallback, errorCallback) {
+  getAllSubChannelIteration(isCatalog, deviceId, channelId, catalogList, currentPage, count, callback, endCallback, errorCallback) {
     this.getSubChannel(isCatalog, deviceId, channelId, currentPage, count, (data) => {
       if (data.list) {
         if (typeof (callback) == "function") callback(data.list)
         catalogList = catalogList.concat(data.list);
         if (catalogList.length < data.total) {
-          currentPage ++
+          currentPage++
           this.getAllSubChannelIteration(isCatalog, deviceId, channelId, catalogList, currentPage, count, callback, endCallback, errorCallback)
-        }else {
+        } else {
           if (typeof (endCallback) == "function") endCallback(catalogList)
         }
       }
@@ -122,14 +123,14 @@ class DeviceService{
     this.$axios({
       method: 'get',
       url: `/api/device/query/sub_channels/${deviceId}/${channelId}/channels`,
-      params:{
+      params: {
         page: currentPage,
         count: count,
         query: "",
         online: "",
         channelType: isCatalog
       }
-    }).then((res) =>{
+    }).then((res) => {
       if (typeof (callback) == "function") callback(res.data)
     }).catch(errorCallback);
   }
@@ -147,9 +148,9 @@ class DeviceService{
         if (typeof (callback) == "function") callback(data.data.list)
         catalogList = catalogList.concat(data.data.list);
         if (catalogList.length < data.data.total) {
-          currentPage ++
+          currentPage++
           this.getTreeIteration(deviceId, parentId, onlyCatalog, catalogList, currentPage, count, callback, endCallback, errorCallback)
-        }else {
+        } else {
           if (typeof (endCallback) == "function") endCallback(catalogList)
         }
       }
@@ -162,15 +163,28 @@ class DeviceService{
     this.$axios({
       method: 'get',
       url: `/api/device/query/tree/${deviceId}`,
-      params:{
+      params: {
         page: currentPage,
         count: count,
         parentId: parentId,
         onlyCatalog: onlyCatalog
       }
-    }).then((res) =>{
+    }).then((res) => {
       if (typeof (callback) == "function") callback(res.data)
     }).catch(errorCallback);
+  }
+
+  getDeviceTreeByName(deviceId, params, callback, errorCallback) {
+    this.$axios({
+      method: 'get',
+      url: `/api/device/query/tree/${deviceId}`,
+      params
+    }).then((res) => {
+      if (typeof (callback) == "function") callback(res.data)
+    }).catch((error) => {
+      console.log(error);
+      if (typeof (errorCallback) == "function") errorCallback(error)
+    });
   }
 }
 

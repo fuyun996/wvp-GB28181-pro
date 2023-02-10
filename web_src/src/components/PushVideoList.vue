@@ -1,25 +1,39 @@
 <template>
-  <div id="pushVideoList" style="width: 100%">
+  <div id="pushVideoList">
     <div class="page-header">
-      <!-- <div class="page-title">推流列表</div> -->
-      <div class="page-header-btn">
-        搜索:
-        <el-input @input="getPushList" style="margin-right: 1rem; width: auto;" size="mini" placeholder="关键字"
-          prefix-icon="el-icon-search" v-model="searchSrt" clearable></el-input>
-        流媒体:
-        <el-select size="mini" @change="getPushList" style="margin-right: 1rem;width: 12%;" v-model="mediaServerId"
-          placeholder="请选择" default-first-option>
-          <el-option label="全部" value=""></el-option>
-          <el-option v-for="item in mediaServerList" :key="item.id" :label="item.id" :value="item.id">
-          </el-option>
-        </el-select>
-        推流状态:
-        <el-select size="mini" style="margin-right: 1rem;width: 12%;" @change="getPushList" v-model="pushing" placeholder="请选择"
-          default-first-option>
-          <el-option label="全部" value=""></el-option>
-          <el-option label="推流进行中" value="true"></el-option>
-          <el-option label="推流未进行" value="false"></el-option>
-        </el-select>
+      <div style="margin-right: 1rem;">
+        <el-row :gutter="20">
+          <el-col :span="8">
+            <div class="flex-center-between">
+              <span style="word-break: keep-all;margin-right: 5px;">搜索:</span>
+              <el-input @input="getPushList" size="mini" placeholder="关键字" prefix-icon="el-icon-search"
+                v-model="searchSrt" clearable></el-input>
+            </div>
+          </el-col>
+          <el-col :span="8">
+            <div class="flex-center-between">
+              <span style="word-break: keep-all;margin-right: 5px;">流媒体:</span>
+              <el-select size="mini" @change="getPushList" v-model="mediaServerId" placeholder="请选择"
+                default-first-option>
+                <el-option label="全部" value=""></el-option>
+                <el-option v-for="item in mediaServerList" :key="item.id" :label="item.id" :value="item.id">
+                </el-option>
+              </el-select>
+            </div>
+          </el-col>
+          <el-col :span="8">
+            <div class="flex-center-between">
+              <span style="word-break: keep-all;margin-right: 5px;">推流状态:</span>
+              <el-select size="mini" @change="getPushList" v-model="pushing" placeholder="请选择" default-first-option>
+                <el-option label="全部" value=""></el-option>
+                <el-option label="推流进行中" value="true"></el-option>
+                <el-option label="推流未进行" value="false"></el-option>
+              </el-select>
+            </div>
+          </el-col>
+        </el-row>
+      </div>
+      <div class="flex-center-between">
         <el-button icon="el-icon-upload2" size="mini" type="primary" @click="importChannel">
           通道导入
         </el-button>
@@ -27,8 +41,8 @@
           <a style="color: #FFFFFF; text-align: center; text-decoration: none" href="/static/file/推流通道导入.zip"
             download='推流通道导入.zip'>下载模板</a>
         </el-button>
-        <el-button icon="el-icon-delete" size="mini"
-          :disabled="multipleSelection.length === 0" type="danger" @click="batchDel">批量移除
+        <el-button icon="el-icon-delete" size="mini" :disabled="multipleSelection.length === 0" type="danger"
+          @click="batchDel">批量移除
         </el-button>
         <el-button icon="el-icon-plus" size="mini" type="primary" @click="addStream">添加通道
         </el-button>
@@ -290,7 +304,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .videoList {
   display: flex;
   flex-wrap: wrap;
