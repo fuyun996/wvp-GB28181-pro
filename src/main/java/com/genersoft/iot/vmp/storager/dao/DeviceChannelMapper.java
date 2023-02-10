@@ -86,6 +86,8 @@ public interface DeviceChannelMapper {
             "SELECT * from device_channel where civilCode in ('50012037002168201000','50','5001','500120','50012037') " +
             "union " +
             "select * from device_channel where name like '%${name}%' " +
+            "union " +
+            "select * from device_channel where name = '重庆市'" +
             " </script>"})
     List<DeviceChannel> queryChannelsByName(String name);
 
