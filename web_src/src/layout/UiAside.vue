@@ -7,12 +7,12 @@
           <template v-if="item.child">
             <el-submenu :index="item.url" :key="index">
               <template slot="title">
-                <i :class="item.icon"></i>
+                <i class="spyfont" :class="item.icon"></i>
                 <span slot="title">{{ item.name }}</span>
               </template>
               <template v-for="(subItem, inx) in item.child">
                 <el-submenu v-if="subItem.child" :index="subItem.url" :key="inx">
-                  <template slot="title"><i :class="subItem.icon"></i>{{ subItem.title }}</template>
+                  <template slot="title"><i class="spyfont" :class="subItem.icon"></i>{{ subItem.title }}</template>
                   <el-menu-item v-for="(threeItem, i) in subItem.subs" :key="i" :index="i">{{
                     threeItem.name
                   }}</el-menu-item>
@@ -23,7 +23,7 @@
           </template>
           <template v-else>
             <el-menu-item :index="item.url" :key="index">
-              <i :class="item.icon"></i>
+              <i class="spyfont" :class="item.icon"></i>
               <span slot="title">{{ item.name }}</span>
             </el-menu-item>
           </template>

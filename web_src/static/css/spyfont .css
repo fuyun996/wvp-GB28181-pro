@@ -1,12 +1,12 @@
 @font-face {
-  font-family: "iconfont"; /* Project id 3888171 */
-  src: url('//at.alicdn.com/t/c/font_3888171_kkh5u95880c.woff2?t=1675936431906') format('woff2'),
-       url('//at.alicdn.com/t/c/font_3888171_kkh5u95880c.woff?t=1675936431906') format('woff'),
-       url('//at.alicdn.com/t/c/font_3888171_kkh5u95880c.ttf?t=1675936431906') format('truetype');
+  font-family: "spyfont"; /* Project id 3888171 */
+  src: url('spyfont.woff2?t=1655453611360') format('woff2'),
+       url('spyfont.woff?t=1655453611360') format('woff'),
+       url('spyfont.ttf?t=1655453611360') format('truetype');
 }
 
-.iconfont {
-  font-family: "iconfont" !important;
+.spyfont {
+  font-family: "spyfont" !important;
   font-size: 16px;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
