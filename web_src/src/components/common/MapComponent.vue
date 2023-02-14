@@ -17,7 +17,7 @@ import View from 'ol/View';
 import Feature from 'ol/Feature';
 import Overlay from 'ol/Overlay';
 import { Point, LineString } from 'ol/geom';
-import { get as getProj, fromLonLat } from 'ol/proj';
+import { get as getProj, fromLonLat, transform } from 'ol/proj';
 import { ZoomSlider, Zoom } from 'ol/control';
 import { containsCoordinate } from 'ol/extent';
 
@@ -244,6 +244,16 @@ export default {
         olMap.addLayer(vectorLayer)
         return vectorLayer;
       }
+    },
+    initPointPick() {
+      // 监听singleclick事件
+      olMap.on('singleclick', (event) => {
+        event.preventDefault();
+        const lnglat = transform(event.coordinate, 'EPSG:3857', 'EPSG:4326')
+        console.log(lnglat)
+        this.$emit('lnglat', lnglat)
+        // olMap.unByKey(key);  // 取消事件监听
+      })
     }
   },
   destroyed() {
@@ -258,8 +268,8 @@ export default {
 </script>
 
 <style>
-.ol-viewport canvas {
+/* .ol-viewport canvas {
   width: 100%;
   height: 100%;
-}
+} */
 </style>
