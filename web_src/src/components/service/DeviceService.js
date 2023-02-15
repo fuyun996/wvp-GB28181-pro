@@ -186,6 +186,19 @@ class DeviceService {
       if (typeof (errorCallback) == "function") errorCallback(error)
     });
   }
+
+  updateDeviceLocation(data, callback, errorCallback) {
+    this.$axios({
+      method: 'post',
+      url: `/api/device/query/device/updateLocation/`,
+      data
+    }).then((res) => {
+      if (typeof (callback) == "function") callback(res.data)
+    }).catch((error) => {
+      console.log(error);
+      if (typeof (errorCallback) == "function") errorCallback(error)
+    });
+  }
 }
 
 export default DeviceService;

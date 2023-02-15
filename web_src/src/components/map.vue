@@ -2,12 +2,26 @@
   <div id="devicePosition" style="width: 100%; height: 100vh;">
     <div style="width: 100%; height: 100vh;padding: 12px;box-sizing: border-box;">
       <el-container v-if="onOff" v-loading="isLoging">
-        <el-aside width="auto" style="background-color: #ffffff">
+        <el-aside style="background-color: #ffffff">
           <DeviceTree ref="deviceTree" :clickEvent="clickEvent" :contextMenuEvent="contextmenuEventHandler">
           </DeviceTree>
         </el-aside>
-        <el-main style="padding: 0">
-          <MapComponent ref="map"></MapComponent>
+        <el-main style="padding: 0;position: relative;">
+          <MapComponent ref="map" @lnglat="setNodeLnglat"></MapComponent>
+          <div class="lnglatbox" v-if="showLngLat">
+            <el-form :inline="true" :model="form" class="demo-form-inline">
+              <el-form-item label="经度:" prop="longitude" required>
+                <el-input v-model="form.longitude" placeholder="经度"></el-input>
+              </el-form-item>
+              <el-form-item label="维度:" prop="latitude" required>
+                <el-input v-model="form.latitude" placeholder="维度"></el-input>
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" @click="onSubmitLngLat">确定</el-button>
+                <el-button @click="showLngLat = false">取消</el-button>
+              </el-form-item>
+            </el-form>
+          </div>
         </el-main>
       </el-container>
       <div v-if="!onOff" style="width: 100%; height:100%; text-align: center; line-height: 5rem">
@@ -81,6 +95,10 @@ export default {
       isLoging: false,
       longitudeStr: "longitude",
       latitudeStr: "latitude",
+
+      showLngLat: false,
+      curPoint: {},
+      form: { channelId: '', deviceId: '', longitude: '', latitude: '' }
     };
   },
   created() {
@@ -107,6 +125,7 @@ export default {
   },
   methods: {
     clickEvent: function (device, data, isCatalog) {
+      this.showLngLat = false
       this.device = device;
       if (data.channelId && !isCatalog) {
         // 点击通道
@@ -132,6 +151,7 @@ export default {
     contextmenuEventHandler: function (device, event, data, isCatalog) {
       console.log(device)
       console.log(device.online)
+      this.showLngLat = false
       this.device = device;
       if (data.channelId && !isCatalog) {
         // 点击通道
@@ -150,7 +170,10 @@ export default {
               icon: "el-icon-edit",
               disabled: false,
               onClick: () => {
-                this.edit(data)
+                this.curPoint = data
+                this.form = { channelId: data.channelId, deviceId: data.deviceId, longitude: '', latitude: '' }
+                this.showLngLat = true
+                this.$refs.map.initPointPick()
               }
             },
             {
@@ -322,8 +345,29 @@ export default {
       }).catch(function (e) {
       });
     },
-    edit: function (data) {
-      this.$message.warning('暂不支持');
+    setNodeLnglat(data) {
+      this.form.longitude = data[0] || ''
+      this.form.latitude = data[1] || ''
+    },
+    onSubmitLngLat() {
+      this.deviceService.updateDeviceLocation(this.form, res => {
+        if (res.code == 0) {
+          this.showLngLat = false
+          if (this.layer != null) {
+            this.$refs.map.removeLayer(this.layer);
+          }
+          this.closeInfoBox()
+          this.layer = this.$refs.map.addLayer([{
+            position: [this.form.longitude, this.form.latitude],
+            image: {
+              src: this.getImageByChannel(this.curPoint),
+              anchor: [0.5, 1]
+            },
+            data: this.curPoint
+          }], this.featureClickEvent)
+          this.$refs.map.panTo([this.form.longitude, this.form.latitude], mapParam.maxZoom)
+        }
+      })
     },
     getTrace: function (data) {
       // this.$message.warning('暂不支持');
@@ -366,7 +410,17 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.lnglatbox {
+  position: absolute;
+  top: 0.5rem;
+  left: 10rem;
+  background-color: #fff;
+  padding-top: 20px;
+  padding-left: 10px;
+  border-radius: 5px;
+}
+
 .infobox-content {
   width: 260px;
   background-color: #FFFFFF;

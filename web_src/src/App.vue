@@ -164,4 +164,12 @@ body,
   width: 90% !important;
   text-align: left;
 }
+
+.deviceMenu .el-tree-node:focus>.el-tree-node__content {
+  background-color: transparent;
+}
+
+.deviceMenu .el-tree-node.is-current {
+  background-color: transparent;
+}
 </style>

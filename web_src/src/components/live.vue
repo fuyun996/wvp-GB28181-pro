@@ -27,7 +27,7 @@
         </div>
         <div>
           <i class="spyfont icon-luxiang btn" :class="{ active: operation == 1 }" @click="operation = 1" />
-          <i class="spyfont icon-lunxun btn" :class="{ active: operation == 2 }" @click="operation = 2" />
+          <i class="spyfont icon-lunxun btn" :class="{ active: isPolling }" @click="openPolling()" />
           <i class="spyfont icon-jietu btn" :class="{ active: operation == 3 }" @click="operation = 3" />
           <i class="spyfont icon-quanping btn" @click="fullScreen()" />
         </div>
@@ -41,6 +41,60 @@
         </div>
       </div>
     </div>>
+
+    <!-- 轮询选择 -->
+    <el-dialog title="选择轮询播放通道" :visible.sync="pollingDialogVisible" width="70%">
+      <div>
+        <el-form :inline="true" :model="sform">
+          <el-form-item label="搜索:">
+            <el-input v-model="sform.query" placeholder="关键字"
+              @change="currentPage = 1; getDeviceChannelList()"></el-input>
+          </el-form-item>
+          <el-form-item label="在线状态:">
+            <el-select v-model="sform.online" @change="currentPage = 1; getDeviceChannelList()">
+              <el-option label="在线" :value="true"></el-option>
+              <el-option label="离线" :value="false"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="轮播间隔(秒):" required>
+            <el-input v-model="sform.time" type="number"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-checkbox v-model="sform.isRead" @change="setTableList">只看已选({{ selectAllList.length }})</el-checkbox>
+          </el-form-item>
+        </el-form>
+        <el-table ref="channelListTable" :data="tableList" style="width: 100%" header-row-class-name="table-header"
+          row-key="id" @selection-change="handleSelectionChange">
+          <el-table-column type="selection" reserve-selection width="55"></el-table-column>
+          <!-- <el-table-column prop="id" label="ID" min-width="180"></el-table-column> -->
+          <el-table-column prop="deviceId" label="设备国际编号" min-width="180">
+          </el-table-column>
+          <el-table-column prop="channelId" label="通道国际编号" min-width="180">
+          </el-table-column>
+          <!-- <el-table-column prop="name" label="设备名称" :show-overflow-tooltip="true" width="300">
+          </el-table-column> -->
+          <el-table-column prop="name" label="通道名称" :show-overflow-tooltip="true" width="300">
+          </el-table-column>
+          <el-table-column label="在线状态" min-width="80">
+            <template slot-scope="scope">
+              <div slot="reference" class="name-wrapper">
+                <el-tag size="medium" v-if="scope.row.status === 1">在线</el-tag>
+                <el-tag size="medium" type="info" v-if="scope.row.status === 0">离线</el-tag>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column prop="manufacture" label="厂家" min-width="120"></el-table-column>
+        </el-table>
+        <el-pagination style="float: right" @size-change="handleSizeChange" @current-change="currentChange"
+          :current-page="currentPage" :page-size="count" :page-sizes="[10, 20, 30, 40]"
+          layout="total, sizes, prev, pager, next" :total="total">
+        </el-pagination>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="pollingDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="startPolling()">确 定</el-button>
+      </span>
+    </el-dialog>
   </el-container>
 </template>
 
@@ -60,14 +114,25 @@ export default {
       spilt: 1,//分屏
       operation: -1, //操作
       playerIdx: 0,//激活播放器
+      curIdx: 0,// 
 
       updateLooper: 0, //数据刷新轮训标志
-      count: 15,
+      count: 10,
       total: 0,
 
       loading: false,
       isCollapse: true,
 
+      pollingDialogVisible: false,
+      deviceChannelList: [],
+      tableList: [],
+      currentPage: 1,
+      count: 10,
+      total: 0,
+      sform: { query: '', online: true, time: '', isRead: false },
+      selectAllList: [],
+      pollingTimer: null,
+      isPolling: false
     };
   },
   mounted() {
@@ -117,7 +182,8 @@ export default {
     '$route.fullPath': 'checkPlayByParam'
   },
   destroyed() {
-    clearTimeout(this.updateLooper);
+    this.updateLooper && clearTimeout(this.updateLooper);
+    this.pollingTimer && clearInterval(this.pollingTimer);
   },
   methods: {
     destroy(idx) {
@@ -137,7 +203,7 @@ export default {
 
     },
     //通知设备上传媒体流
-    sendDevicePush: function (itemData) {
+    sendDevicePush: function (itemData, ispolling) {
       // if (itemData.status === 0) {
       //   this.$message.error('设备离线!');
       //   return
@@ -148,36 +214,43 @@ export default {
       let channelId = itemData.channelId;
       console.log("通知设备推流1：" + deviceId + " : " + channelId);
       let idxTmp = this.playerIdx
-      let that = this;
       this.loading = true
       this.$axios({
         method: 'get',
         url: '/api/play/start/' + deviceId + '/' + channelId
-      }).then(function (res) {
+      }).then((res) => {
         if (res.data.code === 0 && res.data.data) {
-          let videoUrl;
-          if (location.protocol === "https:") {
-            videoUrl = res.data.data.wss_flv.url;
+          let vUrl = location.protocol === "https:" ? res.data.data.wss_flv.url : res.data.data.ws_flv.url
+          itemData.playUrl = vUrl;
+          // 是否是轮询视频
+          if (ispolling) {
+            this.$set(this.videoUrl, this.spilt - 1, vUrl)
+            setTimeout(() => {
+              window.localStorage.setItem('videoUrl', JSON.stringify(this.videoUrl))
+            }, 100)
           } else {
-            videoUrl = res.data.data.ws_flv.url;
+            this.setPlayUrl(vUrl, idxTmp);
           }
-          itemData.playUrl = videoUrl;
-          that.setPlayUrl(videoUrl, idxTmp);
         } else {
-          that.$message.error(res.data.msg);
+          this.$message.error(res.data.msg);
         }
       }).catch(function (e) {
       }).finally(() => {
-        that.loading = false
+        this.loading = false
       });
     },
     setPlayUrl(url, idx) {
-      this.$set(this.videoUrl, idx, url)
-      let _this = this
+      this.spilt == 1 && this.stopPolling() // 停止轮播
+      let max = this.isPolling ? this.spilt - 1 : this.spilt
+      if (this.curIdx >= max) {
+        this.curIdx = 0
+      }
+      console.log('播放索引', this.curIdx)
+      this.$set(this.videoUrl, this.curIdx, url)
+      this.curIdx++
       setTimeout(() => {
-        window.localStorage.setItem('videoUrl', JSON.stringify(_this.videoUrl))
+        window.localStorage.setItem('videoUrl', JSON.stringify(this.videoUrl))
       }, 100)
-
     },
     checkPlayByParam() {
       let { deviceId, channelId } = this.$route.query
@@ -222,6 +295,103 @@ export default {
       console.log(data);
       window.localStorage.setItem('playData', JSON.stringify(data))
     },
+    // 打开视频轮播设置弹窗
+    openPolling () {
+      if(this.isPolling){
+        this.stopPolling()
+        return false
+      }
+      this.sform = { query: '', online: true, time: '', isRead: false }
+      this.selectAllList = []
+      this.currentPage = 1
+      this.getDeviceChannelList()
+      this.pollingDialogVisible = true
+      this.$refs.channelListTable && this.$refs.channelListTable.clearSelection();
+    },
+    // 视频开始轮播
+    startPolling() {
+      if (this.selectAllList.length < 1) {
+        this.$message.warning('请选择轮询播放通道');
+        return false
+      }
+      if (!this.sform.time) {
+        this.$message.warning('请填写轮播间隔，单位(秒)');
+        return false
+      }
+      this.isPolling = true
+      let count = 1
+      this.sendDevicePush(this.selectAllList[0], true)
+      this.pollingTimer && clearInterval(this.pollingTimer)
+      this.pollingTimer = setInterval(() => {
+        if (!this.isPolling) clearInterval(this.pollingTimer)
+        if (count >= this.selectAllList.length) {
+          count = 0
+        }
+        this.sendDevicePush(this.selectAllList[count], true)
+        count++
+      }, Number(this.sform.time * 1000))
+
+      this.pollingDialogVisible = false
+    },
+    // 视频停止轮播
+    stopPolling() {
+      clearInterval(this.pollingTimer)
+      this.isPolling = false
+    },
+    handleSelectionChange(e) {
+      this.selectAllList = e
+    },
+    setTableList(e) {
+      this.currentPage = 1
+      if (e) {
+        this.tableList = this.selectAllList.slice(0, this.count)
+        this.total = this.selectAllList.length
+        this.$nextTick(() => {
+          this.$refs.channelListTable.doLayout();
+        })
+      } else {
+        this.getDeviceChannelList()
+      }
+    },
+    currentChange: function (val) {
+      this.currentPage = val;
+      if (this.sform.isRead) {
+        this.tableList = this.selectAllList.slice((this.currentPage - 1) * this.count, this.currentPage * this.count)
+      } else {
+        this.getDeviceChannelList();
+      }
+    },
+    handleSizeChange: function (val) {
+      this.count = val;
+      this.getDeviceChannelList();
+    },
+    getDeviceChannelList: function () {
+      let that = this
+      this.$axios({
+        method: 'get',
+        url: `/api/device/query/devices/50122700002000000123/channels`,
+        params: {
+          page: that.currentPage,
+          count: that.count,
+          query: that.sform.query,
+          online: that.sform.online,
+          channelType: true
+        }
+      }).then(function (res) {
+        if (res.data.code === 0) {
+          that.total = res.data.data.total
+          that.tableList = that.deviceChannelList = res.data.data.list
+          // 防止出现表格错位
+          that.$nextTick(() => {
+            that.$refs.channelListTable.doLayout();
+          })
+        }
+
+      }).catch(function (error) {
+        console.log(error);
+      });
+    },
+    // 全屏
     fullScreen() {
       let element = this.$refs.vbox;
 
@@ -240,8 +410,6 @@ export default {
 };
 </script>
 <style>
-.deviceMenu {}
-
 .deviceMenu .wrapper {
   margin: 3px 10px 15px 3px;
   border-radius: 3px;

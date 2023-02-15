@@ -115,11 +115,9 @@ export default {
           resolve([node])
         } else {
           this.deviceService.getAllDeviceList((data) => {
-            console.log(data)
             if (data.length > 0) {
               let nodeList = []
               for (let i = 0; i < data.length; i++) {
-                console.log(data[i].name)
                 let node = {
                   name: data[i].name || data[i].deviceId,
                   isLeaf: false,
@@ -142,9 +140,7 @@ export default {
         }
       } else {
         let channelArray = []
-
         this.deviceService.getTree(node.data.userData.deviceId, node.data.id, this.onlyCatalog, catalogData => {
-          console.log(catalogData)
           channelArray = channelArray.concat(catalogData)
           this.channelDataHandler(channelArray, resolve)
         }, (endCatalogData) => {
@@ -164,11 +160,11 @@ export default {
           } else {
             if (item.id.length > 14) {
               let channelType = item.id.substring(10, 13)
-              console.log("channelType: " + channelType)
+              // console.log("channelType: " + channelType)
               if (channelType === '215' || channelType === '216') {
                 type = 2;
               }
-              console.log(type)
+              // console.log(type)
               if (item.basicData.ptztype === 1) { // 1-球机;2-半球;3-固定枪机;4-遥控枪机
                 type = 4;
               } else if (item.basicData.ptztype === 2) {
@@ -285,25 +281,29 @@ export default {
   background-color: transparent;
 }
 
-.el-tree-node__content:hover {
+.deviceMenu .el-tree-node__content:hover {
   background-color: #E45252 !important;
 }
 
-.el-input-group__append,
-.el-input-group__prepend {
+.deviceMenu .el-input-group__append,
+.deviceMenu .el-input-group__prepend {
   background-color: #E45252;
   border: 1px solid #E45252;
 }
 
-.el-tree-node__expand-icon {
-  color: #6691FF;
-}
-
 .device-online {
-  color: #fff;
+  color: #252525;
 }
 
 .device-offline {
   color: #727272;
+}
+
+.deviceMenu .el-tree-node__expand-icon {
+  color: #6691FF;
+}
+
+.deviceMenu .device-online {
+  color: #fff;
 }
 </style>
