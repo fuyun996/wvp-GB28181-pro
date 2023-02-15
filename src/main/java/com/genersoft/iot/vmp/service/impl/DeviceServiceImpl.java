@@ -27,6 +27,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import javax.sip.InvalidArgumentException;
@@ -324,7 +325,6 @@ public class DeviceServiceImpl implements IDeviceService {
 
     @Override
     public void updateDevice(Device device) {
-
         String now = DateUtil.getNow();
         device.setUpdateTime(now);
         device.setCharset(device.getCharset().toUpperCase());
@@ -354,6 +354,51 @@ public class DeviceServiceImpl implements IDeviceService {
         List<DeviceChannel> deviceChannels = deviceChannelMapper.queryChannelsByName(name);
         List<BaseTree<DeviceChannel>> trees = transportChannelsToTreeByName(deviceChannels);
         return trees;
+    }
+
+    @Override
+    public void addChannelCatalog(String id, String name, Integer userId,String parentId) {
+        deviceChannelMapper.addChannelCatalog(id,name,userId,parentId);
+    }
+
+    @Override
+    public List<ChannelCatalog> listChannelCatalog(String parentId,Integer userId) {
+        return deviceChannelMapper.listChannelCatalog(parentId,userId);
+    }
+
+    @Override
+    public void importChannelCatalog(String catalogId, String name,String deviceId, Integer userId, String parentId) {
+        List<DeviceChannel> deviceChannels = deviceChannelMapper.queryOnlineChannelsByDeviceId(deviceId);
+        deviceChannelMapper.addChannelCatalog(catalogId,name,userId,parentId);
+        for(int i=0;i<deviceChannels.size();i++){
+            deviceChannelMapper.importChannelCatalog(deviceChannels.get(i).getChannelId(),deviceChannels.get(i).getName(),userId,catalogId,deviceChannels.get(i).getChannelId(),deviceId);
+        }
+    }
+
+    @Override
+    public void updateChannelCatalogName(int id,String name) {
+        deviceChannelMapper.updateChannelCatalogName(id,name);
+    }
+
+    @Override
+    @Transactional
+    public void deleteChannelCatalogById(int id, Integer userId) {
+        ChannelCatalog channelCatalog = deviceChannelMapper.queryChannelCatalog(id,userId);
+        if(channelCatalog.getChannelId() == null){
+            deviceChannelMapper.deleteChannelCatalogByParentId(channelCatalog.getCatalogId(),userId);
+        }
+        deviceChannelMapper.deleteChannelCatalogById(id,userId);
+    }
+
+    @Override
+    public void chooseChannelCatalog(String channelIds, Integer userId,String parentId) {
+        String[] channelIdList = channelIds.split(",");
+        for(int i=0;i<channelIdList.length;i++){
+            List<DeviceChannel> deviceChannel = deviceChannelMapper.queryChannelByChannelId(channelIdList[i]);
+            if(deviceChannel.size() > 0){
+                deviceChannelMapper.importChannelCatalog(deviceChannel.get(0).getChannelId(),deviceChannel.get(0).getName(),userId,parentId,deviceChannel.get(0).getChannelId(),deviceChannel.get(0).getDeviceId());
+            }
+        }
     }
 
 
@@ -535,7 +580,6 @@ public class DeviceServiceImpl implements IDeviceService {
             return treeNotes;
         }
         for (DeviceChannel channel : channels) {
-
             BaseTree<DeviceChannel> node = new BaseTree<>();
             node.setId(channel.getChannelId());
             node.setDeviceId(channel.getDeviceId());

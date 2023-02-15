@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.genersoft.iot.vmp.conf.DynamicTask;
 import com.genersoft.iot.vmp.conf.exception.ControllerException;
 import com.genersoft.iot.vmp.conf.security.SecurityUtils;
+import com.genersoft.iot.vmp.gb28181.bean.ChannelCatalog;
 import com.genersoft.iot.vmp.gb28181.bean.Device;
 import com.genersoft.iot.vmp.gb28181.bean.DeviceChannel;
 import com.genersoft.iot.vmp.gb28181.bean.SyncStatus;
@@ -17,6 +18,7 @@ import com.genersoft.iot.vmp.service.IDeviceChannelService;
 import com.genersoft.iot.vmp.service.IDeviceService;
 import com.genersoft.iot.vmp.storager.IRedisCatchStorage;
 import com.genersoft.iot.vmp.storager.IVideoManagerStorage;
+import com.genersoft.iot.vmp.storager.dao.DeviceChannelMapper;
 import com.genersoft.iot.vmp.vmanager.bean.BaseTree;
 import com.genersoft.iot.vmp.vmanager.bean.ErrorCode;
 import com.genersoft.iot.vmp.vmanager.bean.WVPResult;
@@ -74,6 +76,9 @@ public class DeviceQuery {
 
 	@Autowired
 	private DynamicTask dynamicTask;
+
+	@Autowired
+	private DeviceChannelMapper deviceChannelMapper;
 
 	/**
 	 * 使用ID查询国标设备
@@ -284,11 +289,9 @@ public class DeviceQuery {
 	@Parameter(name = "device", description = "设备", required = true)
 	@PostMapping("/device/add/")
 	public void addDevice(Device device){
-
 		if (device == null || device.getDeviceId() == null) {
 			throw new ControllerException(ErrorCode.ERROR400);
 		}
-
 		// 查看deviceId是否存在
 		boolean exist = deviceService.isExist(device.getDeviceId());
 		if (exist) {
@@ -298,6 +301,114 @@ public class DeviceQuery {
 	}
 
 	/**
+	 * 自定义分组添加节点
+	 * @param catalogId 节点编号
+	 * @param name 节点名称
+	 * @return
+	 */
+	@Operation(summary = "自定义分组添加节点")
+	@Parameter(name = "catalogId", description = "节点编号", required = true)
+	@Parameter(name = "name", description = "节点名称", required = true)
+	@Parameter(name = "parentId", description = "父节点ID", required = false)
+	@PostMapping("/channelCatalog/addChannelCatalog/")
+	public void addChannelCatalog(@RequestParam(required = true) String catalogId,
+								  @RequestParam(required = true) String name,
+								  @RequestParam(required = false) String parentId){
+		if (catalogId == null || name == null) {
+			throw new ControllerException(ErrorCode.ERROR400);
+		}
+		Integer userId = SecurityUtils.getUserInfo().getId();
+		deviceService.addChannelCatalog(catalogId,name,userId,parentId);
+	}
+
+	/**
+	 * 自定义分组导入设备
+	 * @param deviceId 设备ID
+	 * @param name 节点名称
+	 * @param parentId 父节点ID
+	 * @return
+	 */
+	@Operation(summary = "自定义分组导入设备")
+	@Parameter(name = "catalogId", description = "节点编号", required = true)
+	@Parameter(name = "deviceId", description = "设备ID", required = true)
+	@Parameter(name = "parentId", description = "父节点ID", required = true)
+	@PostMapping("/channelCatalog/importChannelCatalog/")
+	public void importChannelCatalog(@RequestParam(required = true) String catalogId,
+									 @RequestParam(required = true) String name,
+									 @RequestParam(required = true) String deviceId,
+								  	 @RequestParam(required = true) String parentId){
+		if (deviceId == null || name == null) {
+			throw new ControllerException(ErrorCode.ERROR400);
+		}
+		Integer userId = SecurityUtils.getUserInfo().getId();
+		deviceService.importChannelCatalog(catalogId,name,deviceId,userId,parentId);
+	}
+
+	@Operation(summary = "自定义分组选择通道")
+	@Parameter(name = "channelIds", description = "通道ID集合，逗号隔开", required = true)
+	@Parameter(name = "parentId", description = "父节点ID", required = true)
+	@PostMapping("/channelCatalog/chooseChannelCatalog/")
+	public void chooseChannelCatalog(String channelIds,String parentId){
+		if (channelIds == null) {
+			throw new ControllerException(ErrorCode.ERROR400);
+		}
+		Integer userId = SecurityUtils.getUserInfo().getId();
+		deviceService.chooseChannelCatalog(channelIds,userId,parentId);
+	}
+
+	@Operation(summary = "获取用户的自定义分组目录")
+	@Parameter(name = "parentId", description = "父节点ID", required = false)
+	@GetMapping("/channelCatalog/getChannelCatalogByUserId/")
+	public List<ChannelCatalog> getChannelCatalogByUserId(@RequestParam(required = false) String parentId){
+		Integer userId = SecurityUtils.getUserInfo().getId();
+		List<ChannelCatalog> listChannelCatalog = deviceService.listChannelCatalog(parentId,userId);
+		boolean finalParent = false;
+		for(int i=0;i<listChannelCatalog.size();i++){
+			if(listChannelCatalog.get(i).getChannelId() != null){
+				finalParent = true;
+				break;
+			}
+		}
+		if(finalParent){
+			List<ChannelCatalog> listFinalChannelCatalog = new ArrayList<>();
+			for(ChannelCatalog catalog : listChannelCatalog){
+				catalog.setName(catalog.getName());
+				catalog.setDeviceId(catalog.getDeviceId());
+				catalog.setParentId(catalog.getParentId());
+				catalog.setBasicData(deviceChannelMapper.queryChannel(catalog.getDeviceId(),catalog.getChannelId()));
+				listFinalChannelCatalog.add(catalog);
+			}
+
+			return listFinalChannelCatalog;
+		}
+		return listChannelCatalog;
+	}
+
+	/**
+	 * 自定义分组编辑名称
+	 * @param id 分组唯一ID编号
+	 * @return
+	 */
+	@Operation(summary = "自定义分组编辑名称")
+	@Parameter(name = "id", description = "分组唯一ID编号")
+	@Parameter(name = "name", description = "节点名称")
+	@PostMapping("/channelCatalog/updateChannelCatalogName/")
+	public void updateChannelCatalogName(@RequestParam int id,@RequestParam String name){
+		deviceService.updateChannelCatalogName(id,name);
+	}
+
+	/**
+	 * 删除自定义分组
+	 * @param id
+	 */
+	@Operation(summary = "删除自定义分组")
+	@Parameter(name = "id", description = "分组唯一ID编号")
+	@DeleteMapping("/channelCatalog/deleteChannelCatalogById/")
+	public void deleteChannelCatalogById(@RequestParam int id) {
+		Integer userId = SecurityUtils.getUserInfo().getId();
+		deviceService.deleteChannelCatalogById(id,userId);
+	}
+	/**
 	 * 更新设备位置信息
 	 * @param deviceChannel 设备信息
 	 * @return
@@ -306,7 +417,6 @@ public class DeviceQuery {
 	@Parameter(name = "deviceChannel", description = "设备频道明细", required = true)
 	@PostMapping("/device/updateLocation/")
 	public void updateDeviceLocation(@RequestBody DeviceChannel deviceChannel){
-
 		if (deviceChannel != null && deviceChannel.getDeviceId() != null) {
 			deviceService.updateDeviceLocation(deviceChannel);
 		}
@@ -321,7 +431,6 @@ public class DeviceQuery {
 	@Parameter(name = "device", description = "设备", required = true)
 	@PostMapping("/device/update/")
 	public void updateDevice(Device device){
-
 		if (device != null && device.getDeviceId() != null) {
 			deviceService.updateCustomDevice(device);
 		}

@@ -1,5 +1,6 @@
 package com.genersoft.iot.vmp.storager.dao;
 
+import com.genersoft.iot.vmp.gb28181.bean.ChannelCatalog;
 import com.genersoft.iot.vmp.gb28181.bean.Device;
 import com.genersoft.iot.vmp.gb28181.bean.DeviceChannel;
 import com.genersoft.iot.vmp.gb28181.bean.DeviceChannelInPlatform;
@@ -380,4 +381,35 @@ public interface DeviceChannelMapper {
             " <if test='channelId != null' >  AND channelId=#{channelId}</if>" +
             " </script>"})
     void updateDeviceLocation(DeviceChannel deviceChannel);
+
+    @Insert("insert into channel_catalog (catalogId,name,userId,parentId) values "+
+    "('${catalogId}','${name}','${userId}','${parentId}')")
+    void addChannelCatalog(String catalogId, String name, Integer userId,String parentId);
+
+    @Select(value = {" <script>" +
+            "select * from channel_catalog where userId = #{userId}" +
+            " <if test='parentId != null'> and parentId = #{parentId} </if>" +
+            " <if test='parentId == null'> and parentId = '' or parentId is null </if>" +
+            " </script>"})
+    List<ChannelCatalog> listChannelCatalog(String parentId,Integer userId);
+
+    @Insert("insert into channel_catalog (catalogId,name,userId,parentId,channelId,deviceId) values "+
+            "('${catalogId}','${name}','${userId}','${parentId}','${channelId}','${deviceId}')")
+    void importChannelCatalog(String catalogId, String name, Integer userId, String parentId, String channelId,String deviceId);
+
+    @Update(value = {" <script>" +
+            "UPDATE channel_catalog " +
+            "SET " +
+            "name = #{name} " +
+            "WHERE id=#{id} " +
+            " </script>"})
+    void updateChannelCatalogName(int id,String name);
+
+    @Select("select * from channel_catalog where id = #{id} and userId = #{userId}")
+    ChannelCatalog queryChannelCatalog(int id, Integer userId);
+
+    @Delete("delete from channel_catalog where parentId = #{catalogId} and userId = #{userId}")
+    void deleteChannelCatalogByParentId(String catalogId, Integer userId);
+    @Delete("delete from channel_catalog where id = #{id} and userId = #{userId}")
+    void deleteChannelCatalogById(int id, Integer userId);
 }

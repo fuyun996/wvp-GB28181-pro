@@ -1,6 +1,7 @@
 package com.genersoft.iot.vmp.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.genersoft.iot.vmp.gb28181.bean.ChannelCatalog;
 import com.genersoft.iot.vmp.gb28181.bean.Device;
 import com.genersoft.iot.vmp.gb28181.bean.DeviceChannel;
 import com.genersoft.iot.vmp.gb28181.bean.SyncStatus;
@@ -175,4 +176,16 @@ public interface IDeviceService {
     void updateDeviceLocation(DeviceChannel deviceChannel);
 
     List<BaseTree<DeviceChannel>> queryVideoDeviceTreeByName(String name);
+
+    void addChannelCatalog(String catalogId, String name, Integer userId,String parentId);
+
+    List<ChannelCatalog> listChannelCatalog(String parentId,Integer userId);
+
+    void importChannelCatalog(String catalogId, String name,String deviceId, Integer userId, String parentId);
+
+    void updateChannelCatalogName(int id,String name);
+
+    void deleteChannelCatalogById(int id, Integer userId);
+
+    void chooseChannelCatalog(String channelIds, Integer userId,String parentId);
 }
