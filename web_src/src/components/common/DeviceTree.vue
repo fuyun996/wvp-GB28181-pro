@@ -271,7 +271,7 @@ export default {
 
 .device-tree-main-box {
   text-align: left;
-  height: calc(100vh - 153px);
+  height: calc(100vh - 198px);
   overflow: auto;
 }
 </style>

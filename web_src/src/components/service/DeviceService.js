@@ -187,6 +187,7 @@ class DeviceService {
     });
   }
 
+  // 更新设备点位
   updateDeviceLocation(data, callback, errorCallback) {
     this.$axios({
       method: 'post',

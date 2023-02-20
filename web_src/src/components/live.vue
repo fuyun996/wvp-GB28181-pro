@@ -9,7 +9,14 @@
             <i @click="isCollapse = false" class="el-icon-s-fold" style="font-size: 18px;cursor: pointer;"></i>
           </div>
         </div>
-        <DeviceTree :clickEvent="clickEvent" :contextMenuEvent="contextMenuEvent"></DeviceTree>
+        <el-tabs v-model="activeName">
+          <el-tab-pane label="设备树" name="first">
+            <DeviceTree :clickEvent="clickEvent" :contextMenuEvent="contextMenuEvent"></DeviceTree>
+          </el-tab-pane>
+          <el-tab-pane label="分组" name="second">
+            <GroupTree :clickEvent="clickEvent"></GroupTree>
+          </el-tab-pane>
+        </el-tabs>
       </div>
     </el-aside>
     <div v-else class="deviceMenu-collapse" @click="isCollapse = true">
@@ -33,83 +40,36 @@
         </div>
       </el-header>
       <div ref="vbox" class="videobox" :class="operation == 4 ? 'videobox-fullscreen' : ''">
-        <div v-for="i in spilt" :key="i" class="play-box" :style="liveStyle"
-          :class="{ redborder: playerIdx == (i - 1) }" @click="playerIdx = (i - 1)">
+        <div v-for="i in spilt" :key="i" class="play-box" :style="liveStyle" :class="{ redborder: playerIdx == (i - 1) }"
+          @click="playerIdx = (i - 1)">
           <div v-if="!videoUrl[i - 1]" style="color: #ffffff;font-size: 30px;font-weight: bold;">{{ i }}</div>
-          <player ref="player" v-else :videoUrl="videoUrl[i - 1]" fluent autoplay @screenshot="shot"
-            @destroy="destroy" />
+          <player ref="player" v-else :videoUrl="videoUrl[i - 1]" fluent autoplay @screenshot="shot" @destroy="destroy" />
         </div>
       </div>
-    </div>>
+    </div>
 
     <!-- 轮询选择 -->
-    <el-dialog title="选择轮询播放通道" :visible.sync="pollingDialogVisible" width="70%">
-      <div>
-        <el-form :inline="true" :model="sform">
-          <el-form-item label="搜索:">
-            <el-input v-model="sform.query" placeholder="关键字"
-              @change="currentPage = 1; getDeviceChannelList()"></el-input>
-          </el-form-item>
-          <el-form-item label="在线状态:">
-            <el-select v-model="sform.online" @change="currentPage = 1; getDeviceChannelList()">
-              <el-option label="在线" :value="true"></el-option>
-              <el-option label="离线" :value="false"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="轮播间隔(秒):" required>
-            <el-input v-model="sform.time" type="number"></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-checkbox v-model="sform.isRead" @change="setTableList">只看已选({{ selectAllList.length }})</el-checkbox>
-          </el-form-item>
-        </el-form>
-        <el-table ref="channelListTable" :data="tableList" style="width: 100%" header-row-class-name="table-header"
-          row-key="id" @selection-change="handleSelectionChange">
-          <el-table-column type="selection" reserve-selection width="55"></el-table-column>
-          <!-- <el-table-column prop="id" label="ID" min-width="180"></el-table-column> -->
-          <el-table-column prop="deviceId" label="设备国际编号" min-width="180">
-          </el-table-column>
-          <el-table-column prop="channelId" label="通道国际编号" min-width="180">
-          </el-table-column>
-          <!-- <el-table-column prop="name" label="设备名称" :show-overflow-tooltip="true" width="300">
-          </el-table-column> -->
-          <el-table-column prop="name" label="通道名称" :show-overflow-tooltip="true" width="300">
-          </el-table-column>
-          <el-table-column label="在线状态" min-width="80">
-            <template slot-scope="scope">
-              <div slot="reference" class="name-wrapper">
-                <el-tag size="medium" v-if="scope.row.status === 1">在线</el-tag>
-                <el-tag size="medium" type="info" v-if="scope.row.status === 0">离线</el-tag>
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column prop="manufacture" label="厂家" min-width="120"></el-table-column>
-        </el-table>
-        <el-pagination style="float: right" @size-change="handleSizeChange" @current-change="currentChange"
-          :current-page="currentPage" :page-size="count" :page-sizes="[10, 20, 30, 40]"
-          layout="total, sizes, prev, pager, next" :total="total">
-        </el-pagination>
-      </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="pollingDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="startPolling()">确 定</el-button>
-      </span>
-    </el-dialog>
-  </el-container>
+    <SelectChannelTable ref="SelectChannelTable" :type="1" :title="'选择轮询播放通道'" @submit="startPolling">
+    </SelectChannelTable>
+</el-container>
 </template>
 
 <script>
 import uiHeader from "../layout/UiHeader.vue";
 import player from './common/jessibuca.vue'
 import DeviceTree from './common/DeviceTree.vue'
+import GroupTree from './dialog/deviceGroup/groupTree.vue'
+import SelectChannelTable from './common/SelectChannelTable.vue'
+import DeviceService from "./service/DeviceService.js";
 
 export default {
   name: "live",
   components: {
-    uiHeader, player, DeviceTree
+    uiHeader, player, DeviceTree, GroupTree, SelectChannelTable
   },
   data() {
     return {
+      deviceService: new DeviceService(),
       videoUrl: [''],
       spilt: 1,//分屏
       operation: -1, //操作
@@ -123,16 +83,23 @@ export default {
       loading: false,
       isCollapse: true,
 
-      pollingDialogVisible: false,
-      deviceChannelList: [],
-      tableList: [],
-      currentPage: 1,
-      count: 10,
-      total: 0,
-      sform: { query: '', online: true, time: '', isRead: false },
+      activeName: 'first',
+
+      // 视频轮询
       selectAllList: [],
+      isPolling: false,
       pollingTimer: null,
-      isPolling: false
+
+      // 分组
+      groupDialogVisible: false,
+      groupOperationType: 1, // 1-刷新节点， 2-新增，3-编辑， 4-删除， 5-导入设备，6-导入通道
+      groupForm: {},
+      groupFormRule: {
+        catalogId: [
+          { required: true, message: '请输入节点编号', trigger: 'blur' },
+          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+        ],
+      }
     };
   },
   mounted() {
@@ -202,6 +169,7 @@ export default {
     contextMenuEvent: function (device, event, data, isCatalog) {
 
     },
+
     //通知设备上传媒体流
     sendDevicePush: function (itemData, ispolling) {
       // if (itemData.status === 0) {
@@ -295,26 +263,24 @@ export default {
       console.log(data);
       window.localStorage.setItem('playData', JSON.stringify(data))
     },
+
     // 打开视频轮播设置弹窗
-    openPolling () {
-      if(this.isPolling){
+    openPolling() {
+      if (this.isPolling) {
         this.stopPolling()
         return false
       }
-      this.sform = { query: '', online: true, time: '', isRead: false }
       this.selectAllList = []
-      this.currentPage = 1
-      this.getDeviceChannelList()
-      this.pollingDialogVisible = true
-      this.$refs.channelListTable && this.$refs.channelListTable.clearSelection();
+      this.$refs.SelectChannelTable.openDialog()
     },
     // 视频开始轮播
-    startPolling() {
+    startPolling(data, time) {
+      this.selectAllList = data
       if (this.selectAllList.length < 1) {
         this.$message.warning('请选择轮询播放通道');
         return false
       }
-      if (!this.sform.time) {
+      if (!time) {
         this.$message.warning('请填写轮播间隔，单位(秒)');
         return false
       }
@@ -329,7 +295,7 @@ export default {
         }
         this.sendDevicePush(this.selectAllList[count], true)
         count++
-      }, Number(this.sform.time * 1000))
+      }, Number(time * 1000))
 
       this.pollingDialogVisible = false
     },
@@ -337,59 +303,6 @@ export default {
     stopPolling() {
       clearInterval(this.pollingTimer)
       this.isPolling = false
-    },
-    handleSelectionChange(e) {
-      this.selectAllList = e
-    },
-    setTableList(e) {
-      this.currentPage = 1
-      if (e) {
-        this.tableList = this.selectAllList.slice(0, this.count)
-        this.total = this.selectAllList.length
-        this.$nextTick(() => {
-          this.$refs.channelListTable.doLayout();
-        })
-      } else {
-        this.getDeviceChannelList()
-      }
-    },
-    currentChange: function (val) {
-      this.currentPage = val;
-      if (this.sform.isRead) {
-        this.tableList = this.selectAllList.slice((this.currentPage - 1) * this.count, this.currentPage * this.count)
-      } else {
-        this.getDeviceChannelList();
-      }
-    },
-    handleSizeChange: function (val) {
-      this.count = val;
-      this.getDeviceChannelList();
-    },
-    getDeviceChannelList: function () {
-      let that = this
-      this.$axios({
-        method: 'get',
-        url: `/api/device/query/devices/50122700002000000123/channels`,
-        params: {
-          page: that.currentPage,
-          count: that.count,
-          query: that.sform.query,
-          online: that.sform.online,
-          channelType: true
-        }
-      }).then(function (res) {
-        if (res.data.code === 0) {
-          that.total = res.data.data.total
-          that.tableList = that.deviceChannelList = res.data.data.list
-          // 防止出现表格错位
-          that.$nextTick(() => {
-            that.$refs.channelListTable.doLayout();
-          })
-        }
-
-      }).catch(function (error) {
-        console.log(error);
-      });
     },
     // 全屏
     fullScreen() {
