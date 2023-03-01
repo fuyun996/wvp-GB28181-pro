@@ -3,6 +3,7 @@ package com.genersoft.iot.vmp.service.impl;
 import com.genersoft.iot.vmp.common.StreamInfo;
 import com.genersoft.iot.vmp.gb28181.bean.Device;
 import com.genersoft.iot.vmp.gb28181.bean.DeviceChannel;
+import com.genersoft.iot.vmp.gb28181.bean.DeviceScreenRecord;
 import com.genersoft.iot.vmp.gb28181.utils.Coordtransform;
 import com.genersoft.iot.vmp.service.IDeviceChannelService;
 import com.genersoft.iot.vmp.storager.IRedisCatchStorage;
@@ -10,6 +11,8 @@ import com.genersoft.iot.vmp.storager.dao.DeviceChannelMapper;
 import com.genersoft.iot.vmp.storager.dao.DeviceMapper;
 import com.genersoft.iot.vmp.utils.DateUtil;
 import com.genersoft.iot.vmp.vmanager.bean.ResourceBaceInfo;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,7 +101,7 @@ public class DeviceChannelServiceImpl implements IDeviceChannelService {
         HashMap<String, DeviceChannel> channelsInStore = new HashMap<>();
         Device device = deviceMapper.getDeviceByDeviceId(deviceId);
         if (channels != null && channels.size() > 0) {
-            List<DeviceChannel> channelList = channelMapper.queryChannels(deviceId, null, null, null, null, null);
+            List<DeviceChannel> channelList = channelMapper.queryChannels(deviceId, null, null, null, null, null,100);
             if (channelList.size() == 0) {
                 for (DeviceChannel channel : channels) {
                     channel.setDeviceId(deviceId);
@@ -177,5 +180,12 @@ public class DeviceChannelServiceImpl implements IDeviceChannelService {
     @Override
     public ResourceBaceInfo getOverview() {
         return channelMapper.getOverview();
+    }
+
+    @Override
+    public PageInfo getDeviceScreenRecord(String name,int userId, int page, int count) {
+        PageHelper.startPage(page, count);
+        List<DeviceScreenRecord> all = channelMapper.getDeviceScreenRecord(name,userId);
+        return new PageInfo<>(all);
     }
 }

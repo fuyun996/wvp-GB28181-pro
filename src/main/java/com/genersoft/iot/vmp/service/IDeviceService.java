@@ -188,4 +188,6 @@ public interface IDeviceService {
     void deleteChannelCatalogById(int id, Integer userId);
 
     void chooseChannelCatalog(String channelIds, Integer userId,String parentId);
+
+    List<ChannelCatalog> listChannelCatalogByName(String name, Integer userId);
 }

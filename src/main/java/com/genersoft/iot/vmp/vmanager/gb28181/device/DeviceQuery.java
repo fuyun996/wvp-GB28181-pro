@@ -4,21 +4,22 @@ import com.alibaba.fastjson2.JSONObject;
 import com.genersoft.iot.vmp.conf.DynamicTask;
 import com.genersoft.iot.vmp.conf.exception.ControllerException;
 import com.genersoft.iot.vmp.conf.security.SecurityUtils;
-import com.genersoft.iot.vmp.gb28181.bean.ChannelCatalog;
-import com.genersoft.iot.vmp.gb28181.bean.Device;
-import com.genersoft.iot.vmp.gb28181.bean.DeviceChannel;
-import com.genersoft.iot.vmp.gb28181.bean.SyncStatus;
+import com.genersoft.iot.vmp.gb28181.bean.*;
 import com.genersoft.iot.vmp.gb28181.task.ISubscribeTask;
 import com.genersoft.iot.vmp.gb28181.task.impl.CatalogSubscribeTask;
 import com.genersoft.iot.vmp.gb28181.task.impl.MobilePositionSubscribeTask;
 import com.genersoft.iot.vmp.gb28181.transmit.callback.DeferredResultHolder;
 import com.genersoft.iot.vmp.gb28181.transmit.callback.RequestMessage;
 import com.genersoft.iot.vmp.gb28181.transmit.cmd.impl.SIPCommander;
+import com.genersoft.iot.vmp.media.zlm.ZLMRESTfulUtils;
+import com.genersoft.iot.vmp.media.zlm.dto.MediaServerItem;
 import com.genersoft.iot.vmp.service.IDeviceChannelService;
 import com.genersoft.iot.vmp.service.IDeviceService;
+import com.genersoft.iot.vmp.service.IPlayService;
 import com.genersoft.iot.vmp.storager.IRedisCatchStorage;
 import com.genersoft.iot.vmp.storager.IVideoManagerStorage;
 import com.genersoft.iot.vmp.storager.dao.DeviceChannelMapper;
+import com.genersoft.iot.vmp.utils.UploadUtil;
 import com.genersoft.iot.vmp.vmanager.bean.BaseTree;
 import com.genersoft.iot.vmp.vmanager.bean.ErrorCode;
 import com.genersoft.iot.vmp.vmanager.bean.WVPResult;
@@ -30,13 +31,16 @@ import org.apache.commons.compress.utils.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sip.InvalidArgumentException;
 import javax.sip.SipException;
@@ -76,6 +80,10 @@ public class DeviceQuery {
 
 	@Autowired
 	private DynamicTask dynamicTask;
+	@Autowired
+	private UploadUtil uploadUtil;
+	@Value("${upload.file_path}")
+	private String filePath;
 
 	@Autowired
 	private DeviceChannelMapper deviceChannelMapper;
@@ -129,19 +137,24 @@ public class DeviceQuery {
 	@Parameter(name = "count", description = "每页查询数量", required = true)
 	@Parameter(name = "query", description = "查询内容")
 	@Parameter(name = "online", description = "是否在线")
+	@Parameter(name = "PTZType", description = "云台类型")
 	@Parameter(name = "channelType", description = "设备/子目录-> false/true")
 	@Parameter(name = "catalogUnderDevice", description = "是否直属与设备的目录")
 	public PageInfo channels(@PathVariable String deviceId,
 											   int page, int count,
-											   @RequestParam(required = false) String query,
+							                   @RequestParam(required = false) String query,
+							                   @RequestParam(required = false) String PTZType,
 											   @RequestParam(required = false) Boolean online,
 											   @RequestParam(required = false) Boolean channelType,
 											   @RequestParam(required = false) Boolean catalogUnderDevice) {
 		if (ObjectUtils.isEmpty(query)) {
 			query = null;
 		}
-
-		return storager.queryChannelsByDeviceId(deviceId, query, channelType, online, catalogUnderDevice, page, count);
+		int type = 100;
+		if(PTZType != null){
+			type = Integer.parseInt(PTZType);
+		}
+		return storager.queryChannelsByDeviceId(deviceId, query, channelType, online, catalogUnderDevice, page, count,type);
 	}
 
 	/**
@@ -246,6 +259,17 @@ public class DeviceQuery {
 		}
 
 		PageInfo pageResult = storager.querySubChannels(deviceId, channelId, query, channelType, online, page, count);
+		return pageResult;
+	}
+
+	@Operation(summary = "分页查询录屏文件列表")
+	@Parameter(name = "name", description = "文件名称")
+	@GetMapping("/getDeviceScreenRecord")
+	public PageInfo getDeviceScreenRecord(int page,
+										  int count,
+										  @RequestParam(required = false) String name){
+		Integer userId = SecurityUtils.getUserInfo().getId();
+		PageInfo pageResult = deviceChannelService.getDeviceScreenRecord(name,userId,page,count);
 		return pageResult;
 	}
 
@@ -382,6 +406,20 @@ public class DeviceQuery {
 			return listFinalChannelCatalog;
 		}
 		return listChannelCatalog;
+	}
+
+	@Operation(summary = "筛选获取用户的自定义分组目录")
+	@Parameter(name = "name", description = "目录名称", required = false)
+	@GetMapping("/channelCatalog/getChannelCatalogByUserIdAndName/")
+	public List<ChannelCatalog> getChannelCatalogByUserIdAndName(@RequestParam(required = false) String name){
+		Integer userId = SecurityUtils.getUserInfo().getId();
+		List<ChannelCatalog> listChannelCatalogByName = deviceService.listChannelCatalogByName(name,userId);
+		for(int i=0;i<listChannelCatalogByName.size();i++){
+			if(listChannelCatalogByName.get(i).getChannelId() != null){
+				listChannelCatalogByName.get(i).setBasicData(deviceChannelMapper.queryChannel(listChannelCatalogByName.get(i).getDeviceId(),listChannelCatalogByName.get(i).getChannelId()));
+			}
+		}
+		return listChannelCatalogByName;
 	}
 
 	/**
@@ -584,17 +622,59 @@ public class DeviceQuery {
 	}
 
 	@GetMapping("/snap/{deviceId}/{channelId}")
-	@Operation(summary = "请求截图")
+	@Operation(summary = "请求截图-缩略图获取")
 	@Parameter(name = "deviceId", description = "设备国标编号", required = true)
 	@Parameter(name = "channelId", description = "通道国标编号", required = true)
 	public void getSnap(HttpServletResponse resp, @PathVariable String deviceId, @PathVariable String channelId) {
-
 		try {
 			final InputStream in = Files.newInputStream(new File("snap" + File.separator + deviceId + "_" + channelId + ".jpg").toPath());
 			resp.setContentType(MediaType.IMAGE_PNG_VALUE);
 			IOUtils.copy(in, resp.getOutputStream());
 		} catch (IOException e) {
 			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		}
+	}
+
+	@GetMapping("/getUploadSnap")
+	@Operation(summary = "请求获取上传通道截图")
+	@Parameter(name = "id", description = "上传截图或录屏编号ID", required = true)
+	public void getUploadSnap(HttpServletResponse resp, @RequestParam Integer id) {
+		try {
+			DeviceScreenRecord deviceScreenRecord = deviceChannelMapper.getDeviceScreenRecordById(id);
+			final InputStream in = Files.newInputStream(new File(deviceScreenRecord.getFileUrl()).toPath());
+			resp.setContentType(MediaType.IMAGE_PNG_VALUE);
+			IOUtils.copy(in, resp.getOutputStream());
+		} catch (IOException e) {
+			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		}
+	}
+
+	@PostMapping("/snap")
+	@Operation(summary = "上传通道截图")
+	public void uploadSnap(@RequestParam(value = "file") MultipartFile file, HttpServletRequest request) throws IOException {
+		File realPath =  new File(filePath);
+		if(!realPath.exists()) {
+			realPath.mkdirs();
+		}
+		String newFileName = uploadUtil.upload(file,request,realPath.getPath());
+		DeviceScreenRecord deviceScreenRecord = new DeviceScreenRecord();
+		deviceScreenRecord.setFileName(file.getResource().getFilename());
+		deviceScreenRecord.setFileType("1");
+		deviceScreenRecord.setUserName(SecurityUtils.getUserInfo().getUsername());
+		deviceScreenRecord.setUserId(SecurityUtils.getUserInfo().getId());
+		deviceScreenRecord.setFileUrl(realPath.getPath()+"/"+newFileName);
+		deviceChannelMapper.uploadSnap(deviceScreenRecord);
+	}
+
+	@DeleteMapping("/deleteSnapScreenRecord")
+	@Operation(summary = "删除录屏文件或截图")
+	@Parameter(name = "id", description = "上传截图或录屏编号ID", required = true)
+	public void deleteSnapScreenRecord(@RequestParam Integer id){
+		DeviceScreenRecord deviceScreenRecord = deviceChannelMapper.getDeviceScreenRecordById(id);
+		if(deviceScreenRecord != null){
+			File file = new File(deviceScreenRecord.getFileUrl());
+			file.delete();
+			deviceChannelMapper.deleteSnapScreenRecord(id);
 		}
 	}
 
