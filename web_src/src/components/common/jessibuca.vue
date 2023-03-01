@@ -1,5 +1,6 @@
 <template>
-  <div ref="container" @dblclick="fullscreenSwich" style="width:100%;height:100%;background-color: #000000;margin:0 auto;">
+  <div ref="container" @dblclick="fullscreenSwich"
+    style="width:100%;height:100%;background-color: #000000;margin:0 auto;">
     <div class="buttons-box" id="buttonsBox">
       <div class="buttons-box-left">
         <i v-if="!playing" class="iconfont icon-play jessibuca-btn" @click="playBtnClick"></i>
@@ -12,8 +13,8 @@
         <span class="jessibuca-btn">{{ kBps }} kb/s</span>
         <!--          <i class="iconfont icon-file-record1 jessibuca-btn"></i>-->
         <!--          <i class="iconfont icon-xiangqing2 jessibuca-btn" ></i>-->
-        <i class="iconfont icon-camera1196054easyiconnet jessibuca-btn" @click="jessibuca.screenshot('截图','png',0.5)"
-           style="font-size: 1rem !important"></i>
+        <i class="iconfont icon-camera1196054easyiconnet jessibuca-btn" @click="screenShot"
+          style="font-size: 1rem !important"></i>
         <i class="iconfont icon-shuaxin11 jessibuca-btn" @click="playBtnClick"></i>
         <i v-if="!fullscreen" class="iconfont icon-weibiaoti10 jessibuca-btn" @click="fullscreenSwich"></i>
         <i v-if="fullscreen" class="iconfont icon-weibiaoti11 jessibuca-btn" @click="fullscreenSwich"></i>
@@ -270,6 +271,12 @@ export default {
       // console.log("player 事件回调")
       // console.log(type)
       // console.log(message)
+    },
+    screenShot() {
+      if(jessibucaPlayer[this._uid]){
+        const fileBlob = jessibucaPlayer[this._uid].screenshot("截图", 'blob')
+        this.$emit('screenshot', fileBlob)
+      }
     },
     fullscreenSwich: function () {
       let isFull = this.isFullscreen()

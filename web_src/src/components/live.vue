@@ -51,7 +51,7 @@
     <!-- 轮询选择 -->
     <SelectChannelTable ref="SelectChannelTable" :type="1" :title="'选择轮询播放通道'" @submit="startPolling">
     </SelectChannelTable>
-</el-container>
+  </el-container>
 </template>
 
 <script>
@@ -226,29 +226,53 @@ export default {
         this.sendDevicePush({ deviceId, channelId })
       }
     },
-    shot(e) {
-      // console.log(e)
-      // send({code:'image',data:e})
-      var base64ToBlob = function (code) {
-        let parts = code.split(';base64,');
-        let contentType = parts[0].split(':')[1];
-        let raw = window.atob(parts[1]);
-        let rawLength = raw.length;
-        let uInt8Array = new Uint8Array(rawLength);
-        for (let i = 0; i < rawLength; ++i) {
-          uInt8Array[i] = raw.charCodeAt(i);
-        }
-        return new Blob([uInt8Array], {
-          type: contentType
-        });
-      };
-      let aLink = document.createElement('a');
-      let blob = base64ToBlob(e); //new Blob([content]);
-      let evt = document.createEvent("HTMLEvents");
-      evt.initEvent("click", true, true); //initEvent 不加后两个参数在FF下会报错  事件类型，是否冒泡，是否阻止浏览器的默认行为
-      aLink.download = '截图';
-      aLink.href = URL.createObjectURL(blob);
-      aLink.click();
+    shot(file) {
+      this.$prompt('请输入图片名', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        // inputPattern: //,
+        inputErrorMessage: '名称格式不正确'
+      }).then(({ value }) => {
+        let param = new FormData()
+        param.append('file', file, value)
+        this.$axios({
+          method: 'post',
+          url: `/api/device/query/snap`,
+          headers: { 'Content-Type': 'multipart/form-data' },
+          data: param
+        }).then((res) => {
+          if (res.data.code == 0) {
+            this.$message.success(res.data.msg);
+          } else {
+            this.$message.error(res.data.msg);
+          }
+        }).catch(function (error) {
+          console.log(error)
+        })
+      }).catch(() => {
+
+      });
+
+      // var base64ToBlob = function (code) {
+      //   let parts = code.split(';base64,');
+      //   let contentType = parts[0].split(':')[1];
+      //   let raw = window.atob(parts[1]);
+      //   let rawLength = raw.length;
+      //   let uInt8Array = new Uint8Array(rawLength);
+      //   for (let i = 0; i < rawLength; ++i) {
+      //     uInt8Array[i] = raw.charCodeAt(i);
+      //   }
+      //   return new Blob([uInt8Array], {
+      //     type: contentType
+      //   });
+      // };
+      // let aLink = document.createElement('a');
+      // let blob = base64ToBlob(e); //new Blob([content]);
+      // let evt = document.createEvent("HTMLEvents");
+      // evt.initEvent("click", true, true); //initEvent 不加后两个参数在FF下会报错  事件类型，是否冒泡，是否阻止浏览器的默认行为
+      // aLink.download = '截图';
+      // aLink.href = URL.createObjectURL(blob);
+      // aLink.click();
     },
     save(item) {
       let dataStr = window.localStorage.getItem('playData') || '[]'
@@ -325,7 +349,6 @@ export default {
 <style>
 .deviceMenu .wrapper {
   margin: 3px 10px 15px 3px;
-  border-radius: 3px;
   background: #15171D;
   overflow: hidden;
 }

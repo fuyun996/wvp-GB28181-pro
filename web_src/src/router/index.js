@@ -11,6 +11,7 @@ import map from '../components/map.vue'
 import login from '../components/Login.vue'
 import parentPlatformList from '../components/ParentPlatformList.vue'
 import cloudRecord from '../components/CloudRecord.vue'
+import ScreenRecord from '../components/ScreenRecord.vue'
 import mediaServerManger from '../components/MediaServerManger.vue'
 import web from '../components/setting/Web.vue'
 import sip from '../components/setting/Sip.vue'
@@ -80,6 +81,11 @@ export default new VueRouter({
           path: '/cloudRecord',
           name: 'cloudRecord',
           component: cloudRecord,
+        },
+        {
+          path: '/screenRecord',
+          name: 'ScreenRecord',
+          component: ScreenRecord,
         },
         {
           path: '/mediaServerManger',

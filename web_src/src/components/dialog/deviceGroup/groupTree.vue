@@ -19,7 +19,6 @@
 
     <SelectChannelTable ref="SelectChannelTable" :type="2" :title="'选择通道(' + chooseName + ')'" @submit="addChannels">
     </SelectChannelTable>
-
 </div>
 </template>
 
@@ -269,6 +268,7 @@ export default {
   font-size: 12px;
   background-color: transparent;
   color: #fff;
+  display: block;
   text-align: left;
 }
 
