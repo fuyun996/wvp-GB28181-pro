@@ -637,7 +637,7 @@ public class DeviceQuery {
 
 	@GetMapping("/getUploadSnap")
 	@Operation(summary = "请求获取上传通道截图")
-	@Parameter(name = "id", description = "上传截图编号ID", required = true)
+	@Parameter(name = "id", description = "上传截图或录屏编号ID", required = true)
 	public void getUploadSnap(HttpServletResponse resp, @RequestParam Integer id) {
 		try {
 			DeviceScreenRecord deviceScreenRecord = deviceChannelMapper.getDeviceScreenRecordById(id);
@@ -665,6 +665,19 @@ public class DeviceQuery {
 		deviceScreenRecord.setFileUrl(realPath.getPath()+"/"+newFileName);
 		deviceChannelMapper.uploadSnap(deviceScreenRecord);
 	}
+
+	@DeleteMapping("/deleteSnapScreenRecord")
+	@Operation(summary = "删除录屏文件或截图")
+	@Parameter(name = "id", description = "上传截图或录屏编号ID", required = true)
+	public void deleteSnapScreenRecord(@RequestParam Integer id){
+		DeviceScreenRecord deviceScreenRecord = deviceChannelMapper.getDeviceScreenRecordById(id);
+		if(deviceScreenRecord != null){
+			File file = new File(deviceScreenRecord.getFileUrl());
+			file.delete();
+			deviceChannelMapper.deleteSnapScreenRecord(id);
+		}
+	}
+
 //	@GetMapping("/tree")
 //	public ResponseEntity<PageInfo> getTreeByName(@RequestParam String name){
 //		List<BaseTree<DeviceChannel>> treeData = deviceService.queryVideoDeviceTree(deviceId, parentId, onlyCatalog);

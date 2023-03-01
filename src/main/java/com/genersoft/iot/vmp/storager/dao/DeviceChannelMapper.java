@@ -411,7 +411,7 @@ public interface DeviceChannelMapper {
     @Delete("delete from channel_catalog where id = #{id} and userId = #{userId}")
     void deleteChannelCatalogById(int id, Integer userId);
     @Select(value = {" <script>" +"select * from device_screen_record where userId = #{userId} "+
-            "<if test='name !=null'>name like '%${name}%'</if>"+
+            "<if test='name !=null'> and name like '%${name}%'</if>"+
             " </script>"})
     List<DeviceScreenRecord> getDeviceScreenRecord(String name,Integer userId);
 
@@ -422,4 +422,6 @@ public interface DeviceChannelMapper {
 
     @Select("select * from device_screen_record where id = #{id}")
     DeviceScreenRecord getDeviceScreenRecordById(Integer id);
+    @Delete("delete from device_screen_record where id = #{id}")
+    void deleteSnapScreenRecord(Integer id);
 }

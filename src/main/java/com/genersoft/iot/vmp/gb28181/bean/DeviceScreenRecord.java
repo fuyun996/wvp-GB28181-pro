@@ -37,6 +37,8 @@ public class DeviceScreenRecord {
 	 */
 	@Schema(description = "用户ID")
 	private Integer userId;
+	@Schema(description = "操作时间")
+	private Date createTime;
 	
 	/**
 	 * 文件路径
@@ -90,5 +92,13 @@ public class DeviceScreenRecord {
 
 	public void setFileUrl(String fileUrl) {
 		this.fileUrl = fileUrl;
+	}
+
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
 	}
 }
