@@ -401,6 +401,11 @@ public class DeviceServiceImpl implements IDeviceService {
         }
     }
 
+    @Override
+    public List<ChannelCatalog> listChannelCatalogByName(String name, Integer userId) {
+        return deviceMapper.listChannelCatalogByName(name,userId);
+    }
+
 
     @Override
     public List<BaseTree<DeviceChannel>> queryVideoDeviceTree(String deviceId, String parentId, boolean onlyCatalog) {
@@ -457,7 +462,7 @@ public class DeviceServiceImpl implements IDeviceService {
             if (parentId.length() < 14 ) {
                 return null;
             }
-            List<DeviceChannel> deviceChannels = deviceChannelMapper.queryChannels(deviceId, parentId, null, null, null, null);
+            List<DeviceChannel> deviceChannels = deviceChannelMapper.queryChannels(deviceId, parentId, null, null, null, null,null);
             List<BaseTree<DeviceChannel>> trees = transportChannelsToTree(deviceChannels, parentId);
             return trees;
         }
@@ -519,7 +524,7 @@ public class DeviceServiceImpl implements IDeviceService {
             if (parentId.length() < 14 ) {
                 return null;
             }
-            List<DeviceChannel> deviceChannels = deviceChannelMapper.queryChannels(deviceId, parentId, null, null, null, null);
+            List<DeviceChannel> deviceChannels = deviceChannelMapper.queryChannels(deviceId, parentId, null, null, null, null,null);
             List<BaseTree<JSONObject>> trees = transportChannelsToTreeForOpenApi(deviceChannels, parentId);
             return trees;
         }
@@ -564,7 +569,7 @@ public class DeviceServiceImpl implements IDeviceService {
             if (parentId.length() < 14 ) {
                 return null;
             }
-            List<DeviceChannel> deviceChannels = deviceChannelMapper.queryChannels(deviceId, parentId, null, null, null, null);
+            List<DeviceChannel> deviceChannels = deviceChannelMapper.queryChannels(deviceId, parentId, null, null, null, null,null);
             return deviceChannels;
         }
 
@@ -694,7 +699,7 @@ public class DeviceServiceImpl implements IDeviceService {
                 }
             }else {
                 if (haveChannel) {
-                    List<DeviceChannel> deviceChannels = deviceChannelMapper.queryChannels(deviceId, null, null, null, null, null);
+                    List<DeviceChannel> deviceChannels = deviceChannelMapper.queryChannels(deviceId, null, null, null, null, null,null);
                     if (deviceChannels != null && deviceChannels.size() > 0) {
                         result.addAll(deviceChannels);
                     }

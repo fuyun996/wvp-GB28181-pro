@@ -232,7 +232,7 @@ public class VideoManagerStorageImpl implements IVideoManagerStorage {
 	}
 
 	@Override
-	public PageInfo queryChannelsByDeviceId(String deviceId, String query, Boolean hasSubChannel, Boolean online, Boolean catalogUnderDevice, int page, int count) {
+	public PageInfo queryChannelsByDeviceId(String deviceId, String query, Boolean hasSubChannel, Boolean online, Boolean catalogUnderDevice, int page, int count,int PTZType) {
 		// 获取到所有正在播放的流
 		PageHelper.startPage(page, count);
 		List<DeviceChannel> all;
@@ -246,19 +246,19 @@ public class VideoManagerStorageImpl implements IVideoManagerStorage {
 		}
 		if (catalogUnderDevice != null && catalogUnderDevice) {
 			if(roleId == 1){
-				all = deviceChannelMapper.queryChannels(deviceId, deviceId, query, hasSubChannel, online, null);
+				all = deviceChannelMapper.queryChannels(deviceId, deviceId, query, hasSubChannel, online, null,PTZType);
 			}else{
-				all = deviceChannelMapper.queryChannels(deviceId, deviceId, query, hasSubChannel, online, roleId);
+				all = deviceChannelMapper.queryChannels(deviceId, deviceId, query, hasSubChannel, online, roleId,PTZType);
 			}
 
 			// 海康设备的parentId是SIP id
-			List<DeviceChannel> deviceChannels = deviceChannelMapper.queryChannels(deviceId, sipConfig.getId(), query, hasSubChannel, online, roleId);
+			List<DeviceChannel> deviceChannels = deviceChannelMapper.queryChannels(deviceId, sipConfig.getId(), query, hasSubChannel, online, roleId,PTZType);
 			all.addAll(deviceChannels);
 		}else {
 			if(roleId == 1){
-				all = deviceChannelMapper.queryChannels(deviceId, null, query, hasSubChannel, online, null);
+				all = deviceChannelMapper.queryChannels(deviceId, null, query, hasSubChannel, online, null,PTZType);
 			}else{
-				all = deviceChannelMapper.queryChannels(deviceId, null, query, hasSubChannel, online, roleId);
+				all = deviceChannelMapper.queryChannels(deviceId, null, query, hasSubChannel, online, roleId,PTZType);
 			}
 		}
 		return new PageInfo<>(all);
@@ -272,13 +272,13 @@ public class VideoManagerStorageImpl implements IVideoManagerStorage {
 
 	@Override
 	public List<DeviceChannel> queryChannelsByDeviceId(String deviceId) {
-		return deviceChannelMapper.queryChannels(deviceId, null,null, null, null, null);
+		return deviceChannelMapper.queryChannels(deviceId, null,null, null, null, null,100);
 	}
 
 	@Override
 	public PageInfo<DeviceChannel> querySubChannels(String deviceId, String parentChannelId, String query, Boolean hasSubChannel, Boolean online, int page, int count) {
 		PageHelper.startPage(page, count);
-		List<DeviceChannel> all = deviceChannelMapper.queryChannels(deviceId, parentChannelId, query, hasSubChannel, online, null);
+		List<DeviceChannel> all = deviceChannelMapper.queryChannels(deviceId, parentChannelId, query, hasSubChannel, online, null,100);
 		return new PageInfo<>(all);
 	}
 

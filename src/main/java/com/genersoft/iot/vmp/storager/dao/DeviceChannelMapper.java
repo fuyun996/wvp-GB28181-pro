@@ -1,9 +1,6 @@
 package com.genersoft.iot.vmp.storager.dao;
 
-import com.genersoft.iot.vmp.gb28181.bean.ChannelCatalog;
-import com.genersoft.iot.vmp.gb28181.bean.Device;
-import com.genersoft.iot.vmp.gb28181.bean.DeviceChannel;
-import com.genersoft.iot.vmp.gb28181.bean.DeviceChannelInPlatform;
+import com.genersoft.iot.vmp.gb28181.bean.*;
 import com.genersoft.iot.vmp.vmanager.bean.ResourceBaceInfo;
 import com.genersoft.iot.vmp.vmanager.gb28181.platform.bean.ChannelReduce;
 import org.apache.ibatis.annotations.*;
@@ -74,6 +71,7 @@ public interface DeviceChannelMapper {
             "dc.deviceId = #{deviceId} " +
             " <if test='query != null'> AND (dc.channelId LIKE '%${query}%' OR dc.name LIKE '%${query}%' OR dc.name LIKE '%${query}%')</if> " +
             " <if test='parentChannelId != null'> AND (dc.parentId=#{parentChannelId} OR dc.civilCode = #{parentChannelId}) </if> " +
+            " <if test='PTZType != 100' >  AND dc.PTZType = #{PTZType} </if>" +
             " <if test='online == true' > AND dc.status=1</if>" +
             " <if test='online == false' > AND dc.status=0</if>" +
             " <if test='hasSubChannel == true' >  AND dc.subCount > 0 </if>" +
@@ -81,7 +79,7 @@ public interface DeviceChannelMapper {
             " <if test='roleId != null' >  AND dc.channelId in (select rdc.channelId from role_device_channel rdc where rdc.role_id=#{roleId}) </if>" +
             "ORDER BY dc.channelId " +
             " </script>"})
-    List<DeviceChannel> queryChannels(String deviceId, String parentChannelId, String query, Boolean hasSubChannel, Boolean online, Integer roleId);
+    List<DeviceChannel> queryChannels(String deviceId, String parentChannelId, String query, Boolean hasSubChannel, Boolean online, Integer roleId,Integer PTZType);
 
     @Select(value = {" <script>" +
             "SELECT * from device_channel where civilCode in ('50012037002168201000','50','5001','500120','50012037') " +
@@ -412,4 +410,16 @@ public interface DeviceChannelMapper {
     void deleteChannelCatalogByParentId(String catalogId, Integer userId);
     @Delete("delete from channel_catalog where id = #{id} and userId = #{userId}")
     void deleteChannelCatalogById(int id, Integer userId);
+    @Select(value = {" <script>" +"select * from device_screen_record where userId = #{userId} "+
+            "<if test='name !=null'>name like '%${name}%'</if>"+
+            " </script>"})
+    List<DeviceScreenRecord> getDeviceScreenRecord(String name,Integer userId);
+
+    @Insert(value = {" <script>" +"insert into device_screen_record (fileName,fileType,userName,userId,fileUrl)"+
+            " values ('${fileName}','${fileType}','${userName}','${userId}','${fileUrl}')"+
+            " </script>"})
+    void uploadSnap(DeviceScreenRecord deviceScreenRecord);
+
+    @Select("select * from device_screen_record where id = #{id}")
+    DeviceScreenRecord getDeviceScreenRecordById(Integer id);
 }

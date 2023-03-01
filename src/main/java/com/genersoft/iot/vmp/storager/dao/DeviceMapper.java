@@ -1,5 +1,6 @@
 package com.genersoft.iot.vmp.storager.dao;
 
+import com.genersoft.iot.vmp.gb28181.bean.ChannelCatalog;
 import com.genersoft.iot.vmp.gb28181.bean.Device;
 import com.genersoft.iot.vmp.vmanager.bean.ResourceBaceInfo;
 import org.apache.ibatis.annotations.*;
@@ -320,4 +321,8 @@ public interface DeviceMapper {
     @Select("select count(1) as total, sum(online) as online from device")
     ResourceBaceInfo getOverview();
 
+    @Select("select * from channel_catalog where userId = #{userId} and channelId is null"+
+            "union "+
+            "select * from channel_catalog where name like '%${name}%' and userId = #{userId} and channelId is not null")
+    List<ChannelCatalog> listChannelCatalogByName(String name, Integer userId);
 }
