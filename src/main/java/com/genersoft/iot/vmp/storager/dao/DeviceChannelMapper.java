@@ -82,13 +82,15 @@ public interface DeviceChannelMapper {
     List<DeviceChannel> queryChannels(String deviceId, String parentChannelId, String query, Boolean hasSubChannel, Boolean online, Integer roleId,Integer PTZType);
 
     @Select(value = {" <script>" +
-            "SELECT * from device_channel where civilCode in ('50012037002168201000','50','5001','500120','50012037') " +
+            "SELECT * from device_channel where civilCode in (,'50','5001','500120','50012037') " +
+            "union "+
+            "SELECT * from device_channel where  channelId in (select distinct parentId from device_channel where registerWay = '1' and name like '%${name}%') "+
             "union " +
             "select * from device_channel where name like '%${name}%' " +
             "union " +
             "select * from device_channel where name = '重庆市'" +
             " </script>"})
-    List<DeviceChannel> queryChannelsByName(String name);
+    List<DeviceChannel> queryChannelsAllByName(String name);
 
     @Select("SELECT * FROM device_channel WHERE deviceId=#{deviceId} AND channelId=#{channelId}")
     DeviceChannel queryChannel(String deviceId, String channelId);
@@ -406,10 +408,15 @@ public interface DeviceChannelMapper {
     @Select("select * from channel_catalog where id = #{id} and userId = #{userId}")
     ChannelCatalog queryChannelCatalog(int id, Integer userId);
 
+    @Select("select * from channel_catalog where userId = #{userId} and name = #{name}")
+    ChannelCatalog getChannelCatalogByNameAndUserId(String name, Integer userId);
+
     @Delete("delete from channel_catalog where parentId = #{catalogId} and userId = #{userId}")
     void deleteChannelCatalogByParentId(String catalogId, Integer userId);
+
     @Delete("delete from channel_catalog where id = #{id} and userId = #{userId}")
     void deleteChannelCatalogById(int id, Integer userId);
+
     @Select(value = {" <script>" +"select * from device_screen_record where userId = #{userId} "+
             "<if test='name !=null'> and name like '%${name}%'</if>"+
             " </script>"})
@@ -424,4 +431,6 @@ public interface DeviceChannelMapper {
     DeviceScreenRecord getDeviceScreenRecordById(Integer id);
     @Delete("delete from device_screen_record where id = #{id}")
     void deleteSnapScreenRecord(Integer id);
+
+
 }

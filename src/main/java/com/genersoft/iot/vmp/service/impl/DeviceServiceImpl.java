@@ -351,8 +351,8 @@ public class DeviceServiceImpl implements IDeviceService {
 
     @Override
     public List<BaseTree<DeviceChannel>> queryVideoDeviceTreeByName(String name) {
-        List<DeviceChannel> deviceChannels = deviceChannelMapper.queryChannelsByName(name);
-        List<BaseTree<DeviceChannel>> trees = transportChannelsToTreeByName(deviceChannels);
+        List<DeviceChannel> deviceChannelAll = deviceChannelMapper.queryChannelsAllByName(name);
+        List<BaseTree<DeviceChannel>> trees = transportChannelsToTreeByName(deviceChannelAll);
         return trees;
     }
 
