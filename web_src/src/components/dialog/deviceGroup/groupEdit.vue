@@ -20,7 +20,6 @@
           <el-form-item label="节点名称" prop="name">
             <el-input v-model="form.name" clearable></el-input>
           </el-form-item>
-
           <el-form-item>
             <div style="float: right;">
               <el-button type="primary" @click="onSubmit">确认</el-button>
@@ -51,14 +50,14 @@
           </el-form-item>
           <el-form-item>
             <div style="float: right;">
-              <el-button type="primary" @click="onDeviceSubmit">确认</el-button>
+              <el-button type="primary" disabled="isBtnLoading" @click="onDeviceSubmit">确认</el-button>
               <el-button @click="close">取消</el-button>
             </div>
           </el-form-item>
         </el-form>
       </div>
     </el-dialog>
-</div>
+  </div>
 </template>
 
 <script>
@@ -113,7 +112,8 @@ export default {
         catalogId: [{ required: true, trigger: "blur", validator: checkId }]
       },
 
-      deviceList: []
+      deviceList: [],
+      isBtnLoading: false
     };
   },
   methods: {
@@ -144,19 +144,25 @@ export default {
       }
     },
     onSubmit: function () {
-      console.log("onSubmit", this.form);
-      this.$axios({
-        method: "post",
-        url: `/api/device/query/channelCatalog/${this.otype == 2 ? 'updateChannelCatalogName' : 'addChannelCatalog'}/`,
-        params: this.form
-      }).then((res) => {
-        if (res.data.code === 0) {
-          if (this.submitCallback) this.submitCallback(this.form)
-        } else {
-          this.$message({ showClose: true, message: res.data.msg, type: "error", });
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          this.isBtnLoading = true
+          this.$axios({
+            method: "post",
+            url: `/api/device/query/channelCatalog/${this.otype == 2 ? 'updateChannelCatalogName' : 'addChannelCatalog'}/`,
+            params: this.form
+          }).then((res) => {
+            if (res.data.code === 0) {
+              if (this.submitCallback) this.submitCallback(this.form)
+            } else {
+              this.$message({ showClose: true, message: res.data.msg, type: "error", });
+            }
+            this.isBtnLoading = false
+            this.close();
+          }).catch((error) => { console.log(error); this.isBtnLoading = false });
         }
-        this.close();
-      }).catch((error) => { console.log(error); });
+      })
+
     },
     changeDevice(e) {
       this.dform.deviceId = e
@@ -175,19 +181,20 @@ export default {
       });
     },
     onDeviceSubmit: function () {
-      console.log("onDeviceSubmit", this.form);
-      this.$axios({
-        method: "post",
-        url: `/api/device/query/channelCatalog/importChannelCatalog/`,
-        params: this.dform
-      }).then((res) => {
-        if (res.data.code === 0) {
-          if (this.submitCallback) this.submitCallback(this.dform)
-        } else {
-          this.$message({ showClose: true, message: res.data.msg, type: "error", });
-        }
-        this.close();
-      }).catch((error) => { console.log(error); });
+      this.$refs.dform.validate((valid) => {
+        this.$axios({
+          method: "post",
+          url: `/api/device/query/channelCatalog/importChannelCatalog/`,
+          params: this.dform
+        }).then((res) => {
+          if (res.data.code === 0) {
+            if (this.submitCallback) this.submitCallback(this.dform)
+          } else {
+            this.$message({ showClose: true, message: res.data.msg, type: "error", });
+          }
+          this.close();
+        }).catch((error) => { console.log(error); });
+      })
     },
     close: function () {
       this.otype = -1;

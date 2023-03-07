@@ -1,6 +1,6 @@
 <template>
   <div id="groupTree" class="groupTree">
-    <el-tree class="el-scrollbar" ref="tree" id="catalogTree" empty-text="未知节点" node-key="id" default-expand-all
+    <el-tree class="el-scrollbar" ref="tree" id="catalogTree" empty-text="未知节点" node-key="id"
       :highlight-current="false" :expand-on-click-node="false" :props="props" :load="loadNode"
       @node-contextmenu="contextmenuEventHandler" @node-click="nodeClickHandler" lazy>
       <span class="custom-tree-node" slot-scope="{ node, data }" style="width: 100%">
@@ -262,6 +262,7 @@ export default {
   color: #fff;
   
   height: calc(100vh - 150px);
+  overflow-y: scroll;
 }
 
 .groupTree .el-tree {

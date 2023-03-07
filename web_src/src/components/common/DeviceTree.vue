@@ -9,7 +9,7 @@
     <div class="device-tree-main-box" v-loading="mloading" element-loading-background="rgba(0, 0, 0, 0.8)">
       <div v-show="keyword && dlist.length > 0">
         <el-tree ref="searchGdTree" :data="dlist" :props="defaultProps" @node-click="handleSearchNodeClick"
-          @node-contextmenu="handleSearchContextMenu" node-key="id"
+          @node-contextmenu="handleSearchContextMenu" node-key="id" default-expand-all
           style="min-width: 100%; display:inline-block !important;">
           <span class="custom-tree-node" slot-scope="{ node, data }" style="width: 100%">
             <span v-if="node.data.online" class="device-online">{{ node.label }}</span>

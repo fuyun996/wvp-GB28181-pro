@@ -214,6 +214,10 @@ export default {
         this.curIdx = 0
       }
       console.log('播放索引', this.curIdx)
+      this.playerIdx = this.curIdx + 1
+      if(this.playerIdx >= this.spilt){
+        this.playerIdx = 1
+      }
       this.$set(this.videoUrl, this.curIdx, url)
       this.curIdx++
       setTimeout(() => {
