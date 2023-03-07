@@ -408,10 +408,15 @@ public interface DeviceChannelMapper {
     @Select("select * from channel_catalog where id = #{id} and userId = #{userId}")
     ChannelCatalog queryChannelCatalog(int id, Integer userId);
 
+    @Select("select * from channel_catalog where userId = #{userId} and name = #{name}")
+    ChannelCatalog getChannelCatalogByNameAndUserId(String name, Integer userId);
+
     @Delete("delete from channel_catalog where parentId = #{catalogId} and userId = #{userId}")
     void deleteChannelCatalogByParentId(String catalogId, Integer userId);
+
     @Delete("delete from channel_catalog where id = #{id} and userId = #{userId}")
     void deleteChannelCatalogById(int id, Integer userId);
+
     @Select(value = {" <script>" +"select * from device_screen_record where userId = #{userId} "+
             "<if test='name !=null'> and name like '%${name}%'</if>"+
             " </script>"})
@@ -426,4 +431,6 @@ public interface DeviceChannelMapper {
     DeviceScreenRecord getDeviceScreenRecordById(Integer id);
     @Delete("delete from device_screen_record where id = #{id}")
     void deleteSnapScreenRecord(Integer id);
+
+
 }

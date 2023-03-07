@@ -342,6 +342,10 @@ public class DeviceQuery {
 			throw new ControllerException(ErrorCode.ERROR400);
 		}
 		Integer userId = SecurityUtils.getUserInfo().getId();
+		ChannelCatalog channelCatalog = deviceChannelMapper.getChannelCatalogByNameAndUserId(name,userId);
+		if(channelCatalog != null){
+			throw new ControllerException(500,"节点名称已存在");
+		}
 		deviceService.addChannelCatalog(catalogId,name,userId,parentId);
 	}
 
@@ -432,6 +436,11 @@ public class DeviceQuery {
 	@Parameter(name = "name", description = "节点名称")
 	@PostMapping("/channelCatalog/updateChannelCatalogName/")
 	public void updateChannelCatalogName(@RequestParam int id,@RequestParam String name){
+		Integer userId = SecurityUtils.getUserInfo().getId();
+		ChannelCatalog channelCatalog = deviceChannelMapper.getChannelCatalogByNameAndUserId(name,userId);
+		if(channelCatalog != null){
+			throw new ControllerException(500,"节点名称已存在");
+		}
 		deviceService.updateChannelCatalogName(id,name);
 	}
 
