@@ -34,9 +34,9 @@
               @click="showImages(scope.row)">查看</el-button>
             <el-button v-if="scope.row.fileType == 2" size="mini" icon="el-icon-video-play" type="primary"
               @click="palyVideo(scope.row)">播放</el-button>
-            <el-button size="mini" icon="el-icon-download" type="primary"
-              @click="downLoad(scope.row.fileType)">下载</el-button>
-            <el-button size="mini" icon="el-icon-delete" type="danger" @click="deleteRecord(scope.row)">删除</el-button>
+            <el-button size="mini" icon="el-icon-download" type="primary" :loading="scope.row.loading"
+              @click="downLoad(scope.$index, scope.row)">下载</el-button>
+            <el-button size="mini" icon="el-icon-delete" type="danger" @click="deleteRecord(scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -49,8 +49,13 @@
     <!--  -->
     <el-dialog :title="viewObj.name" :visible.sync="dialogVisible" width="50%">
       <div v-loading="dialogLoading">
-        <el-image v-if="viewObj.type == 1" :src="viewObj.url" :preview-src-list="[viewObj.url]">
-        </el-image>
+        <div v-if="viewObj.type == 1">
+          <el-image :src="getSnap()" :preview-src-list="getBigSnap()" fit="contain">
+            <div slot="error" class="image-slot">
+              <i class="el-icon-picture-outline"></i>
+            </div>
+          </el-image>
+        </div>
         <player v-else-if="viewObj.type == 2" ref="player" :videoUrl="viewObj.url" fluent autoplay />
 
       </div>
@@ -125,18 +130,20 @@ export default {
         this.loading = false;
       })
     },
+    getSnap: function () {
+      let url = (process.env.NODE_ENV === 'development' ? "debug" : "") + '/api/device/query/getUploadSnap?id=' + this.viewObj.id
+      this.dialogLoading = false
+      return url
+    },
+    getBigSnap: function () {
+      return [this.getSnap()]
+    },
     showImages(row) {
       this.dialogVisible = true
       this.dialogLoading = true
       this.viewObj.type = 1
-      this.mediaServerObj.getUploadSnap({ id: row.id }, res => {
-        this.viewObj.name = row.fileName
-        let blob = new Blob([res]);
-        this.viewObj.url = URL.createObjectURL(blob);
-        this.dialogLoading = false
-      }, error => {
-        this.dialogLoading = false
-      })
+      this.viewObj.id = row.id
+      this.viewObj.name = row.fileName
     },
     palyVideo(row) {
       this.dialogVisible = true
@@ -144,9 +151,11 @@ export default {
       this.viewObj.type = 2
       this.viewObj.name = row.fileName
     },
-    downLoad(type) {
-      if (type == 1) {
-        this.mediaServerObj.getUploadSnap({ id: id }, res => {
+    downLoad(inx, row) {
+      this.$set(this.recordList[inx], 'loading', true)
+      if (row.fileType == 1) {
+        this.mediaServerObj.getUploadSnap({ id: row.id }, res => {
+          this.$set(this.recordList[inx], 'loading', false)
           let aLink = document.createElement('a');
           let blob = new Blob([res]);
           let evt = document.createEvent("HTMLEvents");
@@ -158,17 +167,29 @@ export default {
       }
     },
     deleteRecord(id) {
-      this.$axios({
-        method: 'delete',
-        url: `/api/device/query/deleteSnapScreenRecord `,
-        params: { id: id }
-      }).then(function (res) {
-        if (res.data.code === 0) {
-
-        }
-      }).catch(function (error) {
-        console.log(error);
+      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$axios({
+          method: 'delete',
+          url: `/api/device/query/deleteSnapScreenRecord`,
+          params: { id: id }
+        }).then(function (res) {
+          if (res.data.code === 0) {
+            this.getRecordList()
+          }
+        }).catch(function (error) {
+          console.log(error);
+        });
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
       });
+
     }
   }
 };

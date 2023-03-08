@@ -74,8 +74,6 @@ export default {
       spilt: 1,//分屏
       operation: -1, //操作
       playerIdx: 0,//激活播放器
-      curIdx: 0,// 
-
       updateLooper: 0, //数据刷新轮训标志
       count: 10,
       total: 0,
@@ -209,17 +207,23 @@ export default {
     },
     setPlayUrl(url, idx) {
       this.spilt == 1 && this.stopPolling() // 停止轮播
+      this.$set(this.videoUrl, this.playerIdx, url)
+      this.playerIdx++
+
       let max = this.isPolling ? this.spilt - 1 : this.spilt
-      if (this.curIdx >= max) {
-        this.curIdx = 0
+      let flag = false
+      for (let i = 0; i < max; i++) {
+        if (!this.videoUrl[i]) {
+          flag = true
+          this.playerIdx = i
+          break
+        }
       }
-      console.log('播放索引', this.curIdx)
-      this.playerIdx = this.curIdx + 1
-      if(this.playerIdx >= this.spilt){
-        this.playerIdx = 1
+      if (!flag && this.playerIdx >= max) {
+        this.playerIdx = 0
       }
-      this.$set(this.videoUrl, this.curIdx, url)
-      this.curIdx++
+      console.log('下一个播放索引', this.playerIdx)
+
       setTimeout(() => {
         window.localStorage.setItem('videoUrl', JSON.stringify(this.videoUrl))
       }, 100)
@@ -335,7 +339,6 @@ export default {
     // 全屏
     fullScreen() {
       let element = this.$refs.vbox;
-
       if (element.requestFullscreen) {
         element.requestFullscreen();
       } else if (element.webkitRequestFullScreen) {
@@ -345,7 +348,6 @@ export default {
       } else if (element.msRequestFullscreen) {
         element.msRequestFullscreen();
       }
-      this.fullscreen = !this.fullscreen
     }
   }
 };
