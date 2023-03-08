@@ -34,9 +34,9 @@
               @click="showImages(scope.row)">查看</el-button>
             <el-button v-if="scope.row.fileType == 2" size="mini" icon="el-icon-video-play" type="primary"
               @click="palyVideo(scope.row)">播放</el-button>
-            <el-button size="mini" icon="el-icon-download" type="primary"
-              @click="downLoad(scope.row.fileType)">下载</el-button>
-            <el-button size="mini" icon="el-icon-delete" type="danger" @click="deleteRecord(scope.row)">删除</el-button>
+            <el-button size="mini" icon="el-icon-download" type="primary" :loading="scope.row.loading"
+              @click="downLoad(scope.$index, scope.row)">下载</el-button>
+            <el-button size="mini" icon="el-icon-delete" type="danger" @click="deleteRecord(scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -144,9 +144,11 @@ export default {
       this.viewObj.type = 2
       this.viewObj.name = row.fileName
     },
-    downLoad(type) {
-      if (type == 1) {
-        this.mediaServerObj.getUploadSnap({ id: id }, res => {
+    downLoad(inx, row) {
+      this.$set(this.recordList[inx], 'loading', true)
+      if (row.fileType == 1) {
+        this.mediaServerObj.getUploadSnap({ id: row.id }, res => {
+          this.$set(this.recordList[inx], 'loading', false)
           let aLink = document.createElement('a');
           let blob = new Blob([res]);
           let evt = document.createEvent("HTMLEvents");
@@ -158,17 +160,29 @@ export default {
       }
     },
     deleteRecord(id) {
-      this.$axios({
-        method: 'delete',
-        url: `/api/device/query/deleteSnapScreenRecord `,
-        params: { id: id }
-      }).then(function (res) {
-        if (res.data.code === 0) {
-
-        }
-      }).catch(function (error) {
-        console.log(error);
+      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$axios({
+          method: 'delete',
+          url: `/api/device/query/deleteSnapScreenRecord`,
+          params: { id: id }
+        }).then(function (res) {
+          if (res.data.code === 0) {
+            this.getRecordList()
+          }
+        }).catch(function (error) {
+          console.log(error);
+        });
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
       });
+
     }
   }
 };

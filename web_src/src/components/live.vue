@@ -215,7 +215,7 @@ export default {
       }
       console.log('播放索引', this.curIdx)
       this.playerIdx = this.curIdx + 1
-      if(this.playerIdx >= this.spilt){
+      if (this.playerIdx >= this.spilt) {
         this.playerIdx = 1
       }
       this.$set(this.videoUrl, this.curIdx, url)
@@ -335,7 +335,6 @@ export default {
     // 全屏
     fullScreen() {
       let element = this.$refs.vbox;
-
       if (element.requestFullscreen) {
         element.requestFullscreen();
       } else if (element.webkitRequestFullScreen) {
@@ -345,7 +344,6 @@ export default {
       } else if (element.msRequestFullscreen) {
         element.msRequestFullscreen();
       }
-      this.fullscreen = !this.fullscreen
     }
   }
 };
