@@ -49,8 +49,13 @@
     <!--  -->
     <el-dialog :title="viewObj.name" :visible.sync="dialogVisible" width="50%">
       <div v-loading="dialogLoading">
-        <el-image v-if="viewObj.type == 1" :src="viewObj.url" :preview-src-list="[viewObj.url]">
-        </el-image>
+        <div v-if="viewObj.type == 1">
+          <el-image :src="getSnap()" :preview-src-list="getBigSnap()" fit="contain">
+            <div slot="error" class="image-slot">
+              <i class="el-icon-picture-outline"></i>
+            </div>
+          </el-image>
+        </div>
         <player v-else-if="viewObj.type == 2" ref="player" :videoUrl="viewObj.url" fluent autoplay />
 
       </div>
@@ -125,21 +130,20 @@ export default {
         this.loading = false;
       })
     },
+    getSnap: function () {
+      let url = (process.env.NODE_ENV === 'development' ? "debug" : "") + '/api/device/query/getUploadSnap?id=' + this.viewObj.id
+      this.dialogLoading = false
+      return url
+    },
+    getBigSnap: function () {
+      return [this.getSnap()]
+    },
     showImages(row) {
       this.dialogVisible = true
       this.dialogLoading = true
       this.viewObj.type = 1
-      this.mediaServerObj.getUploadSnap({ id: row.id }, res => {
-        this.viewObj.name = row.fileName
-
-        let blob = new Blob([res]);
-        this.viewObj.url = URL.createObjectURL(blob);
-        console.log(this.viewObj.url)
-
-        this.dialogLoading = false
-      }, error => {
-        this.dialogLoading = false
-      })
+      this.viewObj.id = row.id
+      this.viewObj.name = row.fileName
     },
     palyVideo(row) {
       this.dialogVisible = true
