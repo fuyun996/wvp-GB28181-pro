@@ -418,7 +418,7 @@ public interface DeviceChannelMapper {
     void deleteChannelCatalogById(int id, Integer userId);
 
     @Select(value = {" <script>" +"select * from device_screen_record where userId = #{userId} "+
-            "<if test='name !=null'> and name like '%${name}%'</if>"+
+            "<if test='name !=null'> and fileName like '%${name}%'</if>"+
             " </script>"})
     List<DeviceScreenRecord> getDeviceScreenRecord(String name,Integer userId);
 
