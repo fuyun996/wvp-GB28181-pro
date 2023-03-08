@@ -82,7 +82,7 @@ public interface DeviceChannelMapper {
     List<DeviceChannel> queryChannels(String deviceId, String parentChannelId, String query, Boolean hasSubChannel, Boolean online, Integer roleId,Integer PTZType);
 
     @Select(value = {" <script>" +
-            "SELECT * from device_channel where civilCode in (,'50','5001','500120','50012037') " +
+            "SELECT * from device_channel where civilCode in ('50','5001','500120','50012037') " +
             "union "+
             "SELECT * from device_channel where  channelId in (select distinct parentId from device_channel where registerWay = '1' and name like '%${name}%') "+
             "union " +
