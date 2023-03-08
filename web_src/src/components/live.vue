@@ -112,10 +112,10 @@ export default {
       let style = { width: '100%', height: '100%' }
       switch (this.spilt) {
         case 4:
-          style = { width: '49%', height: '49%' }
+          style = { width: '50%', height: '50%' }
           break
         case 9:
-          style = { width: '32%', height: '32%' }
+          style = { width: '33.3%', height: '33.3%' }
           break
       }
       this.$nextTick(() => {
@@ -409,7 +409,6 @@ export default {
 }
 
 .play-box {
-  margin: 0 0.5% 1%;
   box-sizing: border-box;
   background-color: #000000;
   border: 2px solid #505050;

@@ -93,7 +93,7 @@ export default {
       jessibucaPlayer[this._uid] = new window.Jessibuca(Object.assign(
         {
           container: this.$refs.container,
-          videoBuffer: 3, // 最大缓冲时长，单位秒
+          videoBuffer: 2, // 最大缓冲时长，单位秒
           isResize: true,
           decoder: "static/js/jessibuca/decoder.js",
           useMSE: true,

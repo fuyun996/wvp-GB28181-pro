@@ -110,7 +110,14 @@ export default {
       this.getRecordList();
     },
     getRecordList: function () {
-      this.mediaServerObj.getDeviceScreenRecord(this.query, res => {
+      let p = {
+        page: this.query.page,
+        count: this.query.count
+      }
+      if (this.query.name) {
+        p.name = this.query.name
+      }
+      this.mediaServerObj.getDeviceScreenRecord(p, res => {
         if (res.code === 0) {
           this.query.total = res.data.total;
           this.recordList = res.data.list;
