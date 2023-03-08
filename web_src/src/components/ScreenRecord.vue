@@ -131,8 +131,11 @@ export default {
       this.viewObj.type = 1
       this.mediaServerObj.getUploadSnap({ id: row.id }, res => {
         this.viewObj.name = row.fileName
+
         let blob = new Blob([res]);
         this.viewObj.url = URL.createObjectURL(blob);
+        console.log(this.viewObj.url)
+
         this.dialogLoading = false
       }, error => {
         this.dialogLoading = false

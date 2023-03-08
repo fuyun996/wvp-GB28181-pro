@@ -83,8 +83,8 @@ export default {
         width = (16 / 9) * height
       }
 
-      dom.style.width = width + 'px';
-      dom.style.height = height + "px";
+      // dom.style.width = width + 'px';
+      // dom.style.height = height + "px";
     },
     create() {
       let options = {};
@@ -93,7 +93,7 @@ export default {
       jessibucaPlayer[this._uid] = new window.Jessibuca(Object.assign(
         {
           container: this.$refs.container,
-          videoBuffer: 2, // 最大缓冲时长，单位秒
+          videoBuffer: 3, // 最大缓冲时长，单位秒
           isResize: true,
           decoder: "static/js/jessibuca/decoder.js",
           useMSE: true,
@@ -186,7 +186,6 @@ export default {
           show = "流畅";
         }
         _this.performance = show;
-        console.log(show)
       });
       jessibuca.on('buffer', function (buffer) {
         // console.log('buffer', buffer);
