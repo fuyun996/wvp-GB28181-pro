@@ -93,17 +93,17 @@ export default {
       jessibucaPlayer[this._uid] = new window.Jessibuca(Object.assign(
         {
           container: this.$refs.container,
-          videoBuffer: 0.2, // 最大缓冲时长，单位秒
+          videoBuffer: 3, // 最大缓冲时长，单位秒
           isResize: true,
           decoder: "static/js/jessibuca/decoder.js",
-          useMSE: false,
+          useMSE: true,
           showBandwidth: false,
           isFlv: true,
           // text: "WVP-PRO",
           // background: "static/images/zlm-logo.png",
           loadingText: "加载中",
           hasAudio: typeof (this.hasAudio) == "undefined" ? true : this.hasAudio,
-          debug: false,
+          debug: true,
           supportDblclickFullscreen: false, // 是否支持屏幕的双击事件，触发全屏，取消全屏事件。
           operateBtns: {
             fullscreen: false,
@@ -115,7 +115,7 @@ export default {
           record: "record",
           vod: this.vod,
           forceNoOffscreen: this.forceNoOffscreen,
-          isNotMute: this.isNotMute,
+          isNotMute: this.isNotMute
         },
         options
       ));
@@ -166,10 +166,6 @@ export default {
         _ts = ts;
       });
 
-      jessibuca.on("videoInfo", function (info) {
-        console.log("videoInfo", info);
-      });
-
       jessibuca.on("error", function (error) {
         console.log("error", error);
       });
@@ -190,6 +186,7 @@ export default {
           show = "流畅";
         }
         _this.performance = show;
+        console.log(show)
       });
       jessibuca.on('buffer', function (buffer) {
         // console.log('buffer', buffer);
